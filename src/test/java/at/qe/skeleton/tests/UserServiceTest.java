@@ -21,13 +21,6 @@ import at.qe.skeleton.services.ClientService;
 import at.qe.skeleton.services.TrainerService;
 import at.qe.skeleton.services.UserService;
 
-/**
- * Some very basic tests for {@link UserService}.
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
- */
 @SpringBootTest
 @WebAppConfiguration
 public class UserServiceTest {

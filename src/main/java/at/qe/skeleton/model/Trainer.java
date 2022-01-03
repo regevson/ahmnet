@@ -15,17 +15,6 @@ public class Trainer extends AbstractUser implements Persistable<String>, Serial
 
     private static final long serialVersionUID = 1L;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private Set<TrainingGroup> groups;
-
-
-
-
-
-
-
-
-
 
 
 

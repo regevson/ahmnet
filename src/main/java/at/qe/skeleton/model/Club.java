@@ -15,10 +15,12 @@ public class Club {
     @Column(length = 100)
     private String name;
 
+/*
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Trainer> trainer;
 
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Client> clients;
+    */
 
 }

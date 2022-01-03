@@ -15,13 +15,6 @@ public class Client extends AbstractUser implements Persistable<String>, Seriali
 
     private static final long serialVersionUID = 1L;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<TrainingGroup> groups;
-
-
-
-
-
 
 
 
