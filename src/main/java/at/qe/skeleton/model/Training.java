@@ -1,6 +1,9 @@
 package at.qe.skeleton.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +22,7 @@ public class Training {
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime startTime;
 
+    private int weekNum;
     private int durationMinutes;
     private String court;
     private String bulletPoints;
@@ -43,6 +47,7 @@ public class Training {
 
     public void setStartTime(LocalDateTime startTime) {
 	this.startTime = startTime;
+	this.setWeekNum(startTime);
     }
 
     public int getDurationMinutes() {
@@ -79,6 +84,20 @@ public class Training {
 
     public long getId() {
 	return id;
+    }
+
+    public int getWeekNum() {
+	return weekNum;
+    }
+
+    public void setWeekNum(int weekNum) {
+	this.weekNum = weekNum;
+    }
+
+    private void setWeekNum(LocalDateTime startTime) {
+	LocalDate date = startTime.toLocalDate();
+	WeekFields weekFields = WeekFields.of(Locale.getDefault()); 
+	setWeekNum(date.get(weekFields.weekOfWeekBasedYear()));
     }
 
 

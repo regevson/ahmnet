@@ -29,9 +29,28 @@ public class TrainingService {
 	return this.trainingRepository.findByPlayerId(player.getId());
     }
 
+    public List<Training> loadTrainingsByPlayerAndWeek(User player, int weekNum) {
+	return this.trainingRepository.findByPlayerIdAndWeek(player.getId(), weekNum);
+    }
+
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public List<Training> loadTrainingsByTrainer(User trainer) {
 	return this.trainingRepository.findByTrainerId(trainer.getId());
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
+    public List<Training> loadTrainingsByTrainerAndWeek(User trainer, int weekNum) {
+	return this.trainingRepository.findByTrainerIdAndWeek(trainer.getId(), weekNum);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
+    public Training saveTraining(Training training) {
+        return trainingRepository.save(training);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
+    public void deleteTraining(Training training) {
+        trainingRepository.delete(training);
     }
 
 }

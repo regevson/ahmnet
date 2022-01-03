@@ -66,5 +66,32 @@ public class TrainingServiceTest {
         Assertions.assertTrue(trainings.get(1).getStartTime().isBefore(trainings.get(2).getStartTime()), "Trainings are wrongly sorted!");
     }
 
+    @DirtiesContext
+    @Test
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    public void testGetTrainingsByPlayerAndWeek() {
+	int weekNum = 1;
+        User user = userService.loadUser("user1");
+        Assertions.assertNotNull(user, "User \"" + user + "\" could not be loaded from test data source");
+        List<Training> trainings = this.trainingService.loadTrainingsByPlayerAndWeek(user, weekNum);
+        Assertions.assertEquals(2, trainings.size(), "Wrong training-size!");
+        Assertions.assertTrue(trainings.get(0).getStartTime().isBefore(trainings.get(1).getStartTime()), "Trainings are wrongly sorted!");
+        Assertions.assertEquals(1, trainings.get(0).getWeekNum(), "Wrong weekNum!");
+        Assertions.assertEquals(1, trainings.get(1).getWeekNum(), "Wrong weekNum!");
+    }
+
+    @DirtiesContext
+    @Test
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    public void testGetTrainingsByTrainerAndWeek() {
+	int weekNum = 1;
+        User user = userService.loadUser("johndoe");
+        Assertions.assertNotNull(user, "User \"" + user + "\" could not be loaded from test data source");
+        List<Training> trainings = this.trainingService.loadTrainingsByTrainerAndWeek(user, weekNum);
+        Assertions.assertEquals(3, trainings.size(), "Wrong training-size!");
+        Assertions.assertTrue(trainings.get(0).getStartTime().isBefore(trainings.get(1).getStartTime()), "Trainings are wrongly sorted!");
+        Assertions.assertTrue(trainings.get(1).getStartTime().isBefore(trainings.get(2).getStartTime()), "Trainings are wrongly sorted!");
+        Assertions.assertEquals(1, trainings.get(0).getWeekNum(), "Wrong weekNum!");
+    }
 
 }

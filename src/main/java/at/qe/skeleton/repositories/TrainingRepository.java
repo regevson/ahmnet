@@ -23,4 +23,16 @@ public interface TrainingRepository extends AbstractRepository<Training, Long> {
     	+ "order by t.startTime asc")
     List<Training> findByTrainerId(@Param("username") String trainerUsername);
 
+    @Query("select t "
+    	+ "from Training t join t.trainingGroup g join g.players p "
+    	+ "where p.username = :username and t.weekNum = :weekNum "
+    	+ "order by t.startTime asc")
+    List<Training> findByPlayerIdAndWeek(@Param("username") String playerUsername, @Param("weekNum") int weekNum);
+
+    @Query("select t "
+    	+ "from Training t join t.trainingGroup g "
+    	+ "where g.trainer.username = :username and t.weekNum = :weekNum "
+    	+ "order by t.startTime asc")
+    List<Training> findByTrainerIdAndWeek(@Param("username") String trainerUsername, @Param("weekNum") int weekNum);
+
 }
