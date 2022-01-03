@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
+
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -15,35 +16,27 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
 import org.springframework.data.domain.Persistable;
 
-/**
- * Entity representing users.
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
- */
 @Entity
 public class User implements Persistable<String>, Serializable, Comparable<User> {
 
     private static final long serialVersionUID = 1L;
 
-    @Id // is primary_key
-    @Column(length = 100) // must have specific length (upper boundary)
+    @Id
+    @Column(length = 100)
     private String username;
 
-		// n:1 ->	I have been created by exactly 1 user, this user can create n users
-    @ManyToOne(optional = false) // wenn createUser==null -> user KANN NICHT in db gestored werden
-    private User createUser; // the user that created me
+    @ManyToOne(optional = false)
+    private User createUser;
 
-    @Column(nullable = false) // this field cannot be null (if it wants to be stored in db)
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
 
-		// n:1 ->	my last update is made by exactly 1 user, this user can update n users
-    @ManyToOne(optional = true) // wenn createUser==null -> user KANN trotzdem in db gestored werden
-    private User updateUser; // the user that updated me -> must not be one
+    @ManyToOne(optional = true)
+    private User updateUser;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateDate;
@@ -56,6 +49,9 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
     private String phone;
 
     boolean enabled;
+
+    @ManyToOne
+    private Club club;
 
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "User_UserRole")
@@ -116,6 +112,14 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Club getClub() {
+        return club;
+    }
+
+    public void setClub(Club club) {
+        this.club = club;
     }
 
     public Set<UserRole> getRoles() {
@@ -199,9 +203,10 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
         return (null == createDate);
     }
 
-	@Override
-	public int compareTo(User o) {
-		return this.username.compareTo(o.getUsername());
-	}
+    @Override
+    public int compareTo(User o) {
+            return this.username.compareTo(o.getUsername());
+    }
 
 }
+

@@ -16,10 +16,10 @@ public class TrainingGroup {
     private long id;
 
     @ManyToOne
-    private Trainer trainer;
+    private User trainer;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Client> clients;
+    private Set<User> players;
 
     @ManyToOne
     private Club club;
@@ -44,20 +44,20 @@ public class TrainingGroup {
 	return this.id;
     }
 
-    public Trainer getTrainer() {
+    public User getTrainer() {
 	return this.trainer;
     }
 
-    public void setTrainer(Trainer trainer) {
+    public void setTrainer(User trainer) {
 	this.trainer = trainer;
     }
 
-    public Set<Client> getClients() {
-	return this.clients;
+    public Set<User> getPlayers() {
+	return this.players;
     }
 
-    public void setClients(Set<Client> clients) {
-	this.clients = clients;
+    public void setPlayers(Set<User> players) {
+	this.players = players;
     }
 
     public Club getClub() {

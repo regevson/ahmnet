@@ -50,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority("ADMIN")
                 //Permit access only for some roles
                 .antMatchers("/secured/**")
-                .hasAnyAuthority("ADMIN", "MANAGER", "EMPLOYEE")
+                .hasAnyAuthority("ADMIN", "TRAINER", "PLAYER")
                 // Allow only certain roles to use websockets (only logged in users)
                 .and().formLogin()
                 .loginPage("/login.xhtml")
@@ -68,8 +68,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         //Configure roles and passwords via datasource
         auth.jdbcAuthentication().dataSource(dataSource)
-                .usersByUsernameQuery("select username, password, enabled from trainer where username=?")
-                .authoritiesByUsernameQuery("select trainer_username, roles from trainer_roles where trainer_username=?");
+                .usersByUsernameQuery("select username, password, enabled from user where username=?")
+                .authoritiesByUsernameQuery("select user_username, roles from user_user_role where user_username=?");
     }
 
     @Bean
