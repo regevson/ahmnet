@@ -14,6 +14,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -52,6 +53,9 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
 
     @ManyToOne
     private Club club;
+
+    @OneToOne
+    private Training timeTable;
 
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "User_UserRole")
@@ -206,6 +210,14 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
     @Override
     public int compareTo(User o) {
             return this.username.compareTo(o.getUsername());
+    }
+
+    public Training getTimeTable() {
+	return timeTable;
+    }
+
+    public void setTimeTable(Training timeTable) {
+	this.timeTable = timeTable;
     }
 
 }

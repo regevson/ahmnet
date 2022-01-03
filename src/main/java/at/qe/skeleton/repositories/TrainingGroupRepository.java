@@ -12,10 +12,13 @@ import at.qe.skeleton.model.TrainingGroup;
 public interface TrainingGroupRepository extends AbstractRepository<TrainingGroup, Long> {
 
     TrainingGroup findById(Long id);
+
     Set<TrainingGroup> findByTrainer_Username(String username);
 
     @Query("select g "
     	+ "from TrainingGroup g join g.players players "
     	+ "where players.username=:username")
     Set<TrainingGroup> findByPlayer_Username(@Param("username") String username);
+
 }
+

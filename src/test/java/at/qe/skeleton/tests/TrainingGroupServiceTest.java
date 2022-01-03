@@ -21,7 +21,6 @@ public class TrainingGroupServiceTest {
 
     @Autowired
     TrainingGroupService trainingGroupService;
-
     @Autowired
     UserService userService;
 
@@ -29,7 +28,7 @@ public class TrainingGroupServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testGetGroupsByTrainer() {
-        User trainer = userService.loadUser("admin");
+        User trainer = userService.loadUser("johndoe");
         Assertions.assertNotNull(trainer, "User \"" + trainer + "\" could not be loaded from test data source");
         Set<TrainingGroup> groups = this.trainingGroupService.loadTrainingGroupByTrainer(trainer);
         Assertions.assertEquals(2, groups.size(), "Wrong amount of groups");
@@ -50,11 +49,13 @@ public class TrainingGroupServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testGetGroupsById() {
-        User trainer = userService.loadUser("admin");
+        User trainer = userService.loadUser("johndoe");
         Assertions.assertNotNull(trainer, "User \"" + trainer + "\" could not be loaded from test data source");
         TrainingGroup group = this.trainingGroupService.loadTrainingGroupById(1);
         Assertions.assertNotNull(group, "Group \"" + group + "\" could not be loaded from test data source");
         Assertions.assertEquals(trainer, group.getTrainer(), "Wrong trainer");
     }
+
+
 
 }

@@ -38,7 +38,7 @@ public class UserServiceTest {
                 Assertions.assertNull(user.getUpdateUser(), "User \"" + user + "\" has a updateUser defined");
                 Assertions.assertNull(user.getUpdateDate(), "User \"" + user +"\" has a updateDate defined");
             } else if ("user2".equals(user.getUsername())) {
-                Assertions.assertTrue(user.getRoles().contains(UserRole.TRAINER), "User \"" + user + "\" does not have role TRAINER");
+                Assertions.assertTrue(user.getRoles().contains(UserRole.PLAYER), "User \"" + user + "\" does not have role TRAINER");
                 Assertions.assertNotNull(user.getCreateUser(), "User \"" + user + "\" does not have a createUser defined");
                 Assertions.assertNotNull(user.getCreateDate(), "User \"" + user + "\" does not have a createDate defined");
                 Assertions.assertNull(user.getUpdateUser(), "User \"" + user + "\" has a updateUser defined");
@@ -59,7 +59,7 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testDeleteUser() {
-        String username = "user1";
+        String username = "johndoe";
         User adminUser = userService.loadUser("admin");
         Assertions.assertNotNull(adminUser, "Admin user could not be loaded from test data source");
         User toBeDeletedUser = userService.loadUser(username);
