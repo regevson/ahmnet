@@ -14,10 +14,10 @@ import at.qe.skeleton.repositories.AbstractUserRepository;
 
 @Service
 @Scope("application")
-public abstract class AbstractUserService<U extends AbstractUser> {
+public abstract class AbstractUserService<U extends AbstractUser, R extends AbstractUserRepository<U>> {
 
     @Autowired
-    protected AbstractUserRepository<U> userRepository;
+    protected R userRepository;
 
     /**
      * Returns a collection of all users.

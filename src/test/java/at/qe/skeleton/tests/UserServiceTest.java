@@ -13,6 +13,9 @@ import at.qe.skeleton.model.AbstractUser;
 import at.qe.skeleton.model.Client;
 import at.qe.skeleton.model.Trainer;
 import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.repositories.AbstractUserRepository;
+import at.qe.skeleton.repositories.ClientRepository;
+import at.qe.skeleton.repositories.TrainerRepository;
 import at.qe.skeleton.services.AbstractUserService;
 import at.qe.skeleton.services.ClientService;
 import at.qe.skeleton.services.TrainerService;
@@ -42,11 +45,11 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testDatainitialization() {
-        this.<Trainer,TrainerService>testDatainitializationHelper(this.trainerService, trainerNum);
-        this.<Client,ClientService>testDatainitializationHelper(this.clientService, clientNum);
+        this.<Trainer,TrainerRepository,TrainerService>testDatainitializationHelper(this.trainerService, trainerNum);
+        this.<Client,ClientRepository,ClientService>testDatainitializationHelper(this.clientService, clientNum);
     }
 
-    private <U extends AbstractUser,S extends AbstractUserService<U>> void testDatainitializationHelper(S service, int numUsers) {
+    private <U extends AbstractUser,R extends AbstractUserRepository<U>,S extends AbstractUserService<U, R>> void testDatainitializationHelper(S service, int numUsers) {
         Assertions.assertEquals(numUsers, service.getAllUsers().size(), "Insufficient amount of users initialized for test data source");
         for (U user : service.getAllUsers()) {
             if ("danihuber".equals(user.getUsername())) {
@@ -70,11 +73,11 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testDeleteUser() {
-        this.<Trainer,TrainerService>testDeleteUserHelper(this.trainerService, trainerNum, "regevson");
-        this.<Client,ClientService>testDeleteUserHelper(this.clientService, clientNum, "mandyflores");
+        this.<Trainer,TrainerRepository,TrainerService>testDeleteUserHelper(this.trainerService, trainerNum, "regevson");
+        this.<Client,ClientRepository,ClientService>testDeleteUserHelper(this.clientService, clientNum, "mandyflores");
     }
 
-    private <U extends AbstractUser,S extends AbstractUserService<U>> void testDeleteUserHelper(S service, int numUsers, String username) {
+    private <U extends AbstractUser,R extends AbstractUserRepository<U>,S extends AbstractUserService<U,R>> void testDeleteUserHelper(S service, int numUsers, String username) {
         U toBeDeletedUser = service.loadUser(username);
         Assertions.assertNotNull(toBeDeletedUser, "User \"" + username + "\" could not be loaded from test data source");
 
@@ -93,11 +96,11 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testUpdateUser() {
-        this.<Trainer,TrainerService>testUpdateUserHelper(this.trainerService, "regevson");
-        this.<Client,ClientService>testUpdateUserHelper(this.clientService, "mandyflores");
+        this.<Trainer,TrainerRepository,TrainerService>testUpdateUserHelper(this.trainerService, "regevson");
+        this.<Client,ClientRepository,ClientService>testUpdateUserHelper(this.clientService, "mandyflores");
     }
 
-    private <U extends AbstractUser,S extends AbstractUserService<U>> void testUpdateUserHelper(S service, String username) {
+    private <U extends AbstractUser,R extends AbstractUserRepository<U>,S extends AbstractUserService<U,R>> void testUpdateUserHelper(S service, String username) {
         U toBeSavedUser = service.loadUser(username);
         Assertions.assertNotNull(toBeSavedUser, "User \"" + username + "\" could not be loaded from test data source");
 
@@ -113,11 +116,11 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testCreateUser() {
-        this.<Trainer,TrainerService>testCreateUserHelper(this.trainerService, new Trainer());
-        this.<Client,ClientService>testCreateUserHelper(this.clientService, new Client());
+        this.<Trainer,TrainerRepository,TrainerService>testCreateUserHelper(this.trainerService, new Trainer());
+        this.<Client,ClientRepository,ClientService>testCreateUserHelper(this.clientService, new Client());
     }
 
-    private <U extends AbstractUser,S extends AbstractUserService<U>> void testCreateUserHelper(S service, U toBeCreatedUser) {
+    private <U extends AbstractUser,R extends AbstractUserRepository<U>,S extends AbstractUserService<U,R>> void testCreateUserHelper(S service, U toBeCreatedUser) {
         String username = "newuser";
         String password = "passwd";
         String fName = "New";
