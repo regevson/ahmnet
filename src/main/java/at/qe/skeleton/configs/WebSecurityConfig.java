@@ -1,16 +1,24 @@
 package at.qe.skeleton.configs;
 
 import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import at.qe.skeleton.services.UserService;
+import filters.CustomAuthenticationFilter;
+import filters.CustomAuthorizationFilter;
 
 /**
  * Spring configuration for web security.
@@ -23,13 +31,21 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity()
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+
     @Autowired
     DataSource dataSource;
+    @Autowired
+    private UserService userService;
+    
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         http.csrf().disable();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
+        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+
 
         http.headers().frameOptions().disable(); // needed for H2 console
 
@@ -60,7 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // :TODO: user failureUrl(/login.xhtml?error) and make sure that a corresponding message is displayed
  
         http.exceptionHandling().accessDeniedPage("/error/access_denied.xhtml");
-        //http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
+        http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
 
     }
 
@@ -76,5 +92,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public static PasswordEncoder passwordEncoder() {
         // :TODO: use proper passwordEncoder and do not store passwords in plain text
         return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+	return super.authenticationManagerBean();
     }
 }

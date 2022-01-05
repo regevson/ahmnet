@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.UserRepository;
@@ -25,6 +26,7 @@ public class UserService {
      *
      * @return
      */
+    @GetMapping("/users")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Collection<User> getAllUsers() {
         return userRepository.findAll();
@@ -36,7 +38,7 @@ public class UserService {
      * @param username the username to search for
      * @return the user with the given username
      */
-    @PreAuthorize("hasAuthority('ADMIN') or principal.username eq #username")
+    //@PreAuthorize("hasAuthority('ADMIN') or principal.username eq #username")
     public User loadUser(String username) {
         return userRepository.findFirstByUsername(username);
     }

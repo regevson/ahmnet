@@ -20,6 +20,8 @@ import javax.persistence.TemporalType;
 
 import org.springframework.data.domain.Persistable;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 public class User implements Persistable<String>, Serializable, Comparable<User> {
 
@@ -29,6 +31,7 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
     @Column(length = 100)
     private String username;
 
+    @JsonBackReference
     @ManyToOne(optional = false)
     private User createUser;
 
@@ -36,6 +39,7 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
 
+    @JsonBackReference
     @ManyToOne(optional = true)
     private User updateUser;
 

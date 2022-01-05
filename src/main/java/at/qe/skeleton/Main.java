@@ -1,12 +1,8 @@
 package at.qe.skeleton;
 
-import javax.faces.webapp.FacesServlet;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.FilterType;
@@ -37,6 +33,7 @@ public class Main extends SpringBootServletInitializer {
             SpringApplication.run(Main.class, args);
     }
 
+/*
     @Bean
     public ServletRegistrationBean<FacesServlet> servletRegistrationBean() {
             FacesServlet servlet = new FacesServlet();
@@ -47,5 +44,6 @@ public class Main extends SpringBootServletInitializer {
             servletRegistrationBean.setLoadOnStartup(1);
             return servletRegistrationBean;
     }
+    */
 
 }
