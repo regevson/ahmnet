@@ -1,10 +1,11 @@
-package filters;
+package at.qe.skeleton.filters;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -34,6 +35,16 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 	    String authHeader = request.getHeader("AUTHORIZATION");
 	    if(authHeader != null && authHeader.startsWith("Bearer ")) {
 		try {
+
+	    String tmp = "";
+	    if ("GET".equalsIgnoreCase(request.getMethod())) {
+	        Scanner s = new Scanner(request.getInputStream(), "UTF-8").useDelimiter("\\A");
+	        tmp += s.hasNext() ? s.next() : "";
+	    }
+
+	    System.out.println(tmp);
+
+
                     String token = authHeader.substring("Bearer ".length());
                     Algorithm algo = Algorithm.HMAC256("secret".getBytes());
                     JWTVerifier verifier = JWT.require(algo).build();

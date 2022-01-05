@@ -15,10 +15,10 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
 
-import at.qe.skeleton.services.UserService;
-import filters.CustomAuthenticationFilter;
-import filters.CustomAuthorizationFilter;
+import at.qe.skeleton.filters.CustomAuthenticationFilter;
+import at.qe.skeleton.filters.CustomAuthorizationFilter;
 
 /**
  * Spring configuration for web security.
@@ -34,13 +34,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     DataSource dataSource;
-    @Autowired
-    private UserService userService;
-    
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
+        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
@@ -69,7 +67,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority("ADMIN", "TRAINER", "PLAYER")
                 // Allow only certain roles to use websockets (only logged in users)
                 .and().formLogin()
-                .loginPage("/login.xhtml")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/secured/welcome.xhtml");
                 

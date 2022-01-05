@@ -47,6 +47,11 @@ public class UserListController implements Serializable {
         return userService.getAllUsers();
     }
 
+    @GetMapping("/user")
+    public User getUser(String username) {
+        return userService.loadUser(username);
+    }
+
     @GetMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException {
         String authHeader = request.getHeader("AUTHORIZATION");
