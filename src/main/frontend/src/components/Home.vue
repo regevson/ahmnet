@@ -8,16 +8,17 @@
 
 <script>
 import axios from 'axios'
-
-
+import {bus} from '../main'
 
 export default {
   name: 'Home',
+
   data() {
     return {
       user: null
     }
   },
+
   async created() {
     const accessToken = 'Bearer ' + localStorage.getItem('accessToken');
     const config = {
@@ -26,15 +27,19 @@ export default {
       }
     }
     const username = localStorage.getItem('username');
-    console.log(username);
     const response = await axios.get('http://localhost:8080/api/user?username=' + username, config);
-    this.user = response.data;
 
-    var tmp = document.getElementById('secret');
-    var arr = this.user.roles;
-    if(arr[0] == "PLAYER")
-      tmp.style.display = "block";
+    this.user = response.data;
+    this.updateNav(this.user.roles);
+  },
+
+  methods: {
+    updateNav: function(roles) {
+      const loggedInfo = {loggedIn:true, roles:roles};
+      bus.$emit('updateNav', loggedInfo);
+    }
   }
+
 }
 
 

@@ -9,8 +9,11 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active" id="secret" style="display:none">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          <li v-if="is_logged_in" class="nav-item active">
+            <a class="nav-link" href="#">Logged In <span class="sr-only">(current)</span></a>
+          </li>
+          <li v-if="is_admin" class="nav-item active">
+            <a class="nav-link" href="#">Admin-Functions</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Link</a>
@@ -41,9 +44,33 @@
 </template>
 
 <script>
+import {bus} from '../main'
 
 export default {
   name: 'Nav',
+
+  data() {
+    return {
+      is_logged_in: false,
+      is_admin: false,
+      is_trainer: false,
+      is_player: false
+    }
+  },
+
+  created() {
+    bus.$on('updateNav', (data) => {
+      this.is_logged_in = data["loggedIn"];
+      if(this.is_logged_in) {
+        this.is_admin = data["roles"].includes("ADMIN");
+        this.is_trainer = data["roles"].includes("TRAINER");
+        this.is_player = data["roles"].includes("PLAYER");
+      }
+      else
+        this.is_admin = this.is_trainer = this.is_player = false;
+    })
+  }
+
 }
 
 </script>

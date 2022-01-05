@@ -26,7 +26,7 @@
 
 <script>
 import axios from 'axios'
-//import qs from 'qs'
+import {bus} from '../main'
 
 
 export default {
@@ -37,6 +37,11 @@ export default {
       password: '',
     }
   },
+
+  created() {
+      bus.$emit('updateNav', false)
+  },
+
   methods: {
     async handleSubmit() {
 
