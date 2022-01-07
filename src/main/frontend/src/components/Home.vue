@@ -1,17 +1,18 @@
 <template>
 <div align="center">
-  <h1>Welcome Home Brother! </h1>
-  <h2 v-if="user">This is your data: <br>{{user.username}}<br>{{user.firstName}}<br>{{user.lastName}}</h2>
-  <h2 v-if="!user">But sth. went wrong!</h2>
+  <h2 v-if="user">Welcome Home {{user.firstName}}! </h2>
+  <h3 v-if="!user">Oops... sth. went wrong!</h3>
+  <Timetable :user="user" />
 </div>
 </template>
 
 <script>
+import Timetable from "./Timetable";
 import axios from 'axios'
-import {bus} from '../main'
 
 export default {
   name: 'Home',
+  components: {Timetable},
 
   data() {
     return {
@@ -27,16 +28,17 @@ export default {
       }
     }
     const username = localStorage.getItem('username');
-    const response = await axios.get('http://localhost:8080/api/user?username=' + username, config);
+    const response = await axios.get('http://10.0.0.242:8080/api/user?username=' + username, config);
 
     this.user = response.data;
-    this.updateNav(this.user.roles);
+    this.updateRoles(this.user.roles);
   },
 
   methods: {
-    updateNav: function(roles) {
-      const loggedInfo = {loggedIn:true, roles:roles};
-      bus.$emit('updateNav', loggedInfo);
+    updateRoles: function(roles_arr) {
+      this.$store.commit('isLoggedIn', true);
+      var roles = {isAdmin: roles_arr.includes("ADMIN"), isTrainer: roles_arr.includes("TRAINER"), isPlayer: roles_arr.includes("PLAYER")};
+      this.$store.commit('roles', roles);
     }
   }
 

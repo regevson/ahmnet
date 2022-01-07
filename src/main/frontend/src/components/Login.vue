@@ -26,7 +26,6 @@
 
 <script>
 import axios from 'axios'
-import {bus} from '../main'
 
 
 export default {
@@ -38,28 +37,22 @@ export default {
     }
   },
 
-  created() {
-      bus.$emit('updateNav', false)
-  },
-
   methods: {
     async handleSubmit() {
-
-        const params = new URLSearchParams()
-        params.append('username', this.username)
-        params.append('password', this.password)
-    
-        const config = {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
+      const params = new URLSearchParams()
+      params.append('username', this.username)
+      params.append('password', this.password)
+  
+      const config = {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
         }
-    
-        const response = await axios.post('http://localhost:8080/login', params, config);
-        localStorage.setItem('accessToken', response.data.access_token);
-        localStorage.setItem('username', this.username);
-        this.$router.push('/home');
-
+      }
+  
+      const response = await axios.post('http://10.0.0.242:8080/login', params, config);
+      localStorage.setItem('accessToken', response.data.access_token);
+      localStorage.setItem('username', this.username);
+      this.$router.push('/home');
     }
   }
 }
