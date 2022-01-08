@@ -25,6 +25,10 @@ public class TrainingService {
     @Autowired
     private TrainingRepository trainingRepository;
 
+    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
+    public Training loadTraining(long id) {
+	return this.trainingRepository.findById(id);
+    }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public List<Training> loadTrainingsByTrainingGroup(TrainingGroup group) {
@@ -49,9 +53,18 @@ public class TrainingService {
 	return this.trainingRepository.findByTrainerIdAndWeek(trainerUsername, weekNum);
     }
 
+/*
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public void updateTrainingDetails(long id, Set<User> attendees, String bulletPoints, String comments) {
         trainingRepository.updateTrainingDetails(id, attendees, bulletPoints, comments);
+    }
+    */
+    public void updateTrainingDetails(long id, Set<User> users, String bulletPoints, String comments) {
+        Training training = this.loadTraining(id);
+        training.setAttendees(users);
+        training.setBulletPoints(bulletPoints);
+        training.setComment(comments);
+        this.saveTraining(training);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
@@ -77,6 +90,7 @@ public class TrainingService {
 	return group;
 
     }
+
 
 
 }

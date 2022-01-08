@@ -94,4 +94,15 @@ public class TrainingServiceTest {
         Assertions.assertEquals(1, trainings.get(0).getWeekNum(), "Wrong weekNum!");
     }
 
+
+    @DirtiesContext
+    @Test
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    public void testGetTrainingById() {
+        User user = userService.loadUser("johndoe");
+        Assertions.assertNotNull(user, "User \"" + user + "\" could not be loaded from test data source");
+        Training training = this.trainingService.loadTraining(1);
+        Assertions.assertEquals(1, training.getId(), "wrong training");
+    }
+
 }

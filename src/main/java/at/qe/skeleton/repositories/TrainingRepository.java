@@ -13,6 +13,8 @@ import at.qe.skeleton.model.User;
 
 public interface TrainingRepository extends AbstractRepository<Training, Long> {
 
+    Training findById(long trainingId);
+
     List<Training> findByTrainingGroupIdOrderByDateTimeAsc(long trainingGroupId);
 
     @Query("select t "
@@ -39,11 +41,13 @@ public interface TrainingRepository extends AbstractRepository<Training, Long> {
     	+ "order by t.dateTime asc")
     List<Training> findByTrainerIdAndWeek(@Param("username") String trainerUsername, @Param("weekNum") int weekNum);
 
+/*
     @Transactional
     @Modifying
     @Query("update Training t "
     	+ "set t.attendees = :attendees, t.bulletPoints = :bulletPoints, t.comment = :comments "
     	+ "where t.id = :id ")
     void updateTrainingDetails(@Param("id") long id, @Param("attendees") Set<User> attendees, @Param("bulletPoints") String bulletPoints, @Param("comments") String comments);
+    */
 
 }
