@@ -1,5 +1,8 @@
 package at.qe.skeleton.tests;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -208,5 +211,14 @@ public class UserServiceTest {
             userService.deleteUser(user);
         });
     }
+
+    @Test
+    @WithMockUser(username = "user1", authorities = {"TRAINER"})
+    public void testGetUsersById() {
+	String[] ids = new String[] {"admin", "user2"};
+        Collection<User> users = userService.loadUsersById(ids);
+        Assertions.assertEquals(2, users.size(), "Users couldn't be loaded by id");
+    }
+
 
 }

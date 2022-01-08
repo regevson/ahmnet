@@ -28,7 +28,7 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(length = 100)
+    @Column(length = 100, name="username")
     private String username;
 
     @JsonBackReference

@@ -1,12 +1,8 @@
 package at.qe.skeleton.model;
 
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 @Entity
 public class Club {
@@ -15,6 +11,10 @@ public class Club {
     @Column(length = 100)
     private String name;
 
+    public String getName() {
+	return name;
+    }
+
 /*
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Trainer> trainer;
@@ -22,5 +22,6 @@ public class Club {
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Client> clients;
     */
+
 
 }

@@ -1,46 +1,46 @@
 <template>
 <div align="center">
+  <Nav v-bind:user="user"/>
+  <!--
   <h2 v-if="user">Welcome Home {{user.firstName}}! </h2>
   <h3 v-if="!user">Oops... sth. went wrong!</h3>
-  <Timetable :user="user" />
+  -->
+  <router-view :user="user"/>
+  <!--
+  -->
 </div>
 </template>
 
 <script>
-import Timetable from "./Timetable";
-import axios from 'axios'
+import Nav from "./Nav";
+import axios from 'axios';
 
 export default {
   name: 'Home',
-  components: {Timetable},
+  components: {Nav},
 
   data() {
     return {
-      user: null
+      user: null,
     }
   },
 
   async created() {
-    const accessToken = 'Bearer ' + localStorage.getItem('accessToken');
-    const config = {
-      headers: {
-      'Authorization': accessToken
-      }
-    }
     const username = localStorage.getItem('username');
-    const response = await axios.get('http://10.0.0.242:8080/api/user?username=' + username, config);
+    const response = await axios.get('api/user?username=' + username);
 
     this.user = response.data;
-    this.updateRoles(this.user.roles);
+
+    if(this.$route.name !== 'timetable') // so there are no unnecessary redirects
+      this.$router.push({name: 'timetable'});
   },
 
-  methods: {
-    updateRoles: function(roles_arr) {
-      this.$store.commit('isLoggedIn', true);
-      var roles = {isAdmin: roles_arr.includes("ADMIN"), isTrainer: roles_arr.includes("TRAINER"), isPlayer: roles_arr.includes("PLAYER")};
-      this.$store.commit('roles', roles);
-    }
-  }
+  beforeRouteUpdate(to, from, next) {
+    if(to.name === 'home') // home gets redirected to timetable
+      next({name: 'timetable'});
+    else
+      next();
+  },
 
 }
 

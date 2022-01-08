@@ -3,7 +3,7 @@
   <div align="center">
     <h3>Your TimeTable:</h3>
 
-    <table class="table table-responsive">
+    <table v-if="trainings" class="table table-responsive">
       <thead>
         <tr align="center">
           <th scope="col">Mo</th>
@@ -18,7 +18,7 @@
       <tbody>
         <tr>
           <td>
-            <Trainingslot :trainings="trainings.MONDAY" :user="user"/>
+            <Trainingslot :trainings="trainings.MONDAY"/>
           </td>
           <td>
             <Trainingslot :trainings="trainings.TUESDAY"/>
@@ -42,6 +42,8 @@
       </tbody>
     </table>
 
+    <h3 v-if="!trainings">Oops... sth. went wrong!</h3> 
+
   </div>
 
 </template>
@@ -64,15 +66,9 @@ export default {
   },
 
   async created() {
-    const accessToken = 'Bearer ' + localStorage.getItem('accessToken');
-    const config = {
-      headers: {
-      'Authorization': accessToken
-      }
-    }
     const username = localStorage.getItem('username');
     //var weekNum = 1;
-    const response = await axios.get('http://10.0.0.242:8080/api/trainingsByWeek?username=' + username + '&weekNum=1', config);
+    const response = await axios.get('api/trainingsByWeek?username=' + username + '&weekNum=1');
 
     this.trainings = response.data;
   },

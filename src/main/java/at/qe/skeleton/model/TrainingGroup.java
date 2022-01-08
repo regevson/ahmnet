@@ -24,7 +24,6 @@ public class TrainingGroup {
 
     private int numRemainingSessions;
 
-
     public long getId() {
 	return this.id;
     }
@@ -52,6 +51,5 @@ public class TrainingGroup {
     public void setNumRemainingSessions(int numRemainingSessions) {
 	this.numRemainingSessions = numRemainingSessions;
     }
-
 
 }

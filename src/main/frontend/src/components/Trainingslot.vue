@@ -2,7 +2,7 @@
 
   <div>
     <div v-for="training in trainings" :key="training.id" align="center" class="trainingPreview">
-      <router-link @click.native="storeSelectedTraining(training)" to="trainingdetails/" class="link">
+      <router-link @click.native="storeSelectedTraining(training)" :to="{name: 'trainingdetails', params: {trainingId: training.id}}" class="link">
         <div>
           {{training.club.name}}<br>
           {{training.date}}<br>

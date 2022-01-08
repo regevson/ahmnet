@@ -2,6 +2,7 @@ package at.qe.skeleton.services;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -9,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.UserRepository;
@@ -29,6 +29,11 @@ public class UserService {
     @PreAuthorize("hasAuthority('ADMIN')")
     public Collection<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    public Set<User> loadUsersById(String[] users) {
+        return userRepository.getUsersById(users);
     }
 
     /**
@@ -75,7 +80,7 @@ public class UserService {
     }
 
     // get user that is currently logged in
-    private User getAuthenticatedUser() {
+    public User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findFirstByUsername(auth.getName());
         System.out.println(user.getFirstName());

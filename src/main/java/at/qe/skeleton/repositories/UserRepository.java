@@ -1,11 +1,13 @@
 package at.qe.skeleton.repositories;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
 
 /**
  * Repository for managing {@link User} entities.
@@ -25,5 +27,8 @@ public interface UserRepository extends AbstractRepository<User, String> {
 
     @Query("SELECT u FROM User u WHERE :role MEMBER OF u.roles")
     List<User> findByRole(@Param("role") UserRole role);
+
+    @Query("SELECT u FROM User u WHERE u.id in :ids")
+    Set<User> getUsersById(@Param("ids") String ids[]);
 
 }
