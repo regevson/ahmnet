@@ -1,7 +1,7 @@
 <template>
   <div align="left">
 
-    <form v-if="training && trainingGroup" @submit.prevent="updateTrainingDetails">
+    <form v-if="training" @submit.prevent="updateTrainingDetails">
 
       <p>Club: {{training.club.name}}</p>
       <p>Datum: {{training.date}}</p>
@@ -41,11 +41,14 @@
 
 <script>
 import axios from 'axios'
+//import {Datepicker} from 'v-datetime-field'
 
 export default {
   name: 'TrainingDetails',
+  //components: {Datepicker},
   data() {
     return {
+      training: null,
       trainingGroup: null,
       presentPlayers: [],
       bulletPoints: '',
@@ -53,25 +56,13 @@ export default {
     }
   },
 
-  computed: {
-    training: function() {
-      return this.$store.getters.selectedTraining;
-    },
-  },
-
-  mounted() {
-    //window.onbeforeunload = function() {return '';}
-  },
-
-  watch: {
-    training: function() {
-      if(this.training != null) {
-        this.trainingGroup = this.training.trainingGroup;
-        this.presentPlayers = this.training.attendees.map(p => p.id);
-        this.bulletPoints = this.training.bulletPoints;
-        this.comments = this.training.comment;
-      }
-    }
+  async created() {
+    const response = await axios.get('api/training?id=' + this.$route.params.training);
+    this.training = response.data;
+    this.trainingGroup = this.training.trainingGroup;
+    this.presentPlayers = this.training.attendees.map(p => p.id);
+    this.bulletPoints = this.training.bulletPoints;
+    this.comments = this.training.comment;
   },
 
   methods: {
@@ -87,6 +78,7 @@ export default {
       this.$router.push({name: 'timetable'});
     },
   }
+
 
 }
 

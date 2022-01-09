@@ -39,6 +39,7 @@ export default {
 
   methods: {
     async handleSubmit() {
+
       const params = new URLSearchParams()
       params.append('username', this.username)
       params.append('password', this.password)
@@ -50,9 +51,10 @@ export default {
       }
   
       const response = await axios.post('http://10.0.0.242:8080/login', params, config);
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access_token;
       localStorage.setItem('accessToken', response.data.access_token);
       localStorage.setItem('username', this.username);
-      this.$router.push('/home');
+      this.$router.push('/timetable');
     }
   }
 }

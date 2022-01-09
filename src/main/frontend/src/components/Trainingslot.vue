@@ -2,7 +2,7 @@
 
   <div>
     <div v-for="training in trainings" :key="training.id" align="center" class="trainingPreview">
-      <router-link @click.native="storeSelectedTraining(training)" :to="{name: 'trainingdetails', params: {trainingId: training.id}}" class="link">
+      <router-link :to="{name: 'trainingdetails', params: {training: training.id}}" class="link">
         <div>
           {{training.club.name}}<br>
           {{training.date}}<br>
@@ -29,12 +29,6 @@ export default {
     return {
     }
   },
-
-  methods: {
-    storeSelectedTraining(training) {
-      this.$store.commit('selectedTraining', training);
-    }
-  }
 
 }
 

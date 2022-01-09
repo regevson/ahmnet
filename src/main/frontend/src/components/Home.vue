@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import Nav from "./Nav";
-import axios from 'axios';
+import Nav from "./Nav"
+import axios from 'axios'
 
 export default {
   name: 'Home',
@@ -28,19 +28,23 @@ export default {
   async created() {
     const username = localStorage.getItem('username');
     const response = await axios.get('api/user?username=' + username);
+    console.log(response.data);
 
     this.user = response.data;
 
-    if(this.$route.name !== 'timetable') // so there are no unnecessary redirects
-      this.$router.push({name: 'timetable'});
+    // in case user navigates to '/home', he gets redirected to '/timetable'
+    if(this.$route.name === 'home') 
+      this.$router.replace({name: 'timetable'});
   },
 
+  /*
   beforeRouteUpdate(to, from, next) {
-    if(to.name === 'home') // home gets redirected to timetable
+    if(to.name === '/') 
       next({name: 'timetable'});
     else
       next();
   },
+  */
 
 }
 

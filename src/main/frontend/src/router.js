@@ -10,11 +10,12 @@ Vue.use(Router)
 export default new Router ({
   mode: 'history',
   routes: [
+    {path: '/', component: Login},
     {path: '/login', component: Login},
     {path: '/home', name: 'home', component: Home,
       children: [
-        { path: 'timetable', name: 'timetable', component: Timetable },
-        { path: 'trainingdetails:trainingId', name: 'trainingdetails', components: {default: TrainingDetails} }
+        { path: '/timetable', name: 'timetable', component: Timetable },
+        { path: '/trainingdetails/training:training', name: 'trainingdetails', components: {default: TrainingDetails}}
       ]
     }
   ]
