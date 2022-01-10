@@ -1,11 +1,12 @@
 package at.qe.skeleton.services;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,18 +54,21 @@ public class TrainingService {
 	return this.trainingRepository.findByTrainerIdAndWeek(trainerUsername, weekNum);
     }
 
-/*
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
-    public void updateTrainingDetails(long id, Set<User> attendees, String bulletPoints, String comments) {
-        trainingRepository.updateTrainingDetails(id, attendees, bulletPoints, comments);
-    }
-    */
-    public void updateTrainingDetails(long id, Set<User> users, String bulletPoints, String comments) {
+    public void updateTrainingDetails(long id, String dateTime, int duration, Set<User> users, String bulletPoints, String comments) {
         Training training = this.loadTraining(id);
+        training.setDateTime(this.convertToLocalDateTime(dateTime));
+        training.setDurationMinutes(duration);
         training.setAttendees(users);
         training.setBulletPoints(bulletPoints);
         training.setComment(comments);
         this.saveTraining(training);
+    }
+
+    private LocalDateTime convertToLocalDateTime(String dateTime) {
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	formatter = formatter.withLocale(Locale.GERMAN);
+	return LocalDateTime.parse(dateTime, formatter);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
@@ -90,7 +94,5 @@ public class TrainingService {
 	return group;
 
     }
-
-
 
 }

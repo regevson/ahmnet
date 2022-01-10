@@ -35,16 +35,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 	    String authHeader = request.getHeader("AUTHORIZATION");
 	    if(authHeader != null && authHeader.startsWith("Bearer ")) {
 		try {
-
-	    String tmp = "";
-	    if ("GET".equalsIgnoreCase(request.getMethod())) {
-	        Scanner s = new Scanner(request.getInputStream(), "UTF-8").useDelimiter("\\A");
-	        tmp += s.hasNext() ? s.next() : "";
-	    }
-
-	    System.out.println(tmp);
-
-
                     String token = authHeader.substring("Bearer ".length());
                     Algorithm algo = Algorithm.HMAC256("secret".getBytes());
                     JWTVerifier verifier = JWT.require(algo).build();
@@ -58,7 +48,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 	    new UsernamePasswordAuthenticationToken(username, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(autToken);
                     filterChain.doFilter(request, response);
-		}catch(Exception ex) {
+		}
+		catch(Exception ex) {
 		    response.setHeader("error", ex.getMessage());
 		    response.setStatus(403, "FORBIDDEN");
                     Map<String, String> error = new HashMap<>();

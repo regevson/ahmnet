@@ -3,8 +3,7 @@ package at.qe.skeleton.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.WeekFields;
-import java.util.Locale;
+import java.time.temporal.IsoFields;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -55,13 +54,17 @@ public class Training {
 	this.setWeekNum(dateTime);
     }
 
-    public String getDate() {
-	return this.dateTime.toLocalDate().toString();
+    public LocalDate getDate() {
+	return this.dateTime.toLocalDate();
     }
 
     public String getTimeslot() {
 	LocalTime startTime = this.dateTime.toLocalTime();
 	return startTime +  " - " + startTime.plusMinutes(this.durationMinutes);
+    }
+
+    public String getStartTime() {
+	return this.dateTime.toLocalTime().toString() + ":00";
     }
 
     public int getDurationMinutes() {
@@ -110,8 +113,7 @@ public class Training {
 
     private void setWeekNum(LocalDateTime dateTime) {
 	LocalDate date = dateTime.toLocalDate();
-	WeekFields weekFields = WeekFields.of(Locale.getDefault()); 
-	setWeekNum(date.get(weekFields.weekOfWeekBasedYear()));
+        setWeekNum(date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR));
     }
 
     public TrainingGroup getTrainingGroup() {

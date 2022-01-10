@@ -27,6 +27,11 @@ public class TrainingController {
     @Autowired
     UserService userService;
 
+    @GetMapping("/training")
+    public Training getTrainingsById(long id) {
+	return this.trainingService.loadTraining(id);
+    }
+
     @GetMapping("/trainingsByWeek")
     public HashMap<DayOfWeek, List<Training>> getTrainingsByWeek(String username, int weekNum) {
         List<Training> trainings = this.trainingService.loadTrainingsByTrainerAndWeek(username, weekNum);
@@ -35,9 +40,9 @@ public class TrainingController {
     }
 
     @PostMapping("/updateTrainingDetails")
-    public void setTrainingsDetails(long id, String[] attendees, String bulletPoints, String comments) {
+    public void setTrainingsDetails(long id, String dateTime, int duration, String[] attendees, String bulletPoints, String comments) {
         Set<User> attendedUsers = this.userService.loadUsersById(attendees);
-        this.trainingService.updateTrainingDetails(id, attendedUsers, bulletPoints, comments);
+        this.trainingService.updateTrainingDetails(id, dateTime, duration, attendedUsers, bulletPoints, comments);
     }
 
 }
