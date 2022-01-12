@@ -41,8 +41,10 @@ public class TrainingController {
 
     @PostMapping("/updateTrainingDetails")
     public void setTrainingsDetails(long id, String dateTime, int duration, String[] attendees, String bulletPoints, String comments) {
+    try {
         Set<User> attendedUsers = this.userService.loadUsersById(attendees);
         this.trainingService.updateTrainingDetails(id, dateTime, duration, attendedUsers, bulletPoints, comments);
+    }catch (Exception e) {e.printStackTrace();}
     }
 
 }

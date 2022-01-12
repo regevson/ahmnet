@@ -4,9 +4,35 @@
     <form v-if="training" @submit.prevent="updateTrainingDetails">
 
       <p>Club: {{training.club.name}}</p>
+
       <p>Datum: {{training.date}}</p>
+
+      <b-form-datepicker v-model="training.date" class="mb-2" 
+            locale="de" 
+            :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit'}" 
+            :showDecadeNav="false" 
+            :start-weekday="1"
+            :hide-header="true"
+            calendar-width="100%"
+            menu-class="w-100"
+            >
+      </b-form-datepicker>
+      <br>
+
+
       <p>Zeit: {{training.timeslot}}</p>
+      <b-form-timepicker v-model="training.startTime" 
+            locale="de"
+            :minutes-step="15"
+            :hide-header="true"
+            >
+      </b-form-timepicker>
+      <br>
+
+
       <p>Dauer: {{training.durationMinutes}}</p>
+      <b-form-input type="number" v-model="training.durationMinutes" placeholder="Dauer in Minuten"></b-form-input>
+      <br>
 
       <p>Trainer: {{trainingGroup.trainer.firstName}} {{trainingGroup.trainer.lastName}}</p>
 
@@ -50,7 +76,8 @@ export default {
       trainingGroup: null,
       presentPlayers: [],
       bulletPoints: '',
-      comments: ''
+      comments: '',
+      value: ''
     }
   },
 
@@ -67,6 +94,8 @@ export default {
     async updateTrainingDetails() {
       const params = new URLSearchParams()
       params.append('id', this.training.id)
+      params.append('dateTime', this.training.date + ' ' + this.training.startTime)
+      params.append('duration', this.training.durationMinutes)
       params.append('attendees', this.presentPlayers)
       params.append('bulletPoints', this.bulletPoints)
       params.append('comments', this.comments)
