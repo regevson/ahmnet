@@ -34,11 +34,11 @@
       <b-form-input type="number" v-model="training.durationMinutes" placeholder="Dauer in Minuten"></b-form-input>
       <br>
 
-      <p>Trainer: {{trainingGroup.trainer.firstName}} {{trainingGroup.trainer.lastName}}</p>
+      <p>Trainer: {{training.trainingGroup.trainer.firstName}} {{training.trainingGroup.trainer.lastName}}</p>
 
       <p>Anwesenheit Spieler:</p>
       <div class="form-check">
-        <div v-for="player in trainingGroup.players" :key="player.id">
+        <div v-for="player in training.trainingGroup.players" :key="player.id">
           <input class="form-check-input" type="checkbox" :value="player.id" :id="player.id" v-model="presentPlayers">
           <label class="form-check-label" :for="player.id">
             <span> {{player.firstName}} {{player.lastName}} </span>
@@ -49,11 +49,11 @@
       <br>
 
       <p>Schwerpunkte:</p>
-      <textarea v-model="bulletPoints" rows="4">
+      <textarea v-model="training.bulletPoints" rows="4">
       </textarea>
       <br>
       <p>Kommentare:</p>
-      <textarea v-model="comments" rows="4">
+      <textarea v-model="training.comment" rows="4">
       </textarea>
       <br>
 
@@ -73,21 +73,14 @@ export default {
   data() {
     return {
       training: null,
-      trainingGroup: null,
       presentPlayers: [],
-      bulletPoints: '',
-      comments: '',
-      value: ''
     }
   },
 
   async created() {
     const response = await axios.get('api/training?id=' + this.$route.params.training);
     this.training = response.data;
-    this.trainingGroup = this.training.trainingGroup;
     this.presentPlayers = this.training.attendees.map(p => p.id);
-    this.bulletPoints = this.training.bulletPoints;
-    this.comments = this.training.comment;
   },
 
   methods: {
@@ -97,8 +90,8 @@ export default {
       params.append('dateTime', this.training.date + ' ' + this.training.startTime)
       params.append('duration', this.training.durationMinutes)
       params.append('attendees', this.presentPlayers)
-      params.append('bulletPoints', this.bulletPoints)
-      params.append('comments', this.comments)
+      params.append('bulletPoints', this.training.bulletPoints)
+      params.append('comments', this.training.comment)
 
       const response = await axios.post('api/updateTrainingDetails?' + params);
       console.log(response);
