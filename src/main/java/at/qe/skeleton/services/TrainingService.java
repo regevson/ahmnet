@@ -55,23 +55,6 @@ public class TrainingService {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
-    public void updateTrainingDetails(long id, String dateTime, int duration, Set<User> users, String bulletPoints, String comments) {
-        Training training = this.loadTraining(id);
-        training.setDateTime(this.convertToLocalDateTime(dateTime));
-        training.setDurationMinutes(duration);
-        training.setAttendees(users);
-        training.setBulletPoints(bulletPoints);
-        training.setComment(comments);
-        this.saveTraining(training);
-    }
-
-    private LocalDateTime convertToLocalDateTime(String dateTime) {
-	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-	formatter = formatter.withLocale(Locale.GERMAN);
-	return LocalDateTime.parse(dateTime, formatter);
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public Training saveTraining(Training training) {
         return trainingRepository.save(training);
     }

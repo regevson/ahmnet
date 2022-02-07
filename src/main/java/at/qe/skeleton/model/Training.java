@@ -54,19 +54,6 @@ public class Training {
 	this.setWeekNum(dateTime);
     }
 
-    public LocalDate getDate() {
-	return this.dateTime.toLocalDate();
-    }
-
-    public String getTimeslot() {
-	LocalTime startTime = this.dateTime.toLocalTime();
-	return startTime +  " - " + startTime.plusMinutes(this.durationMinutes);
-    }
-
-    public String getStartTime() {
-	return this.dateTime.toLocalTime().toString() + ":00";
-    }
-
     public int getDurationMinutes() {
 	return durationMinutes;
     }

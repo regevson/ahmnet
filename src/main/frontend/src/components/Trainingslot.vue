@@ -4,7 +4,7 @@
     <div v-for="training in trainings" :key="training.id" align="center" class="trainingPreview">
       <router-link :to="{name: 'trainingdetails', params: {training: training.id}}" class="link">
         <div>
-          {{training.club.name}}<br>
+          {{training.clubName}}<br>
           {{training.date}}<br>
           {{training.timeslot}}<br>
           {{training.court}}<br>
