@@ -82,13 +82,5 @@ export default {
 td {
   border-top: none !important;
 }
-.trainingPreview {
-  background: cadetblue;
-  color: white;
-  font-weight: bold;
-  border-radius: 14px;
-  padding: 10px 0 10px 0;
-  width: auto;
-}
 </style>
 

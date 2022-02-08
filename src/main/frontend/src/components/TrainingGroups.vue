@@ -51,14 +51,25 @@ export default {
 
 <style scoped>
 .card-header {
-  background: cornflowerblue;
+  background: #4b9183;
   border: none;
 }
 .card-header .btn{
-  background: cornflowerblue;
+  background: #4b9183;
   border: none;
   color: white;
   font-weight: bold;
   box-shadow: none;
 }
+
+.card-body {
+  /*background: #1b2730;*/
+  border: 2px solid #4b9183;
+  border-radius: 5px;
+  border-top: none;
+  height: auto;
+  padding: 5px;
+}
+
+
 </style>

@@ -2,17 +2,23 @@
 <div>
   
  <div v-for="(group, idx) in groups" :key="idx">
-  <router-link :to="{name: 'traininggroupdetails', params: {groupId: group.id}}">
+  <router-link :to="{name: 'traininggroupdetails', params: {groupId: group.id}}" class="link">
     <div id="groupSnippet">
-      <b>GruppenNr:</b> {{group.id}}<br>
-      <b>Trainer:</b> {{group.trainer.firstName}} {{group.trainer.lastName}}<br>
-      <b>SpielerInnen:</b>
-      <span v-for="player in group.players" :key="player.id">
-      {{player.firstName}} {{player.lastName}}, 
-      </span>
+      <div class="top">
+        Gruppe {{group.id}}<br>
+      </div>
+      <div class="bot">
+        <b>Trainer:</b> <span class="player trainer">{{group.trainer.firstName}} {{group.trainer.lastName}}</span><br>
+        <hr style="margin: 5px 0px 5px 0px">
+        <b>SpielerInnen:</b><br>
+        <span class="player" v-for="player in group.players" :key="player.id">
+        {{player.firstName}} {{player.lastName}}
+        </span>
+      </div>
     </div>
     </router-link>
   </div>
+  <div style="clear: both"></div>
 
 </div>
 </template>
@@ -42,11 +48,43 @@ export default {
 
 <style scoped>
 #groupSnippet {
-  background: green;
-  color: white;
-  width: 50%;
+  float: left;
+  background: #f9bb2d;
+  color: black;
+  max-width: 185px;
   border-radius: 15px;
-  padding: 10px;
+  padding: 0px;
+  overflow: auto;
   margin-bottom: 10px;
+  text-align: left;
+  margin-right: 10px;
 }
+
+#groupSnippet .top {
+  background: orange;
+  padding: 5px;
+  text-align: center;
+  font-weight: 800;
+}
+
+#groupSnippet .bot {
+  padding: 10px;
+}
+
+#groupSnippet .player {
+  display: inline-block;
+  background: #4b9183;
+  color: white;
+  border-radius: 5px;
+  margin-bottom: 2px;
+  padding: 3px;
+  font-size: 11px;
+}
+
+#groupSnippet .trainer {
+  background: green;
+  font-weight: bold;
+}
+
+
 </style>
