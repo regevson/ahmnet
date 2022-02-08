@@ -30,6 +30,14 @@ public class TrainingGroupController {
     public Collection<Club> getAllClubs() {
 	return this.trainingGroupService.loadAllClubs();
     }
+    
+    
+    @GetMapping("/deleteGroup")
+    public void deleteGroup(long id) {
+    try {
+	this.trainingGroupService.deleteGroup(id);
+    }catch(Exception e) { e.printStackTrace();};
+    }
 
     @GetMapping("/groupsByClub")
     public Collection<TrainingGroupDto> getClubsByClub(String clubName) {

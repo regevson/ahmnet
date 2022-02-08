@@ -1,8 +1,8 @@
 <template>
   <div>
 
-    <form v-if="group" @submit.prevent="updateTrainingGroupDetails">
-      GruppenNr: {{group.id}}<br><br>
+    <form style="text-align: left" v-if="group" @submit.prevent="">
+      <span v-if="group.id != -1">GruppenNr: {{group.id}}</span><br><br>
 
 
     Club:
@@ -20,7 +20,14 @@
     <br>
 
 
-      <input type="submit" class="fourth" value="Anpassen" style="margin-top: 30px">
+      <div align="center" v-if="group.id == -1">
+        <input class="changeGroupBtn fourth" type="submit" @click="updateTrainingGroupDetails" value="Erstellen">
+      </div>
+
+      <div align="center" v-if="group.id != -1">
+        <input class="changeGroupBtn fourth" type="submit" @click="updateTrainingGroupDetails" value="Anpassen">
+        <button v-if="group.id != -1" @click="deleteGroup" class="deleteGroupBtn">Löschen</button>
+      </div>
 
     </form>
   </div>
@@ -46,12 +53,19 @@ export default {
   },
 
   async created() {
-    let response = await axios.get('api/group?id=' + this.$route.params.groupId);
-    this.group = response.data;
+    let response;
 
-    this.players = this.group.players.map(this.combineInfo); 
-    this.club = this.group.club;
-    this.trainer = this.group.trainer;
+    if(this.$route.params.groupId == -1) // create new group
+      this.group = {id: -1, firstname:'', lastname:'', fullName:'', club: {name:null}};       
+
+    else { // group already exists
+      response = await axios.get('api/group?id=' + this.$route.params.groupId);
+      this.group = response.data;
+
+      this.players = this.group.players.map(this.combineInfo); 
+      this.club = this.group.club;
+      this.trainer = this.group.trainer;
+    }
 
     response = await axios.get('api/allClubs');
     this.allClubs = response.data;
@@ -90,9 +104,13 @@ export default {
       const response = await axios.post('api/updateTrainingGroupDetails', params, config);
       console.log(response);
       this.$router.push({name: 'traininggroups'});
-      /*
-      */
     },
+
+    async deleteGroup() {
+      const response = await axios.get('api/deleteGroup?id=' + this.group.id);
+      console.log(response);
+      this.$router.push({name: 'traininggroups'});
+    }
   },
 
 
@@ -105,6 +123,56 @@ export default {
 -->
 
 <style>
+
+.changeGroupBtn {
+  color: white;
+  background: #4b9183;
+  border: 2px solid #4b9183;
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  margin: 20px 10px 30px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.changeGroupBtn:hover {
+  background: none;
+  border: 2px solid #4b9183;
+  color: #4b9183;
+
+  transition: all 0.3s ease-in-out;
+}
+
+.deleteGroupBtn {
+  color: white;
+  background: red;
+  border: 2px solid red;
+
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  margin: 20px 0 30px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.deleteGroupBtn:hover {
+  background: none;
+  border: 2px solid red;
+  color: red;
+
+  transition: all 0.3s ease-in-out;
+}
+
+
+
+
+
+
+
+
+
+
+/* multiselect */
 fieldset[disabled] .multiselect {
   pointer-events: none;
 }

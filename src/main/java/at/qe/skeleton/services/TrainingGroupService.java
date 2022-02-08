@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import at.qe.skeleton.model.Club;
 import at.qe.skeleton.model.TrainingGroup;
@@ -27,7 +28,7 @@ public class TrainingGroupService {
     public List<Club> loadAllClubs() {
         return clubRepository.findAll();
     }
-    
+
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public Set<TrainingGroup> loadTrainingGroupsByClub(String clubName) {
 	return this.trainingGroupRepository.findByClub_NameContaining(clubName);
@@ -48,14 +49,22 @@ public class TrainingGroupService {
 	return this.trainingGroupRepository.findById(id);
     }
 
-    @PreAuthorize("hasAuthority('TRAINER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public TrainingGroup saveGroup(TrainingGroup group) {
         return trainingGroupRepository.save(group);
     }
 
-    @PreAuthorize("hasAuthority('TRAINER')")
-    public TrainingGroup deleteGroup(TrainingGroup group) {
-        return trainingGroupRepository.save(group);
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    public void deleteGroup(TrainingGroup group) {
+        trainingGroupRepository.delete(group);
+    }
+
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    public void deleteGroup(long id) {
+	TrainingGroup group = this.loadTrainingGroupById(id);
+	group.getPlayers().removeAll(group.getPlayers());
+        trainingGroupRepository.delete(group);
     }
 
 }

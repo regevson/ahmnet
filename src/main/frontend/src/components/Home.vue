@@ -58,9 +58,9 @@ export default {
 </script>
 
 <style>
-@import url('http://fonts.cdnfonts.com/css/product-sans');
 
 body {
+  padding: 10px;
 }
 
 .ahmBgGreen {

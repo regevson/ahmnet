@@ -2,11 +2,15 @@ package at.qe.skeleton.model;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -14,6 +18,7 @@ import javax.persistence.Table;
 public class TrainingGroup {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // otherwise there is problem when saving with empty id
     private long id;
 
     @ManyToOne
@@ -22,8 +27,11 @@ public class TrainingGroup {
     @ManyToOne
     private Club club;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     private Set<User> players;
+
+    @OneToMany(mappedBy = "trainingGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Training> trainings;
 
     private int numRemainingSessions;
 
@@ -61,6 +69,14 @@ public class TrainingGroup {
 
     public void setNumRemainingSessions(int numRemainingSessions) {
 	this.numRemainingSessions = numRemainingSessions;
+    }
+
+    public Set<Training> getTrainings() {
+	return trainings;
+    }
+
+    public void setTrainings(Set<Training> trainings) {
+	this.trainings = trainings;
     }
 
 }

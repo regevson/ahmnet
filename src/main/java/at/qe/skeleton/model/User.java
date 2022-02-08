@@ -58,9 +58,6 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
     @ManyToOne
     private Club club;
 
-    @OneToOne
-    private Training timeTable;
-
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "User_UserRole")
     @Enumerated(EnumType.STRING)
@@ -214,14 +211,6 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
     @Override
     public int compareTo(User o) {
             return this.username.compareTo(o.getUsername());
-    }
-
-    public Training getTimeTable() {
-	return timeTable;
-    }
-
-    public void setTimeTable(Training timeTable) {
-	this.timeTable = timeTable;
     }
 
 }

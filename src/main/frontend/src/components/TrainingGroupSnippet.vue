@@ -61,7 +61,7 @@ export default {
 }
 
 #groupSnippet .top {
-  background: orange;
+  background: #df9203;
   padding: 5px;
   text-align: center;
   font-weight: 800;
@@ -77,6 +77,7 @@ export default {
   color: white;
   border-radius: 5px;
   margin-bottom: 2px;
+  margin-right: 2px;
   padding: 3px;
   font-size: 11px;
 }

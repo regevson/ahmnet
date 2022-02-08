@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import at.qe.skeleton.model.Training;
 import at.qe.skeleton.model.TrainingGroup;
 
 @Repository
@@ -16,6 +17,7 @@ public interface TrainingGroupRepository extends AbstractRepository<TrainingGrou
     Set<TrainingGroup> findByTrainer_Username(String username);
 
     Set<TrainingGroup> findByClub_NameContaining(String name);
+
 
     @Query("select g "
     	+ "from TrainingGroup g join g.players players "

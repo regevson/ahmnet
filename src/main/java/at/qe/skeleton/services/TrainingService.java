@@ -31,10 +31,12 @@ public class TrainingService {
 	return this.trainingRepository.findById(id);
     }
 
+/*
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public List<Training> loadTrainingsByTrainingGroup(TrainingGroup group) {
 	return this.trainingRepository.findByTrainingGroupIdOrderByDateTimeAsc(group.getId());
     }
+    */
 
     public List<Training> loadTrainingsByPlayer(User player) {
 	return this.trainingRepository.findByPlayerId(player.getId());

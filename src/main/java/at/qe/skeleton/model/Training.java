@@ -2,15 +2,16 @@ package at.qe.skeleton.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.IsoFields;
 import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+
 
 @Entity
 public class Training {
@@ -31,8 +32,8 @@ public class Training {
     private Set<User> attendees;
 
     @ManyToOne
+    @JoinColumn(name="trainingGroupId")
     private TrainingGroup trainingGroup;
-
 
 
     public LocalDateTime getDateTime() {
