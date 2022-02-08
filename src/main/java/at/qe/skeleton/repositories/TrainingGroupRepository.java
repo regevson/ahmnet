@@ -15,6 +15,8 @@ public interface TrainingGroupRepository extends AbstractRepository<TrainingGrou
 
     Set<TrainingGroup> findByTrainer_Username(String username);
 
+    Set<TrainingGroup> findByClub_NameContaining(String name);
+
     @Query("select g "
     	+ "from TrainingGroup g join g.players players "
     	+ "where players.username=:username")

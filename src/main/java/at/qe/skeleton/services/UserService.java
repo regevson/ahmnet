@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.UserRepository;
 
 @Service
@@ -29,6 +30,14 @@ public class UserService {
     @PreAuthorize("hasAuthority('ADMIN')")
     public Collection<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Collection<User> getAllTrainer() {
+        return userRepository.findByRole(UserRole.TRAINER);
+    }
+
+    public Collection<User> getAllPlayer() {
+        return userRepository.findByRole(UserRole.PLAYER);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")

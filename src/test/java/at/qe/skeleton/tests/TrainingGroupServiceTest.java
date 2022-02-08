@@ -27,6 +27,14 @@ public class TrainingGroupServiceTest {
     @DirtiesContext
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    public void testGetGroupsByClub() {
+        Set<TrainingGroup> groups = this.trainingGroupService.loadTrainingGroupsByClub("TC Vomp");
+        Assertions.assertTrue(groups.size() > 1, "Wrong amount of groups");
+    }
+
+    @DirtiesContext
+    @Test
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testGetGroupsByTrainer() {
         User trainer = userService.loadUser("johndoe");
         Assertions.assertNotNull(trainer, "User \"" + trainer + "\" could not be loaded from test data source");

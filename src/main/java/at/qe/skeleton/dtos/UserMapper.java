@@ -12,11 +12,13 @@ public class UserMapper {
 	dto.setId(user.getId());
 	dto.setFirstName(user.getFirstName());
 	dto.setLastName(user.getLastName());
+	dto.setFullName(user.getFirstName() + " " + user.getLastName());
+	dto.setClubName(user.getClub().getName());
 	return dto;
     }
-    public static Collection<UserDto> mapToUserDto(Collection<User> user) {
+    public static Collection<UserDto> mapToUserDto(Collection<User> users) {
 	Collection<UserDto> dtos = new ArrayList<>();
-	for(User u : user)
+	for(User u : users)
 	    dtos.add(mapToUserDto(u));
 	return dtos;
     }

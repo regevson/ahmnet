@@ -15,7 +15,7 @@ export const bus = new Vue();
 Vue.use(bootstrap)
 
 new Vue({
-  router,
   store,
+  router,
   render: h => h(App),
 }).$mount('#app')

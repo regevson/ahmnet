@@ -25,6 +25,8 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import at.qe.skeleton.dtos.UserDto;
+import at.qe.skeleton.dtos.UserMapper;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.UserService;
@@ -32,7 +34,7 @@ import at.qe.skeleton.services.UserService;
 @RequestMapping("/api")
 @RestController
 @Scope("application")
-public class UserListController implements Serializable {
+public class UserListController {
 
     @Autowired
     private UserService userService;
@@ -45,6 +47,16 @@ public class UserListController implements Serializable {
     @GetMapping("/users")
     public Collection<User> getUsers() {
         return userService.getAllUsers();
+    }
+
+    @GetMapping("/allTrainer")
+    public Collection<UserDto> getAllTrainer() {
+        return UserMapper.mapToUserDto(userService.getAllTrainer());
+    }
+
+    @GetMapping("/allPlayer")
+    public Collection<UserDto> getAllPlayer() {
+        return UserMapper.mapToUserDto(userService.getAllPlayer());
     }
 
     @GetMapping("/user")

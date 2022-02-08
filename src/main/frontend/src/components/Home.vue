@@ -1,6 +1,6 @@
 <template>
 <div align="center">
-  <Nav v-bind:user="user"/>
+  <Nav v-on:newRoute="changeRoute" v-bind:user="user"/>
   <!--
   <h2 v-if="user">Welcome Home {{user.firstName}}! </h2>
   <h3 v-if="!user">Oops... sth. went wrong!</h3>
@@ -36,6 +36,12 @@ export default {
     if(this.$route.name === 'home') 
       this.$router.replace({name: 'timetable'});
   },
+
+  methods: {
+    changeRoute: function(newRouteName) {
+      this.$router.push({name: newRouteName});
+    },
+  }
 
   /*
   beforeRouteUpdate(to, from, next) {

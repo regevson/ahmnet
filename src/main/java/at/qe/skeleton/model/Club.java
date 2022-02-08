@@ -8,7 +8,7 @@ import javax.persistence.Id;
 public class Club {
 
     @Id
-    @Column(length = 100)
+    @Column(length = 100, name="name")
     private String name;
 
     public String getName() {

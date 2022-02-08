@@ -78,7 +78,7 @@ export default {
   },
 
   async created() {
-    const response = await axios.get('api/training?id=' + this.$route.params.training);
+    const response = await axios.get('api/training?id=' + this.$route.params.trainingId);
     this.training = response.data;
   },
 

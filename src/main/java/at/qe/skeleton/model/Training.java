@@ -18,9 +18,6 @@ public class Training {
     @Id
     private long id;
 
-    @ManyToOne
-    private Club club;
-
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime dateTime;
 
@@ -37,13 +34,6 @@ public class Training {
     private TrainingGroup trainingGroup;
 
 
-    public Club getClub() {
-	return club;
-    }
-
-    public void setClub(Club club) {
-	this.club = club;
-    }
 
     public LocalDateTime getDateTime() {
 	return dateTime;

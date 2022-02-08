@@ -19,6 +19,9 @@ public class TrainingGroup {
     @ManyToOne
     private User trainer;
 
+    @ManyToOne
+    private Club club;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<User> players;
 
@@ -34,6 +37,14 @@ public class TrainingGroup {
 
     public void setTrainer(User trainer) {
 	this.trainer = trainer;
+    }
+
+    public Club getClub() {
+	return club;
+    }
+
+    public void setClub(Club club) {
+	this.club = club;
     }
 
     public Set<User> getPlayers() {

@@ -22,7 +22,7 @@ public class TrainingMapper {
     public TrainingTimeslotDto mapToTrainingTimeslotDto(Training tr) {
 	TrainingTimeslotDto dto = new TrainingTimeslotDto();
 	dto.setId(tr.getId());
-	dto.setClubName(tr.getClub().getName());
+	dto.setClubName(tr.getTrainingGroup().getClub().getName());
 	dto.setDate(tr.getDateTime().toLocalDate());
 	LocalTime startTime = tr.getDateTime().toLocalTime();
 	dto.setTimeslot(startTime.toString() + " - " + startTime.plusMinutes(tr.getDurationMinutes()).toString());
@@ -33,7 +33,7 @@ public class TrainingMapper {
     public TrainingDetailsDto mapToTrainingDetailsDto(Training tr) {
 	TrainingDetailsDto dto = new TrainingDetailsDto();
 	dto.setId(tr.getId());
-	dto.setClub(tr.getClub());
+	dto.setClub(tr.getTrainingGroup().getClub());
 	dto.setDate(tr.getDateTime().toLocalDate());
 	LocalTime startTime = tr.getDateTime().toLocalTime();
 	dto.setStartTime(startTime);
@@ -49,7 +49,7 @@ public class TrainingMapper {
     }
     
     public void mapFromTrainingDetailsDto(TrainingDetailsDto dto, Training tr) {
-	tr.setClub(dto.getClub());
+	tr.getTrainingGroup().setClub(dto.getClub());
         tr.setDateTime(dto.getDate().atTime(dto.getStartTime()));
         tr.setDurationMinutes(dto.getDurationMinutes());
         //List<User> players = dto.getPlayers().stream().map(p -> userService.loadUser(p.getId())).collect(Collectors.toList());

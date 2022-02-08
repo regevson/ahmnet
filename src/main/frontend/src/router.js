@@ -4,6 +4,8 @@ import Login from './components/Login.vue'
 import Home from './components/Home.vue'
 import Timetable from './components/Timetable.vue'
 import TrainingDetails from './components/TrainingDetails.vue'
+import TrainingGroups from './components/TrainingGroups.vue'
+import TrainingGroupDetails from './components/TrainingGroupDetails.vue'
 
 Vue.use(Router)
 
@@ -15,7 +17,9 @@ export default new Router ({
     {path: '/home', name: 'home', component: Home,
       children: [
         { path: '/timetable', name: 'timetable', component: Timetable },
-        { path: '/trainingdetails/training:training', name: 'trainingdetails', components: {default: TrainingDetails}}
+        { path: '/traininggroups', name: 'traininggroups', component: TrainingGroups },
+        { path: '/traininggroupdetails/group:groupId', name: 'traininggroupdetails', components: {default: TrainingGroupDetails} },
+        { path: '/trainingdetails/training:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}}
       ]
     }
   ]

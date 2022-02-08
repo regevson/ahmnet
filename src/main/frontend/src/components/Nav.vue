@@ -9,25 +9,14 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li v-if="!isLoggedIn" class="nav-item active">
-            <router-link to="./Login"><a class="nav-link" href="#">Log In <span class="sr-only">(current)</span></a></router-link>
+            <router-link to="./login"><a class="nav-link" href="#">Log In <span class="sr-only">(current)</span></a></router-link>
           </li>
           <li v-if="isLoggedIn && hasRole('ADMIN')" class="nav-item active">
             <a class="nav-link" href="#">Admin-Functions</a>
           </li>
-          <li v-if="isLoggedIn && hasRole('TRAINER')" class="nav-item active">
-            <a class="nav-link" href="#">Trainer-Functions</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Dropdown
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </div>
-          </li>
+           <b-nav-item-dropdown v-if="isLoggedIn && hasRole('TRAINER')" text="Trainer-Funktionen" right>
+            <b-dropdown-item href="#"><a href="#" v-on:click="returnRoute('traininggroups')">Trainingsgruppen</a></b-dropdown-item>
+           </b-nav-item-dropdown>
         </ul>
       </div>
     </nav>
@@ -52,6 +41,9 @@ export default {
   methods: {
     hasRole: function(role) {
       return this.user.roles.includes(role);
+    },
+    returnRoute: function(newRouteName) {
+      this.$emit('newRoute', newRouteName);
     }
   }
 }
