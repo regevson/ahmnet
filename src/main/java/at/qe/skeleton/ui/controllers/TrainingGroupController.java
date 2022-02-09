@@ -30,7 +30,11 @@ public class TrainingGroupController {
     public Collection<Club> getAllClubs() {
 	return this.trainingGroupService.loadAllClubs();
     }
-    
+
+    @GetMapping("/allGroups")
+    public Collection<TrainingGroupDto> getAllGroups() {
+	return this.trainingGroupMapper.mapToTrainingGroupDto(trainingGroupService.loadAllGroups());
+    }
     
     @GetMapping("/deleteGroup")
     public void deleteGroup(long id) {

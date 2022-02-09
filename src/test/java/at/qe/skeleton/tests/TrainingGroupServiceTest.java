@@ -28,7 +28,7 @@ public class TrainingGroupServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testGetGroupsByClub() {
-        Set<TrainingGroup> groups = this.trainingGroupService.loadTrainingGroupsByClub("TC Vomp");
+        Set<TrainingGroup> groups = this.trainingGroupService.loadTrainingGroupsByClub("TC Wiesing");
         Assertions.assertTrue(groups.size() > 1, "Wrong amount of groups");
     }
 
@@ -39,14 +39,14 @@ public class TrainingGroupServiceTest {
         User trainer = userService.loadUser("johndoe");
         Assertions.assertNotNull(trainer, "User \"" + trainer + "\" could not be loaded from test data source");
         Set<TrainingGroup> groups = this.trainingGroupService.loadTrainingGroupByTrainer(trainer);
-        Assertions.assertEquals(2, groups.size(), "Wrong amount of groups");
+        Assertions.assertTrue(groups.size() > 1, "Wrong amount of groups");
     }
 
     @DirtiesContext
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testGetGroupsByPlayer() {
-        User player = userService.loadUser("user1");
+        User player = userService.loadUser("susi");
         Assertions.assertNotNull(player, "User \"" + player + "\" could not be loaded from test data source");
         Set<TrainingGroup> groups = this.trainingGroupService.loadTrainingGroupByPlayer(player);
         for(TrainingGroup g : groups)
@@ -59,7 +59,7 @@ public class TrainingGroupServiceTest {
     public void testGetGroupsById() {
         User trainer = userService.loadUser("johndoe");
         Assertions.assertNotNull(trainer, "User \"" + trainer + "\" could not be loaded from test data source");
-        TrainingGroup group = this.trainingGroupService.loadTrainingGroupById(1);
+        TrainingGroup group = this.trainingGroupService.loadTrainingGroupById(0);
         Assertions.assertNotNull(group, "Group \"" + group + "\" could not be loaded from test data source");
         Assertions.assertEquals(trainer, group.getTrainer(), "Wrong trainer");
     }

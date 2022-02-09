@@ -1,21 +1,19 @@
 package at.qe.skeleton.services;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import at.qe.skeleton.model.Training;
-import at.qe.skeleton.model.TrainingGroup;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.TrainingRepository;
 
@@ -27,7 +25,7 @@ public class TrainingService {
     private TrainingRepository trainingRepository;
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
-    public Training loadTraining(long id) {
+    public Training loadTrainingById(long id) {
 	return this.trainingRepository.findById(id);
     }
 
@@ -48,7 +46,7 @@ public class TrainingService {
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public List<Training> loadTrainingsByTrainer(User trainer) {
-	return this.trainingRepository.findByTrainerId(trainer.getId());
+	return this.trainingRepository.findByTrainer_UsernameOrderByDateTimeAsc(trainer.getId());
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
@@ -61,8 +59,18 @@ public class TrainingService {
         return trainingRepository.save(training);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    public void deleteTraining(long id) {
+	Training training = this.loadTrainingById(id);
+	deleteTraining(training);
+    }
+
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public void deleteTraining(Training training) {
+	training.getAttendees().removeAll(training.getAttendees());
+	training.getTrainingGroup().getTrainings().remove(training);
         trainingRepository.delete(training);
     }
 
@@ -77,7 +85,14 @@ public class TrainingService {
 	    group.put(day, dayList);
 	}
 	return group;
-
     }
+    
+    public List<Training> orderTrainingsAsc(Set<Training> trs) {
+        List<Training> trList = new ArrayList<>(trs);
+        Comparator<Training> comparator = Comparator.comparing(Training::getDateTime);
+        trList.sort(comparator);
+        return trList;
+    }
+    
 
 }

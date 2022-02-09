@@ -11,7 +11,7 @@
 
 
     SpielerInnen: 
-  <multiselect v-model="players" :options="allPlayers" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="false" placeholder="Auswählen/Suchen" label="fullInfo" track-by="fullInfo" :preselect-first="false" :clearOnSelect="false" selectLabel="" deselectLabel="" selectedLabel="" />
+  <multiselect v-model="players" :options="allPlayers" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="false" placeholder="Auswählen/Suchen" label="combinedInfo" track-by="combinedInfo" :preselect-first="false" :clearOnSelect="false" selectLabel="" deselectLabel="" selectedLabel="" />
   <br>
 
 
@@ -21,12 +21,12 @@
 
 
       <div align="center" v-if="group.id == -1">
-        <input class="changeGroupBtn fourth" type="submit" @click="updateTrainingGroupDetails" value="Erstellen">
+        <input class="changeBtn fourth" type="submit" @click="updateTrainingGroupDetails" value="Erstellen">
       </div>
 
       <div align="center" v-if="group.id != -1">
-        <input class="changeGroupBtn fourth" type="submit" @click="updateTrainingGroupDetails" value="Anpassen">
-        <button v-if="group.id != -1" @click="deleteGroup" class="deleteGroupBtn">Löschen</button>
+        <input class="changeBtn fourth" type="submit" @click="updateTrainingGroupDetails" value="Anpassen">
+        <button v-if="group.id != -1" @click="deleteGroup" class="deleteBtn">Löschen</button>
       </div>
 
     </form>
@@ -62,7 +62,7 @@ export default {
       response = await axios.get('api/group?id=' + this.$route.params.groupId);
       this.group = response.data;
 
-      this.players = this.group.players.map(this.combineInfo); 
+      this.players = this.group.players.map(this.combinePlayerInfo); 
       this.club = this.group.club;
       this.trainer = this.group.trainer;
     }
@@ -71,7 +71,7 @@ export default {
     this.allClubs = response.data;
 
     response = await axios.get('api/allPlayer');
-    this.allPlayers = response.data.map(this.combineInfo); 
+    this.allPlayers = response.data.map(this.combinePlayerInfo); 
 
     response = await axios.get('api/allTrainer');
     this.allTrainer = response.data;
@@ -79,18 +79,17 @@ export default {
   },
 
   methods: {
-    combineInfo(player) {
-      player.fullInfo = player.firstName + ' ' + player.lastName + ' (' + player.id + ' ) (' + player.clubName + ')';
+    combinePlayerInfo(player) {
+      player.combinedInfo = player.firstName + ' ' + player.lastName + ' (' + player.id + ' ) (' + player.clubName + ')';
       return player;
     },
-    removeInfo(player) {
-      delete player.fullInfo;
+    removeCombinedPlayerInfo(player) {
+      delete player.combinedInfo;
       return player;
     },
 
     updateGroup() {
-      this.players.map(this.removeInfo);
-      this.group.players = this.players;
+      this.group.players = this.players.map(this.removeCombinedPlayerInfo);
       this.group.club = this.club;
       this.group.trainer = this.trainer;
     },
@@ -123,53 +122,6 @@ export default {
 -->
 
 <style>
-
-.changeGroupBtn {
-  color: white;
-  background: #4b9183;
-  border: 2px solid #4b9183;
-  border-radius: 8px;
-  padding: 5px;
-  font-weight: bold;
-  margin: 20px 10px 30px 0;
-  transition: all 0.3s ease-in-out;
-}
-
-.changeGroupBtn:hover {
-  background: none;
-  border: 2px solid #4b9183;
-  color: #4b9183;
-
-  transition: all 0.3s ease-in-out;
-}
-
-.deleteGroupBtn {
-  color: white;
-  background: red;
-  border: 2px solid red;
-
-  border-radius: 8px;
-  padding: 5px;
-  font-weight: bold;
-  margin: 20px 0 30px 0;
-  transition: all 0.3s ease-in-out;
-}
-
-.deleteGroupBtn:hover {
-  background: none;
-  border: 2px solid red;
-  color: red;
-
-  transition: all 0.3s ease-in-out;
-}
-
-
-
-
-
-
-
-
 
 
 /* multiselect */

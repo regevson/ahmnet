@@ -15,13 +15,4 @@ public class Club {
 	return name;
     }
 
-/*
-    @OneToMany(fetch = FetchType.EAGER)
-    private Set<Trainer> trainer;
-
-    @OneToMany(fetch = FetchType.EAGER)
-    private Set<Client> clients;
-    */
-
-
 }

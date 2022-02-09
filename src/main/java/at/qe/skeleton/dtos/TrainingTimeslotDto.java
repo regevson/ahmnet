@@ -2,6 +2,7 @@ package at.qe.skeleton.dtos;
 
 import java.time.LocalDate;
 
+import at.qe.skeleton.model.Club;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import lombok.Setter;
 public class TrainingTimeslotDto {
 
     private long id;
-    private String clubName;
+    private Club club;
     private LocalDate date;
     private String timeslot;
     private String court;

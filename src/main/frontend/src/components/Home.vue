@@ -70,5 +70,61 @@ body {
   background: #1b2730;
 }
 
+.newBtn {
+  background: none;
+  border: 2px solid #4b9183;
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  color: green;
+  margin: 20px 0 30px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.newBtn:hover {
+  color: white;
+  background: #4b9183;
+  transition: all 0.3s ease-in-out;
+}
+
+.changeBtn {
+  color: white;
+  background: #4b9183;
+  border: 2px solid #4b9183;
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  margin: 20px 10px 30px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.changeBtn:hover {
+  background: none;
+  border: 2px solid #4b9183;
+  color: #4b9183;
+
+  transition: all 0.3s ease-in-out;
+}
+
+.deleteBtn {
+  color: white;
+  background: red;
+  border: 2px solid red;
+
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  margin: 20px 0 30px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.deleteBtn:hover {
+  background: none;
+  border: 2px solid red;
+  color: red;
+
+  transition: all 0.3s ease-in-out;
+}
+
 </style>
 

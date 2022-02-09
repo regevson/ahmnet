@@ -33,13 +33,28 @@ public class TrainingController {
     @Autowired
     TrainingMapper mapper;
 
+    @GetMapping("/newTraining")
+    public TrainingDetailsDto getNewTraining() {
+	TrainingDetailsDto dto = new TrainingDetailsDto();
+	dto.setId(-1L);
+	return dto;
+    }
+
     @GetMapping("/training")
     public TrainingDetailsDto getTrainingsById(long id) {
-	return mapper.mapToTrainingDetailsDto(this.trainingService.loadTraining(id));
+	return mapper.mapToTrainingDetailsDto(this.trainingService.loadTrainingById(id));
+    }
+
+    @GetMapping("/deleteTraining")
+    public void deleteGroup(long id) {
+    try {
+	this.trainingService.deleteTraining(id);
+    }catch(Exception e) { e.printStackTrace();};
     }
 
     @GetMapping("/trainingsByWeek")
     public HashMap<DayOfWeek, List<TrainingTimeslotDto>> getTrainingsByWeek(String username, int weekNum) {
+    try {
         List<Training> trainings = this.trainingService.loadTrainingsByTrainerAndWeek(username, weekNum);
 	HashMap<DayOfWeek, List<Training>> trainingsByDay = this.trainingService.groupByDay(trainings);
 
@@ -53,14 +68,20 @@ public class TrainingController {
 	}
 
         return trDtoByDay;
+    }catch(Exception e) { e.printStackTrace();};
+        return null;
     }
 
     @PostMapping("/updateTrainingDetails")
-    public void setTrainingsDetails(@RequestBody TrainingDetailsDto trDetailsDto) {
+    public void setTrainingsDetails(@RequestBody TrainingDetailsDto trainingDto) {
     try {
-	Training tr = this.trainingService.loadTraining(trDetailsDto.getId());
-	mapper.mapFromTrainingDetailsDto(trDetailsDto, tr);
-	this.trainingService.saveTraining(tr);
+        Training training = null;
+        if(trainingDto.getId() != -1)
+            training = this.trainingService.loadTrainingById(trainingDto.getId());
+        else
+            training = new Training();
+	mapper.mapFromTrainingDetailsDto(trainingDto, training);
+	this.trainingService.saveTraining(training);
     }catch (Exception e) {e.printStackTrace();}
     }
 

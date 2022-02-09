@@ -30,6 +30,11 @@ public class TrainingGroupService {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    public List<TrainingGroup> loadAllGroups() {
+        return trainingGroupRepository.findAll();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public Set<TrainingGroup> loadTrainingGroupsByClub(String clubName) {
 	return this.trainingGroupRepository.findByClub_NameContaining(clubName);
     }
@@ -55,16 +60,16 @@ public class TrainingGroupService {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public void deleteGroup(TrainingGroup group) {
-        trainingGroupRepository.delete(group);
-    }
-
-    @Transactional
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public void deleteGroup(long id) {
 	TrainingGroup group = this.loadTrainingGroupById(id);
+	deleteGroup(group);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    public void deleteGroup(TrainingGroup group) {
 	group.getPlayers().removeAll(group.getPlayers());
         trainingGroupRepository.delete(group);
     }
+
 
 }

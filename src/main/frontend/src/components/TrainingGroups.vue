@@ -3,7 +3,7 @@
   <div align="center">
     <h3>Trainingsgruppen</h3>
     <div align="center">
-      <button class="newGroupBtn" v-on:click="createGroup">Neue Gruppe erstellen</button>
+      <button class="newBtn" v-on:click="createGroup">Neue Gruppe erstellen</button>
     </div>
   </div>
 
@@ -83,21 +83,5 @@ export default {
   padding: 5px;
 }
 
-.newGroupBtn {
-  background: none;
-  border: 2px solid #4b9183;
-  border-radius: 8px;
-  padding: 5px;
-  font-weight: bold;
-  color: green;
-  margin: 20px 0 30px 0;
-  transition: all 0.3s ease-in-out;
-}
-
-.newGroupBtn:hover {
-  color: white;
-  background: #4b9183;
-  transition: all 0.3s ease-in-out;
-}
 
 </style>

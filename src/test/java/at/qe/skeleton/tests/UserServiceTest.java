@@ -35,13 +35,13 @@ public class UserServiceTest {
                 Assertions.assertNotNull(user.getCreateDate(), "User \"" + user + "\" does not have a createDate defined");
                 Assertions.assertNull(user.getUpdateUser(), "User \"" + user + "\" has a updateUser defined");
                 Assertions.assertNull(user.getUpdateDate(), "User \"" + user + "\" has a updateDate defined");
-            } else if ("user1".equals(user.getUsername())) {
+            } else if ("susi".equals(user.getUsername())) {
                 Assertions.assertTrue(user.getRoles().contains(UserRole.PLAYER), "User \"" + user + "\" does not have role PLAYER");
                 Assertions.assertNotNull(user.getCreateUser(), "User \"" + user + "\" does not have a createUser defined");
                 Assertions.assertNotNull(user.getCreateDate(), "User \"" + user + "\" does not have a createDate defined");
                 Assertions.assertNull(user.getUpdateUser(), "User \"" + user + "\" has a updateUser defined");
                 Assertions.assertNull(user.getUpdateDate(), "User \"" + user +"\" has a updateDate defined");
-            } else if ("user2".equals(user.getUsername())) {
+            } else if ("max".equals(user.getUsername())) {
                 Assertions.assertTrue(user.getRoles().contains(UserRole.PLAYER), "User \"" + user + "\" does not have role TRAINER");
                 Assertions.assertNotNull(user.getCreateUser(), "User \"" + user + "\" does not have a createUser defined");
                 Assertions.assertNotNull(user.getCreateDate(), "User \"" + user + "\" does not have a createDate defined");
@@ -85,7 +85,7 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testUpdateUser() {
-        String username = "user1";
+        String username = "susi";
         User adminUser = userService.loadUser("admin");
         Assertions.assertNotNull(adminUser, "Admin user could not be loaded from test data source");
         User toBeSavedUser = userService.loadUser(username);
@@ -97,7 +97,7 @@ public class UserServiceTest {
         toBeSavedUser.setEmail("changed-email@whatever.wherever");
         userService.saveUser(toBeSavedUser);
 
-        User freshlyLoadedUser = userService.loadUser("user1");
+        User freshlyLoadedUser = userService.loadUser("susi");
         Assertions.assertNotNull(freshlyLoadedUser, "User \"" + username + "\" could not be loaded from test data source after being saved");
         Assertions.assertNotNull(freshlyLoadedUser.getUpdateUser(), "User \"" + username + "\" does not have a updateUser defined after being saved");
         Assertions.assertEquals(adminUser, freshlyLoadedUser.getUpdateUser(), "User \"" + username + "\" has wrong updateUser set");
@@ -176,7 +176,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @WithMockUser(username = "user1", authorities = {"PLAYER"})
+    @WithMockUser(username = "susi", authorities = {"PLAYER"})
     public void testUnauthorizedLoadUser() {
         Assertions.assertThrows(org.springframework.security.access.AccessDeniedException.class, () -> {
             User user = userService.loadUser("admin");
@@ -184,18 +184,18 @@ public class UserServiceTest {
         });
     }
 
-    @WithMockUser(username = "user1", authorities = {"TRAINER"})
+    @WithMockUser(username = "susi", authorities = {"TRAINER"})
     public void testAuthorizedLoadUser() {
-        String username = "user1";
+        String username = "susi";
         User user = userService.loadUser(username);
         Assertions.assertEquals(username, user.getUsername(), "Call to userService.loadUser returned wrong user");
     }
 
     @Test
-    @WithMockUser(username = "user1", authorities = {"TRAINER"})
+    @WithMockUser(username = "susi", authorities = {"TRAINER"})
     public void testUnauthorizedSaveUser() {
         Assertions.assertThrows(org.springframework.security.access.AccessDeniedException.class, () -> {
-            String username = "user1";
+            String username = "susi";
             User user = userService.loadUser(username);
             Assertions.assertEquals(username, user.getUsername(), "Call to userService.loadUser returned wrong user");
             userService.saveUser(user);
@@ -203,19 +203,19 @@ public class UserServiceTest {
     }
 
     @Test
-    @WithMockUser(username = "user1", authorities = {"TRAINER"})
+    @WithMockUser(username = "susi", authorities = {"TRAINER"})
     public void testUnauthorizedDeleteUser() {
         Assertions.assertThrows(org.springframework.security.access.AccessDeniedException.class, () -> {
-            User user = userService.loadUser("user1");
-            Assertions.assertEquals("user1", user.getUsername(), "Call to userService.loadUser returned wrong user");
+            User user = userService.loadUser("susi");
+            Assertions.assertEquals("susi", user.getUsername(), "Call to userService.loadUser returned wrong user");
             userService.deleteUser(user);
         });
     }
 
     @Test
-    @WithMockUser(username = "user1", authorities = {"TRAINER"})
+    @WithMockUser(username = "susi", authorities = {"TRAINER"})
     public void testGetUsersById() {
-	String[] ids = new String[] {"admin", "user2"};
+	String[] ids = new String[] {"admin", "max"};
         Collection<User> users = userService.loadUsersById(ids);
         Assertions.assertEquals(2, users.size(), "Users couldn't be loaded by id");
     }

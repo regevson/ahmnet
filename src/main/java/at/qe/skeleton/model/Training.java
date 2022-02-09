@@ -5,18 +5,25 @@ import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 
 @Entity
 public class Training {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // otherwise there is problem when saving with empty id
     private long id;
 
     @Column(columnDefinition = "TIMESTAMP")
@@ -34,7 +41,12 @@ public class Training {
     @ManyToOne
     @JoinColumn(name="trainingGroupId")
     private TrainingGroup trainingGroup;
+    
+    @ManyToOne
+    private User trainer;
 
+    @ManyToOne
+    private Club club;
 
     public LocalDateTime getDateTime() {
 	return dateTime;
@@ -108,6 +120,22 @@ public class Training {
 
     public void setAttendees(Set<User> attendance) {
 	this.attendees = attendance;
+    }
+
+    public User getTrainer() {
+	return trainer;
+    }
+
+    public void setTrainer(User trainer) {
+	this.trainer = trainer;
+    }
+
+    public Club getClub() {
+	return club;
+    }
+
+    public void setClub(Club club) {
+	this.club = club;
     }
 
 }

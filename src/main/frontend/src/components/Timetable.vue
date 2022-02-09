@@ -3,7 +3,12 @@
   <div align="center">
     <h3>Your TimeTable:</h3>
 
-    <table v-if="trainings" class="table table-responsive">
+    <div align="center">
+      <button class="newBtn" @click="createTraining" >Neues Training erstellen</button>
+    </div>
+
+
+    <table v-if="trainings" class="timetable table table-responsive">
       <thead>
         <tr align="center">
           <th scope="col">Mo</th>
@@ -67,11 +72,17 @@ export default {
 
   async created() {
     const username = localStorage.getItem('username');
-    //var weekNum = 1;
-    const response = await axios.get('api/trainingsByWeek?username=' + username + '&weekNum=1');
+    const weekNum = 6;
+    const response = await axios.get('api/trainingsByWeek?username=' + username + '&weekNum=' + weekNum);
 
     this.trainings = response.data;
   },
+
+  methods: {
+    createTraining() {
+      this.$router.push({name: 'trainingdetails', params: {trainingId: -1}});
+    }
+  }
 
 }
 
@@ -79,8 +90,9 @@ export default {
 </script>
 
 <style>
-td {
+.timetable td {
   border-top: none !important;
 }
+
 </style>
 

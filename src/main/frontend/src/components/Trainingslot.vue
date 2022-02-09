@@ -6,7 +6,7 @@
         <div>
           <span style="font-size: 13px; display: block; font-weight: 600;">{{training.date}}</span>
           <hr>
-          <span>{{training.clubName}}</span><br>
+          <span>{{training.club.name}}</span><br>
           <span>{{training.timeslot}}</span><br>
           <hr>
           <span style="font-size: 13px; display: block; font-weight: 600;">{{training.court}}</span>

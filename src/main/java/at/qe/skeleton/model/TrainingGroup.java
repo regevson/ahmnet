@@ -27,10 +27,10 @@ public class TrainingGroup {
     @ManyToOne
     private Club club;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<User> players;
 
-    @OneToMany(mappedBy = "trainingGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "trainingGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Training> trainings;
 
     private int numRemainingSessions;

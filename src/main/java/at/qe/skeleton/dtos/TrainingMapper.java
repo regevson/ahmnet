@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import at.qe.skeleton.model.Training;
-import at.qe.skeleton.model.User;
+import at.qe.skeleton.services.TrainingGroupService;
 import at.qe.skeleton.services.TrainingService;
 import at.qe.skeleton.services.UserService;
 
@@ -18,11 +18,15 @@ public class TrainingMapper {
     TrainingService trainingService;
     @Autowired
     UserService userService;
+    @Autowired
+    TrainingGroupMapper groupMapper;
+    @Autowired
+    TrainingGroupService trainingGroupService;
 
     public TrainingTimeslotDto mapToTrainingTimeslotDto(Training tr) {
 	TrainingTimeslotDto dto = new TrainingTimeslotDto();
 	dto.setId(tr.getId());
-	dto.setClubName(tr.getTrainingGroup().getClub().getName());
+	dto.setClub(tr.getClub());
 	dto.setDate(tr.getDateTime().toLocalDate());
 	LocalTime startTime = tr.getDateTime().toLocalTime();
 	dto.setTimeslot(startTime.toString() + " - " + startTime.plusMinutes(tr.getDurationMinutes()).toString());
@@ -33,14 +37,15 @@ public class TrainingMapper {
     public TrainingDetailsDto mapToTrainingDetailsDto(Training tr) {
 	TrainingDetailsDto dto = new TrainingDetailsDto();
 	dto.setId(tr.getId());
-	dto.setClub(tr.getTrainingGroup().getClub());
+	dto.setGroup(groupMapper.mapToTrainingGroupDto(tr.getTrainingGroup()));
+	dto.setClub(tr.getClub());
+	dto.setCourt(tr.getCourt());
 	dto.setDate(tr.getDateTime().toLocalDate());
 	LocalTime startTime = tr.getDateTime().toLocalTime();
 	dto.setStartTime(startTime);
 	dto.setTimeslot(startTime.toString() + " - " + startTime.plusMinutes(tr.getDurationMinutes()).toString());
 	dto.setDurationMinutes(tr.getDurationMinutes());
-	dto.setTrainerFn(tr.getTrainingGroup().getTrainer().getFirstName());
-	dto.setTrainerLn(tr.getTrainingGroup().getTrainer().getLastName());
+	dto.setTrainer(UserMapper.mapToUserDto(tr.getTrainer()));
 	dto.setPlayers(UserMapper.mapToUserDto(tr.getTrainingGroup().getPlayers()));
 	dto.setAttendees(tr.getAttendees().stream().map(u -> u.getId()).collect(Collectors.toList()));
 	dto.setBulletPoints(tr.getBulletPoints());
@@ -49,11 +54,15 @@ public class TrainingMapper {
     }
     
     public void mapFromTrainingDetailsDto(TrainingDetailsDto dto, Training tr) {
-	tr.getTrainingGroup().setClub(dto.getClub());
+        tr.setTrainingGroup(trainingGroupService.loadTrainingGroupById(dto.getGroup().getId()));
+        tr.setTrainer(userService.loadUser(dto.getTrainer().getId()));
+        tr.setClub(dto.getClub());
+	tr.setCourt(dto.getCourt());
         tr.setDateTime(dto.getDate().atTime(dto.getStartTime()));
         tr.setDurationMinutes(dto.getDurationMinutes());
         //List<User> players = dto.getPlayers().stream().map(p -> userService.loadUser(p.getId())).collect(Collectors.toList());
-        tr.setAttendees(dto.getAttendees().stream().map(id -> userService.loadUser(id)).collect(Collectors.toSet()));
+        if(dto.getAttendees() != null)
+            tr.setAttendees(dto.getAttendees().stream().map(id -> userService.loadUser(id)).collect(Collectors.toSet()));
         tr.setBulletPoints(dto.getBulletPoints());
         tr.setComment(dto.getComments());
     }
