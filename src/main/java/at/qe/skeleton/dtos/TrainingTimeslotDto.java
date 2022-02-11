@@ -14,7 +14,7 @@ public class TrainingTimeslotDto {
 
     private long id;
     private Club club;
-    private LocalDate date;
+    private String date;
     private String timeslot;
     private String court;
 

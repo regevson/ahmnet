@@ -1,27 +1,48 @@
 <template>
-  <div>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <img src="../../public/img/logo.png" style="width: 20%;">
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+<div>
+  <b-navbar toggleable="lg" type="dark" variant="info">
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li v-if="!isLoggedIn" class="nav-item active">
-            <router-link to="./login"><a class="nav-link" href="#">Log In <span class="sr-only">(current)</span></a></router-link>
-          </li>
-          <li v-if="isLoggedIn && hasRole('ADMIN')" class="nav-item active">
-            <a class="nav-link" href="#">Admin-Functions</a>
-          </li>
-           <b-nav-item-dropdown v-if="isLoggedIn && hasRole('TRAINER')" text="Trainer-Funktionen" right>
-            <b-dropdown-item href="#"><a href="#" v-on:click="returnRoute('traininggroups')">Trainingsgruppen</a></b-dropdown-item>
-           </b-nav-item-dropdown>
-        </ul>
-      </div>
-    </nav>
 
-  </div>
+    <a href="timetable" style="display: contents">
+      <img href="timetable" src="../../public/img/logo.png" style="width: 8%; min-width: 110px; display: block; margin-right: 20px;">
+    </a>
+
+    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+    <b-collapse id="nav-collapse" is-nav>
+      <b-navbar-nav>
+        <b-nav-item v-if="!isLoggedIn" :to="{name: 'login'}" class="nav-link">
+           Login
+        </b-nav-item>
+        <b-nav-item v-if="isLoggedIn" :to="{name: 'timetable'}" class="nav-link">
+            Studentafel
+        </b-nav-item>
+        <b-nav-item v-if="isLoggedIn && hasRole('TRAINER')" :to="{name: 'traininggroups'}" class="nav-link">
+            Trainingsgruppen
+        </b-nav-item>
+        <b-nav-item v-if="isLoggedIn && hasRole('ADMIN')" href="#" class="nav-link">
+            Admin-Functions
+        </b-nav-item>
+      </b-navbar-nav>
+
+      <!-- Right aligned nav items -->
+      <b-navbar-nav class="ml-auto">
+
+        <b-nav-item-dropdown right>
+          <!-- Using 'button-content' slot -->
+          <template #button-content>
+            <a class="nav-link" style="display:inline-block">User</a>
+          </template>
+          <b-dropdown-item href="login">Log In</b-dropdown-item>
+          <b-dropdown-item href="#">Log Out</b-dropdown-item>
+        </b-nav-item-dropdown>
+      </b-navbar-nav>
+    </b-collapse>
+  </b-navbar>
+</div>
+
+
+
 </template>
 
 <script>
@@ -43,6 +64,7 @@ export default {
       return this.user.roles.includes(role);
     },
     returnRoute: function(newRouteName) {
+      // unused
       this.$emit('newRoute', newRouteName);
     }
   }
@@ -51,3 +73,24 @@ export default {
 
 </script>
 
+<style scoped>
+.navbar {
+  background: #1b2730 !important;
+  color: white;
+  font-weight: bold;
+}
+
+.nav-link {
+  color: white !important;
+}
+
+.nav-link:hover {
+  color: #bf8a4a !important;
+}
+
+.router-link-active {
+  color: #bf8a4a !important;
+  font-weight: 800;
+  font-size: 19px;
+}
+</style>

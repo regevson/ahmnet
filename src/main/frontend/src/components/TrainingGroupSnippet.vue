@@ -49,8 +49,8 @@ export default {
 <style scoped>
 #groupSnippet {
   float: left;
-  background: #f9bb2d;
-  color: black;
+  background: #1b2730;
+  color: white;
   max-width: 185px;
   border-radius: 15px;
   padding: 0px;
@@ -61,10 +61,11 @@ export default {
 }
 
 #groupSnippet .top {
-  background: #df9203;
+  background: #bf8a4a;
   padding: 5px;
   text-align: center;
   font-weight: 800;
+  color: #1b2730;
 }
 
 #groupSnippet .bot {
@@ -83,7 +84,7 @@ export default {
 }
 
 #groupSnippet .trainer {
-  background: green;
+  background: #bf8a4a;
   font-weight: bold;
 }
 

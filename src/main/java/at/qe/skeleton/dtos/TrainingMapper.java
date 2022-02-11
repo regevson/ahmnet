@@ -1,5 +1,6 @@
 package at.qe.skeleton.dtos;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class TrainingMapper {
 	TrainingTimeslotDto dto = new TrainingTimeslotDto();
 	dto.setId(tr.getId());
 	dto.setClub(tr.getClub());
-	dto.setDate(tr.getDateTime().toLocalDate());
+	dto.setDate(trainingService.convertDateToGerman(tr.getDateTime().toLocalDate()));
 	LocalTime startTime = tr.getDateTime().toLocalTime();
 	dto.setTimeslot(startTime.toString() + " - " + startTime.plusMinutes(tr.getDurationMinutes()).toString());
 	dto.setCourt(tr.getCourt());

@@ -5,9 +5,10 @@
   <h2 v-if="user">Welcome Home {{user.firstName}}! </h2>
   <h3 v-if="!user">Oops... sth. went wrong!</h3>
   -->
-  <router-view :user="user"/>
-  <!--
-  -->
+  <div class="wrapper">
+    <router-view :user="user"/>
+  </div>
+
 </div>
 </template>
 
@@ -39,6 +40,7 @@ export default {
 
   methods: {
     changeRoute: function(newRouteName) {
+      // unused
       this.$router.push({name: newRouteName});
     },
   }
@@ -59,8 +61,20 @@ export default {
 
 <style>
 
-body {
+.wrapper {
   padding: 10px;
+}
+
+h1 {
+  font-size: 1.5vw;
+  font-weight: bold;
+  background: #4b9183;
+  color: white;
+  width: auto;
+  max-width: 700px;
+  display: block;
+  border-radius: 4px;
+  padding: 5px;
 }
 
 .ahmBgGreen {
@@ -124,6 +138,16 @@ body {
   color: red;
 
   transition: all 0.3s ease-in-out;
+}
+
+.arrow {
+  font-size: 20px;
+  color: #4b9183;
+}
+
+.arrow:hover {
+  cursor: pointer;
+  color: green;
 }
 
 </style>

@@ -1,6 +1,7 @@
 package at.qe.skeleton.ui.controllers;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import at.qe.skeleton.dtos.TimetableDto;
 import at.qe.skeleton.dtos.TrainingDetailsDto;
 import at.qe.skeleton.dtos.TrainingMapper;
 import at.qe.skeleton.dtos.TrainingTimeslotDto;
@@ -53,9 +55,9 @@ public class TrainingController {
     }
 
     @GetMapping("/trainingsByWeek")
-    public HashMap<DayOfWeek, List<TrainingTimeslotDto>> getTrainingsByWeek(String username, int weekNum) {
+    public TimetableDto getTrainingsByWeek(String trainer, int weekNum) {
     try {
-        List<Training> trainings = this.trainingService.loadTrainingsByTrainerAndWeek(username, weekNum);
+        List<Training> trainings = this.trainingService.loadTrainingsByTrainerAndWeek(trainer, weekNum);
 	HashMap<DayOfWeek, List<Training>> trainingsByDay = this.trainingService.groupByDay(trainings);
 
 	HashMap<DayOfWeek,List<TrainingTimeslotDto>> trDtoByDay = new HashMap<>();
@@ -67,7 +69,11 @@ public class TrainingController {
             trDtoByDay.put(e.getKey(), trDtoList);
 	}
 
-        return trDtoByDay;
+	TimetableDto dto = new TimetableDto();
+	dto.setDatesInWeek(trainingService.getDatesInWeek(weekNum));
+	dto.setTrainings(trDtoByDay);
+
+        return dto;
     }catch(Exception e) { e.printStackTrace();};
         return null;
     }

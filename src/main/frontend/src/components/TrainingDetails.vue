@@ -11,7 +11,7 @@
       <multiselect v-model="group" :options="allGroups" placeholder="Auswählen/Suchen" label="combinedInfo" track-by="combinedInfo" deselectLabel="" selectLabel="" />
       <br>
 
-      <p>Datum: {{training.date}}</p>
+      <p>Datum:</p>
 
       <b-form-datepicker v-model="training.date" class="mb-2" 
             locale="de" 

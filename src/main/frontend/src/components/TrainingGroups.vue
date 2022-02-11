@@ -1,7 +1,7 @@
 <template>
 <div>
   <div align="center">
-    <h3>Trainingsgruppen</h3>
+    <h1>Trainingsgruppen</h1>
     <div align="center">
       <button class="newBtn" v-on:click="createGroup">Neue Gruppe erstellen</button>
     </div>
@@ -10,9 +10,9 @@
  <div v-for="(club, idx) in clubs" :key="idx">
     <b-card no-body class="mb-1">
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block v-b-toggle="'accordion-'+idx" variant="info">{{club.name}} - Gruppen</b-button>
+        <button block class="cardBtn" v-b-toggle="'accordion-'+idx">{{club.name}} - Gruppen</button>
       </b-card-header>
-      <b-collapse :id="'accordion-'+idx" visible accordion="my-accordion" role="tabpanel">
+      <b-collapse :id="'accordion-'+idx" accordion="my-accordion" role="tabpanel">
         <b-card-body>
           <TrainingGroupSnippet :club="club"/>
         </b-card-body>
@@ -60,28 +60,30 @@ export default {
 <style scoped>
 
 .card {
-  border: 2px solid #4b9183;
+  border: 2px solid #bf8a4a;
 }
 
 .card-header {
-  background: #4b9183;
+  background: #bf8a4a;
   border: none;
   border-radius: 0 !important;
 }
-.card-header .btn{
-  background: #4b9183;
-  border: none;
-  color: white;
-  font-weight: bold;
-  box-shadow: none;
-}
 
 .card-body {
-  /*background: #1b2730;*/
   border: none;
   height: auto;
   padding: 5px;
 }
+
+.cardBtn {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 5px;
+  width: 100%;
+}
+
 
 
 </style>

@@ -1,11 +1,17 @@
 package at.qe.skeleton.services;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.IsoFields;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -93,6 +99,22 @@ public class TrainingService {
         trList.sort(comparator);
         return trList;
     }
+
+    public List<String> getDatesInWeek(int weekNum) {
+        LocalDate monday = LocalDate.ofYearDay(2022,1)
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNum)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate prevSunday = monday.minusDays(1);
+        return IntStream.range(0, 7).mapToObj(prevSunday::plusDays)
+        	.map(d -> this.convertDateToGerman(d))
+        	.collect(Collectors.toList());
+    }
+
+    public String convertDateToGerman(LocalDate date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return date.format(formatter);
+    }
     
+
 
 }

@@ -13,7 +13,7 @@ export default new Router ({
   mode: 'history',
   routes: [
     {path: '/', component: Login},
-    {path: '/login', component: Login},
+    {path: '/login', name: 'login', component: Login},
     {path: '/home', name: 'home', component: Home,
       children: [
         { path: '/timetable', name: 'timetable', component: Timetable },
