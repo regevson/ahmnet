@@ -1,16 +1,15 @@
 <template>
 
   <div>
-    <div v-for="training in trainings" :key="training.id" align="center" class="trainingPreview">
+    <div v-for="(training,tr_idx) in trainings" :key="training.id" align="center" :class="{currentslot: checkSlot(tr_idx) === 'currentslot', pastslot: checkSlot(tr_idx) === 'pastslot'}" class="trainingPreview">
       <router-link :to="{name: 'trainingdetails', params: {trainingId: training.id}}" class="link">
-        <div>
           <span style="font-size: 13px; display: block; font-weight: 600;">{{training.date}}</span>
-          <hr>
+        <div id="inner" class="trainingPreviewInner">
           <span>{{training.club.name}}</span><br>
-          <span>{{training.timeslot}}</span><br>
           <hr>
-          <span style="font-size: 13px; display: block; font-weight: 600;">{{training.court}}</span>
+          <span>{{training.timeslot}}</span><br>
         </div>
+          <span style="font-size: 13px; display: block; font-weight: 600;">{{training.court}}</span>
       </router-link>
     </div>
   </div>
@@ -32,6 +31,30 @@ export default {
     }
   },
 
+  methods: {
+    checkSlot(tr_idx) {
+      const tr = this.trainings[tr_idx];
+      let startDateTime = this.convertToDate(tr.date);
+      let startTime = tr.startTime.split(':');
+      startDateTime.setHours(startTime[0], startTime[1], startTime[2]);
+      let endDateTime = new Date(+startDateTime + 60000 * tr.durationMinutes);
+
+      //let currDateTime = new Date();
+      let currDateTime = new Date("2022-02-12");
+      currDateTime.setHours(14, 10, 0);
+      if(currDateTime >= startDateTime && currDateTime <= endDateTime)
+        return "currentslot";
+      else if(startDateTime < currDateTime)
+        return "pastslot";
+      else
+        return "";
+    },
+    convertToDate(dateStr) {
+      var parts = dateStr.split("-");
+      return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+    }
+  },
+
 }
 
 
@@ -50,15 +73,22 @@ td {
 }
 .trainingPreview {
   font-weight: 700;
-  border-radius: 14px;
-  padding: 10px 5px 10px 5px;
+  padding: 5px 0 5px 0;
   width: auto;
   margin-top: 20px;
   min-width: 125px;
   transition: all 0.5s ease-in-out;
-  background: #d1fdf53d;
+  background: #4b9183;
   border: 2px solid #4b9183;
+  border-radius: 14px;
   text-align: center;
+}
+
+.trainingPreviewInner {
+  padding: 5px 5px 5px 5px;
+  background: #6bab9f;
+  margin: 5px 0 5px 0;
+  border-radius: 14px;
 }
 
 .trainingPreview:hover {
@@ -67,17 +97,34 @@ td {
 }
 
 .link {
-  color: #4b9183;
+  color: white;
   text-decoration: none;
 }
 .link:hover {
-  color: #4b9183;
+  color: white;
   text-decoration: none;
 }
 
 .trainingPreview hr {
   margin: 0;
-  background: #4b9183;
+  background: white;
+  height: 3px !important;
+}
+
+.currentslot {
+  color: white !important;
+  border: 4px outset orange !important;
+}
+
+.currentslot #inner {
+}
+
+.currentslot > .link {
+  color: white !important;
+}
+
+.pastslot {
+  opacity: 0.7;
 }
 
 </style>

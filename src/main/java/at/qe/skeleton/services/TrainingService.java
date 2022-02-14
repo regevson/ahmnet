@@ -2,13 +2,14 @@ package at.qe.skeleton.services;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.IsoFields;
-import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,6 +28,8 @@ import at.qe.skeleton.repositories.TrainingRepository;
 @Scope("application")
 public class TrainingService {
 
+    @Autowired
+    private UserService userService;
     @Autowired
     private TrainingRepository trainingRepository;
 
@@ -101,11 +104,10 @@ public class TrainingService {
     }
 
     public List<String> getDatesInWeek(int weekNum) {
-        LocalDate monday = LocalDate.ofYearDay(2022,1)
-                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNum)
-                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        LocalDate prevSunday = monday.minusDays(1);
-        return IntStream.range(0, 7).mapToObj(prevSunday::plusDays)
+        LocalDate monday = LocalDate.of(Year.now().getValue(), 2, 1)
+                .with(WeekFields.of(Locale.GERMANY).getFirstDayOfWeek())
+                .with(WeekFields.of(Locale.GERMANY).weekOfWeekBasedYear(), weekNum);
+        return IntStream.range(0, 7).mapToObj(monday::plusDays)
         	.map(d -> this.convertDateToGerman(d))
         	.collect(Collectors.toList());
     }
@@ -114,7 +116,23 @@ public class TrainingService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         return date.format(formatter);
     }
-    
 
+    public List<Training> loadFreeTrainingsByWeek(int weekNum) {
+	return this.trainingRepository.findFreeTrainingsByWeek(weekNum);
+    }
+
+    public void freeTraining(long id) {
+	Training tr = this.loadTrainingById(id);
+	tr.setFree(true);
+	this.saveTraining(tr);
+    }
+
+    public void grabTraining(long id) {
+	Training tr = this.loadTrainingById(id);
+	tr.setFree(false);
+	User user = this.userService.getAuthenticatedUser();
+	tr.setTrainer(user);
+	this.saveTraining(tr);
+    }
 
 }

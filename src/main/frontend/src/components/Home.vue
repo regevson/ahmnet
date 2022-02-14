@@ -32,9 +32,10 @@ export default {
     console.log(response.data);
 
     this.user = response.data;
+    localStorage.setItem('user', JSON.stringify(this.user));
 
     // in case user navigates to '/home', he gets redirected to '/timetable'
-    if(this.$route.name === 'home') 
+    if(this.$route.name === 'home')
       this.$router.replace({name: 'timetable'});
   },
 
@@ -128,7 +129,7 @@ h1 {
   border-radius: 8px;
   padding: 5px;
   font-weight: bold;
-  margin: 20px 0 30px 0;
+  margin: 20px 10px 30px 0;
   transition: all 0.3s ease-in-out;
 }
 
@@ -139,6 +140,27 @@ h1 {
 
   transition: all 0.3s ease-in-out;
 }
+
+.freeBtn {
+  color: white;
+  background: orange;
+  border: 2px solid orange;
+
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  margin: 20px 10px 30px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.freeBtn:hover {
+  background: none;
+  border: 2px solid orange;
+  color: orange;
+
+  transition: all 0.3s ease-in-out;
+}
+
 
 .arrow {
   font-size: 20px;

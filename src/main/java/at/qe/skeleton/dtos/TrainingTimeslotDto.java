@@ -1,6 +1,6 @@
 package at.qe.skeleton.dtos;
 
-import java.time.LocalDate;
+import java.time.LocalTime;
 
 import at.qe.skeleton.model.Club;
 import lombok.Getter;
@@ -16,6 +16,8 @@ public class TrainingTimeslotDto {
     private Club club;
     private String date;
     private String timeslot;
+    private LocalTime startTime;
+    private int durationMinutes;
     private String court;
 
 }

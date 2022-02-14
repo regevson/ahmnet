@@ -79,7 +79,9 @@
 
       <div align="center" v-if="training.id != -1">
         <input class="changeBtn fourth" type="submit" @click="updateTrainingDetails" value="Anpassen">
-        <button v-if="training.id != -1" @click="deleteTraining" class="deleteBtn">Löschen</button>
+        <button @click="deleteTraining" class="deleteBtn">Löschen</button>
+        <button v-if="isFreeable(training) == true" @click="freeTraining" class="freeBtn">Freigeben</button>
+        <button v-if="isFreeable(training) == false" @click="grabTraining" class="freeBtn">Übernehmen</button>
       </div>
 
 
@@ -121,6 +123,7 @@ export default {
       //set defaults
       this.training.startTime = "10:30";
       this.training.durationMinutes = 60;
+      this.training.isFree = false;
     }
     else {
       response = await axios.get('api/training?id=' + this.$route.params.trainingId);
@@ -176,7 +179,23 @@ export default {
       const response = await axios.get('api/deleteTraining?id=' + this.training.id);
       console.log(response);
       this.$router.push({name: 'timetable'});
-    }
+    },
+
+    async freeTraining() {
+      const response = await axios.get('api/freeTraining?id=' + this.training.id);
+      console.log(response);
+      this.$router.push({name: 'timetable'});
+    },
+
+    async grabTraining() {
+      const response = await axios.get('api/grabTraining?id=' + this.training.id);
+      console.log(response);
+      this.$router.push({name: 'timetable'});
+    },
+
+    isFreeable(training) {
+      return !training.isFree;
+    },
 
   }
 

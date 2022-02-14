@@ -92,7 +92,6 @@ public class UserService {
     public User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findFirstByUsername(auth.getName());
-        System.out.println(user.getFirstName());
         return user;
     }
 

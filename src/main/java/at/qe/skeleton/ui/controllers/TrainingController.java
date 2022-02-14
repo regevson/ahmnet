@@ -48,9 +48,23 @@ public class TrainingController {
     }
 
     @GetMapping("/deleteTraining")
-    public void deleteGroup(long id) {
+    public void deleteTraining(long id) {
     try {
 	this.trainingService.deleteTraining(id);
+    }catch(Exception e) { e.printStackTrace();};
+    }
+
+    @GetMapping("/freeTraining")
+    public void freeTraining(long id) {
+    try {
+	this.trainingService.freeTraining(id);
+    }catch(Exception e) { e.printStackTrace();};
+    }
+
+    @GetMapping("/grabTraining")
+    public void grabTraining(long id) {
+    try {
+	this.trainingService.grabTraining(id);
     }catch(Exception e) { e.printStackTrace();};
     }
 
@@ -77,6 +91,31 @@ public class TrainingController {
     }catch(Exception e) { e.printStackTrace();};
         return null;
     }
+    
+    @GetMapping("/freeTrainings")
+    public TimetableDto getFreeTrainings(int weekNum) {
+    try {
+	List<Training> trainings = this.trainingService.loadFreeTrainingsByWeek(weekNum);
+	HashMap<DayOfWeek, List<Training>> trainingsByDay = this.trainingService.groupByDay(trainings);
+
+	HashMap<DayOfWeek,List<TrainingTimeslotDto>> trDtoByDay = new HashMap<>();
+	for(Map.Entry<DayOfWeek,List<Training>> e : trainingsByDay.entrySet()) {
+            List<TrainingTimeslotDto> trDtoList = new ArrayList<>();
+	    List<Training> trList = e.getValue();
+            for(Training t : trList) 
+        	trDtoList.add(mapper.mapToTrainingTimeslotDto(t));
+            trDtoByDay.put(e.getKey(), trDtoList);
+	}
+
+	TimetableDto dto = new TimetableDto();
+	dto.setDatesInWeek(trainingService.getDatesInWeek(weekNum));
+	dto.setTrainings(trDtoByDay);
+
+        return dto;
+    }catch(Exception e) { e.printStackTrace();};
+        return null;
+    }
+    
 
     @PostMapping("/updateTrainingDetails")
     public void setTrainingsDetails(@RequestBody TrainingDetailsDto trainingDto) {

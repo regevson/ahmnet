@@ -20,6 +20,9 @@
         <b-nav-item v-if="isLoggedIn && hasRole('TRAINER')" :to="{name: 'traininggroups'}" class="nav-link">
             Trainingsgruppen
         </b-nav-item>
+        <b-nav-item v-if="isLoggedIn && hasRole('TRAINER')" :to="{name: 'vacationtable'}" class="nav-link">
+            Urlaubstafel
+        </b-nav-item>
         <b-nav-item v-if="isLoggedIn && hasRole('ADMIN')" href="#" class="nav-link">
             Admin-Functions
         </b-nav-item>

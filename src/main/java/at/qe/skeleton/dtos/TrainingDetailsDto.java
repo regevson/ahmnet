@@ -28,5 +28,6 @@ public class TrainingDetailsDto {
     private Collection<String> attendees;
     private String bulletPoints;
     private String comments;
+    private Boolean isFree;
 
 }

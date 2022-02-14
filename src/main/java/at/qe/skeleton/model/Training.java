@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,8 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.ColumnDefault;
 
 
 @Entity
@@ -34,6 +32,9 @@ public class Training {
     private String court;
     private String bulletPoints;
     private String comment;
+
+    @Column(columnDefinition = "boolean default false", nullable = false)
+    private Boolean isFree;
 
     @ManyToMany
     private Set<User> attendees;
@@ -136,6 +137,14 @@ public class Training {
 
     public void setClub(Club club) {
 	this.club = club;
+    }
+
+    public boolean isFree() {
+	return isFree;
+    }
+
+    public void setFree(boolean isFree) {
+	this.isFree = isFree;
     }
 
 }

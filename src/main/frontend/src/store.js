@@ -5,19 +5,40 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
-    selectedTraining: null,
+    selectedTrainer: null,
+    weekNum: null,
   },
 
   getters: {
-    selectedTraining(state) {
-      return state.selectedTraining;
+    selectedTrainer(state) {
+      if(state.selectedTrainer == null)
+        state.selectedTrainer = JSON.parse(localStorage.getItem('user'));
+      return state.selectedTrainer;
     },
+
+    weekNum(state) {
+      if(state.weekNum == null)
+        state.weekNum = calcCurrentWeekNum();
+      return state.weekNum;
+    },
+
   },
 
   mutations: {
-    selectedTraining(state, training) {
-      state.selectedTraining = training;
+    selectedTrainer(state, trainer) {
+      state.selectedTrainer = trainer;
+    },
+
+    weekNum(state, weekNum) {
+      state.weekNum = weekNum;
     },
   }
 
 });
+
+function calcCurrentWeekNum() {
+  let currentDate = new Date();
+  var oneJan = new Date(currentDate.getFullYear(),0,1);
+  var numberOfDays = Math.floor((currentDate - oneJan) / (24 * 60 * 60 * 1000));
+  return Math.ceil(( currentDate.getDay() + 1 + numberOfDays) / 7) - 1;
+}

@@ -1,13 +1,15 @@
 package at.qe.skeleton.dtos;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import at.qe.skeleton.model.Training;
+import at.qe.skeleton.model.User;
 import at.qe.skeleton.services.TrainingGroupService;
 import at.qe.skeleton.services.TrainingService;
 import at.qe.skeleton.services.UserService;
@@ -31,8 +33,16 @@ public class TrainingMapper {
 	dto.setDate(trainingService.convertDateToGerman(tr.getDateTime().toLocalDate()));
 	LocalTime startTime = tr.getDateTime().toLocalTime();
 	dto.setTimeslot(startTime.toString() + " - " + startTime.plusMinutes(tr.getDurationMinutes()).toString());
+	dto.setStartTime(startTime);
+	dto.setDurationMinutes(tr.getDurationMinutes());
 	dto.setCourt(tr.getCourt());
 	return dto;
+    }
+    public Collection<TrainingTimeslotDto> mapToUserDto(Collection<Training> trainings) {
+	Collection<TrainingTimeslotDto> dtos = new ArrayList<>();
+	for(Training t : trainings)
+	    dtos.add(mapToTrainingTimeslotDto(t));
+	return dtos;
     }
 
     public TrainingDetailsDto mapToTrainingDetailsDto(Training tr) {
@@ -51,6 +61,7 @@ public class TrainingMapper {
 	dto.setAttendees(tr.getAttendees().stream().map(u -> u.getId()).collect(Collectors.toList()));
 	dto.setBulletPoints(tr.getBulletPoints());
 	dto.setComments(tr.getComment());
+	dto.setIsFree(tr.isFree());
 	return dto;
     }
     
@@ -66,5 +77,6 @@ public class TrainingMapper {
             tr.setAttendees(dto.getAttendees().stream().map(id -> userService.loadUser(id)).collect(Collectors.toSet()));
         tr.setBulletPoints(dto.getBulletPoints());
         tr.setComment(dto.getComments());
+        tr.setFree(dto.getIsFree());
     }
 }
