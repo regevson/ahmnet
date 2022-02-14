@@ -3,17 +3,16 @@
 
     <form v-if="training" @submit.prevent="">
 
-      Club:
-      <multiselect v-model="club" :options="allClubs" placeholder="Auswählen/Suchen" label="name" track-by="name" deselectLabel="" selectLabel="" />
+      <p class="entry">Club:</p>
+      <multiselect v-model="club" :options="allClubs" placeholder="Club suchen" label="name" track-by="name" deselectLabel="" selectLabel="" />
       <br>
 
-      Gruppe:
-      <multiselect v-model="group" :options="allGroups" placeholder="Auswählen/Suchen" label="combinedInfo" track-by="combinedInfo" deselectLabel="" selectLabel="" />
+      <p class="entry">Gruppe:</p>
+      <multiselect v-model="group" :options="allGroups" placeholder="Gruppe suchen" label="combinedInfo" track-by="combinedInfo" deselectLabel="" selectLabel="" />
       <br>
 
-      <p>Datum:</p>
-
-      <b-form-datepicker v-model="training.date" class="mb-2" 
+      <p class="entry">Datum:</p>
+      <b-form-datepicker v-model="training.date" class="mb-2 detailsInput"
             locale="de" 
             :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit'}" 
             :showDecadeNav="false" 
@@ -25,9 +24,8 @@
       </b-form-datepicker>
       <br>
 
-
-      <p>Zeit: {{training.timeslot}}</p>
-      <b-form-timepicker v-model="training.startTime" 
+      <p class="entry">Zeit:</p>
+      <b-form-timepicker v-model="training.startTime" class="detailsInput"
             locale="de"
             :minutes-step="15"
             :hide-header="true"
@@ -37,22 +35,22 @@
       <br>
 
 
-      <p>Dauer: {{training.durationMinutes}}</p>
-      <b-form-input type="number" v-model="training.durationMinutes" placeholder="Dauer in Minuten"></b-form-input>
+      <p class="entry">Dauer:</p>
+      <b-form-input type="number" class="detailsInput" v-model="training.durationMinutes" placeholder="Dauer in Minuten"></b-form-input>
       <br>
 
-      <p>Court:</p>
-      <b-form-input v-model="training.court" placeholder="Platz 3"></b-form-input>
+      <p class="entry">Court:</p>
+      <b-form-input v-model="training.court" class="detailsInput"></b-form-input>
       <br>
 
 
-      TrainerIn:
-      <multiselect v-model="trainer" :options="allTrainer" placeholder="Select one" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
+      <p class="entry">TrainerIn:</p>
+      <multiselect v-model="trainer" :options="allTrainer" placeholder="TrainerIn suchen" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
       <br>
 
       <div v-if="training.id != -1">
-        <p>Anwesenheit Spieler:</p>
-        <div class="form-check">
+        <p class="entry">Anwesenheit SpielerInnen:</p>
+        <div style="margin-top: 10px" class="form-check">
           <div v-for="player in training.players" :key="player.id">
             <input class="form-check-input" type="checkbox" :value="player.id" :id="player.id" v-model="training.attendees">
             <label class="form-check-label" :for="player.id">
@@ -61,15 +59,15 @@
           </div>
         </div>
       </div>
-
       <br>
 
-      <p>Schwerpunkte:</p>
-      <textarea v-model="training.bulletPoints" rows="4">
+      <p class="entry">Schwerpunkte:</p>
+      <textarea v-model="training.bulletPoints" rows="4" style="width: 100%; padding: 5px;" class="detailsInput">
       </textarea>
       <br>
-      <p>Kommentare:</p>
-      <textarea v-model="training.comments" rows="4">
+
+      <p class="entry">Kommentare:</p>
+      <textarea v-model="training.comments" rows="4" style="width: 100%; padding: 5px;" class="detailsInput">
       </textarea>
       <br>
 
@@ -123,7 +121,7 @@ export default {
       //set defaults
       this.training.startTime = "10:30";
       this.training.durationMinutes = 60;
-      this.training.isFree = false;
+      this.training.free = false;
     }
     else {
       response = await axios.get('api/training?id=' + this.$route.params.trainingId);
@@ -194,7 +192,7 @@ export default {
     },
 
     isFreeable(training) {
-      return !training.isFree;
+      return !training.free;
     },
 
   }
@@ -204,3 +202,16 @@ export default {
 
 
 </script>
+
+<style>
+.entry {
+  background: #499082;
+  color: white;
+  font-weight: bold;
+  padding: 10px 5px 10px 5px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  margin-bottom: 0px;
+}
+
+</style>

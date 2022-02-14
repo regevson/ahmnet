@@ -11,8 +11,6 @@ export const store = new Vuex.Store({
 
   getters: {
     selectedTrainer(state) {
-      if(state.selectedTrainer == null)
-        state.selectedTrainer = JSON.parse(localStorage.getItem('user'));
       return state.selectedTrainer;
     },
 

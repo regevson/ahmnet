@@ -1,7 +1,7 @@
 <template>
 
   <div align="center">
-    <h1>DEINE STUNDENTAFEL</h1>
+    <h1>URLAUBSTAFEL</h1><br>
 
     
     <Table :isVacationTable="true"/>
@@ -19,7 +19,6 @@
 
 <script>
 import Table from "./Table";
-//import axios from 'axios'
 
 export default {
   name: 'VacationTable',
@@ -31,15 +30,6 @@ export default {
   data() {
     return {
     }
-  },
-
-  created() {
-  },
-
-  methods: {
-  },
-
-  computed: {
   },
 
 }

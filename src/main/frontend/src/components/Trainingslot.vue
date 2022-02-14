@@ -1,7 +1,7 @@
 <template>
 
   <div>
-    <div v-for="(training,tr_idx) in trainings" :key="training.id" align="center" :class="{currentslot: checkSlot(tr_idx) === 'currentslot', pastslot: checkSlot(tr_idx) === 'pastslot'}" class="trainingPreview">
+    <div v-for="(training,tr_idx) in trainings" :key="training.id" align="center" :class="{currentslot: checkSlot(tr_idx) === 'currentslot', pastslot: checkSlot(tr_idx) === 'pastslot', vacationslot: checkVacation(tr_idx) == 'vacationslot'}" class="trainingPreview">
       <router-link :to="{name: 'trainingdetails', params: {trainingId: training.id}}" class="link">
           <span style="font-size: 13px; display: block; font-weight: 600;">{{training.date}}</span>
         <div id="inner" class="trainingPreviewInner">
@@ -23,7 +23,8 @@ export default {
   name: 'TrainingSlot',
   props: {
     trainings: Array,
-    user: Object
+    user: Object,
+    selectedTrainer: Object
   },
 
   data() {
@@ -48,6 +49,11 @@ export default {
         return "pastslot";
       else
         return "";
+    },
+    checkVacation(tr_idx) {
+      const tr = this.trainings[tr_idx];
+      if(tr.free || tr.originalTrainerId != this.selectedTrainer.id)
+        return 'vacationslot';
     },
     convertToDate(dateStr) {
       var parts = dateStr.split("-");
@@ -124,7 +130,26 @@ td {
 }
 
 .pastslot {
-  opacity: 0.7;
+  /*opacity: 0.7;*/
+  opacity: 1;
+}
+
+.vacationslot {
+  background: #fdd663 !important;
+  border-color: #fdd663;
+}
+
+.vacationslot #inner {
+  background: #ffffff6b;
+  color: #774e00 !important;
+}
+
+.vacationslot > .link {
+  color: black !important;
+}
+
+.vacationslot hr {
+  background: #8c6903;
 }
 
 </style>

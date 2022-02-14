@@ -124,6 +124,7 @@ public class TrainingService {
     public void freeTraining(long id) {
 	Training tr = this.loadTrainingById(id);
 	tr.setFree(true);
+	tr.setTrainer(tr.getOriginalTrainer());
 	this.saveTraining(tr);
     }
 

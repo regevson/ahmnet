@@ -60,11 +60,11 @@ export default {
 <style scoped>
 
 .card {
-  border: 2px solid #bf8a4a;
+  border: 2px solid #3e6d63;
 }
 
 .card-header {
-  background: #bf8a4a;
+  background: #3e6d63;
   border: none;
   border-radius: 0 !important;
 }

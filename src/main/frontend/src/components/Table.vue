@@ -19,25 +19,25 @@
       <tbody>
         <tr>
           <td>
-            <Trainingslot :trainings="trainings.MONDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.MONDAY"/>
           </td>
           <td>
-            <Trainingslot :trainings="trainings.TUESDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.TUESDAY"/>
           </td>
           <td>
-            <Trainingslot :trainings="trainings.WEDNESDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.WEDNESDAY"/>
           </td>
           <td>
-            <Trainingslot :trainings="trainings.THURSDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.THURSDAY"/>
           </td>
           <td>
-            <Trainingslot :trainings="trainings.FRIDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.FRIDAY"/>
           </td>
           <td>
-            <Trainingslot :trainings="trainings.SATURDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.SATURDAY"/>
           </td>
           <td>
-            <Trainingslot :trainings="trainings.SUNDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.SUNDAY"/>
           </td>
         </tr>
       </tbody>

@@ -2,20 +2,24 @@
   <div>
 
     <form style="text-align: left" v-if="group" @submit.prevent="">
-      <span v-if="group.id != -1">GruppenNr: {{group.id}}</span><br><br>
+
+      <div align="center" v-if="group.id != -1">
+        <p class="entry" style="background: #1b2730; border-radius: 5px;">Gruppe {{group.id}}</p>
+      </div>
+      <br>
 
 
-    Club:
+    <p class="entry">Club:</p>
     <multiselect v-model="club" :options="allClubs" placeholder="Auswählen/Suchen" label="name" track-by="name" deselectLabel="" selectLabel="" />
     <br>
 
 
-    SpielerInnen: 
+    <p class="entry">SpielerInnen:</p>
   <multiselect v-model="players" :options="allPlayers" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="false" placeholder="Auswählen/Suchen" label="combinedInfo" track-by="combinedInfo" :preselect-first="false" :clearOnSelect="false" selectLabel="" deselectLabel="" selectedLabel="" />
   <br>
 
 
-    TrainerIn:
+    <p class="entry">TrainerIn:</p>
     <multiselect v-model="trainer" :options="allTrainer" placeholder="Select one" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
     <br>
 
@@ -122,7 +126,13 @@ export default {
 -->
 
 <style>
-
+.detailsInput {
+  border: 1px solid #b1acac !important;
+  border-radius: 0px !important;
+  border-bottom-left-radius: 5px !important;
+  border-bottom-right-radius: 5px !important;
+  border-top: none !important;
+}
 
 /* multiselect */
 fieldset[disabled] .multiselect {
@@ -280,8 +290,11 @@ fieldset[disabled] .multiselect {
   min-height: 40px;
   display: block;
   padding: 8px 40px 0 8px;
-  border-radius: 5px;
-  border: 1px solid gray;
+  /*border-radius: 5px;*/
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border: 1px solid #b1acac;
+  border-top: none;
   background: #fff;
   font-size: 14px;
 }
@@ -295,7 +308,7 @@ fieldset[disabled] .multiselect {
   color: white;
   font-weight: bold;
   line-height: 1;
-  background: green;
+  background: #316286;
   margin-bottom: 5px;
   white-space: nowrap;
   overflow: hidden;
@@ -456,7 +469,7 @@ fieldset[disabled] .multiselect {
   padding-right: 12px;
   padding-left: 20px;
   font-size: 13px;
-  background: green;
+  background: #316286;
   color: white !important;
 }
 
@@ -464,7 +477,7 @@ fieldset[disabled] .multiselect {
 .multiselect__option--highlight {
   /* background: #41b883; */
   background: none;
-  color: green;
+  color: #316286;
 }
 
 .multiselect__option--highlight:after {
@@ -473,7 +486,7 @@ fieldset[disabled] .multiselect {
 }
 
 .multiselect__option--selected {
-  background: green;
+  background: #316286;
   color: white;
   font-weight: bold;
 }

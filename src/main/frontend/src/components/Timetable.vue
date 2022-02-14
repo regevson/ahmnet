@@ -1,27 +1,25 @@
 <template>
+<div>
 
-  <div align="center">
+  <div v-if="selectedTrainer" align="center">
     <h1>DEINE STUNDENTAFEL</h1>
 
     <div align="center">
       <button class="newBtn" @click="createTraining" >Neues Training erstellen</button>
     </div>
 
-    <div align="left">
-      <span>TrainerIn auswählen:</span>
+    <div v-if="hasRole('TRAINER')" align="left">
+      <p class="entry">TrainerIn auswählen:</p>
       <multiselect v-model="selectedTrainer" :options="allTrainer" placeholder="Trainer auswählen" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
     </div>
     <br>
     
     <Table :selectedTrainer="selectedTrainer" :isVacationTable="false"/>
 
-
-<!--
-    <h3 v-if="!trainings">Oops... sth. went wrong!</h3> 
--->
-
   </div>
 
+  <h3 v-if="!selectedTrainer">Oops... sth. went wrong!</h3> 
+</div>
 </template>
 
 <script>
@@ -54,11 +52,16 @@ export default {
       const response = await axios.get('api/allTrainer');
       this.allTrainer = response.data;
     },
+    hasRole: function(role) {
+      return this.user.roles.includes(role);
+    }
   },
 
   computed: {
     selectedTrainer: {
       get() {
+        if(this.$store.getters["selectedTrainer"] == null)
+          this.$store.commit("selectedTrainer", this.user);
         return this.$store.getters["selectedTrainer"];
       },
       set(selectedTrainer) {

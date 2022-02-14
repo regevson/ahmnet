@@ -19,5 +19,7 @@ public class TrainingTimeslotDto {
     private LocalTime startTime;
     private int durationMinutes;
     private String court;
+    private boolean isFree;
+    private String originalTrainerId;
 
 }

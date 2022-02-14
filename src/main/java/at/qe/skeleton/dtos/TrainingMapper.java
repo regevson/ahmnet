@@ -36,6 +36,8 @@ public class TrainingMapper {
 	dto.setStartTime(startTime);
 	dto.setDurationMinutes(tr.getDurationMinutes());
 	dto.setCourt(tr.getCourt());
+	dto.setFree(tr.isFree());
+	dto.setOriginalTrainerId(tr.getOriginalTrainer().getId());
 	return dto;
     }
     public Collection<TrainingTimeslotDto> mapToUserDto(Collection<Training> trainings) {
@@ -61,7 +63,7 @@ public class TrainingMapper {
 	dto.setAttendees(tr.getAttendees().stream().map(u -> u.getId()).collect(Collectors.toList()));
 	dto.setBulletPoints(tr.getBulletPoints());
 	dto.setComments(tr.getComment());
-	dto.setIsFree(tr.isFree());
+	dto.setFree(tr.isFree());
 	return dto;
     }
     
@@ -77,6 +79,6 @@ public class TrainingMapper {
             tr.setAttendees(dto.getAttendees().stream().map(id -> userService.loadUser(id)).collect(Collectors.toSet()));
         tr.setBulletPoints(dto.getBulletPoints());
         tr.setComment(dto.getComments());
-        tr.setFree(dto.getIsFree());
+        tr.setFree(dto.isFree());
     }
 }

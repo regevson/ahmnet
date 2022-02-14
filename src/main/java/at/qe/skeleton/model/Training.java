@@ -47,6 +47,9 @@ public class Training {
     private User trainer;
 
     @ManyToOne
+    private User originalTrainer;
+
+    @ManyToOne
     private Club club;
 
     public LocalDateTime getDateTime() {
@@ -129,6 +132,8 @@ public class Training {
 
     public void setTrainer(User trainer) {
 	this.trainer = trainer;
+	if(this.getOriginalTrainer() == null)
+	    this.originalTrainer = trainer;
     }
 
     public Club getClub() {
@@ -145,6 +150,10 @@ public class Training {
 
     public void setFree(boolean isFree) {
 	this.isFree = isFree;
+    }
+
+    public User getOriginalTrainer() {
+	return originalTrainer;
     }
 
 }
