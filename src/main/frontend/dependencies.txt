@@ -1,2 +1,0 @@
-bootstrapvue
-npm install vue-multiselect --save
