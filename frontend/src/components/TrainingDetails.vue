@@ -4,11 +4,11 @@
     <form v-if="training" @submit.prevent="">
 
       <p class="entry">Club:</p>
-      <multiselect v-model="club" :options="allClubs" placeholder="Club suchen" label="name" track-by="name" deselectLabel="" selectLabel="" />
+      <multiselect :allowEmpty="false" v-model="training.club" :options="allClubs" placeholder="Club suchen" label="name" track-by="name" deselectLabel="" selectLabel="" />
       <br>
 
       <p class="entry">Gruppe:</p>
-      <multiselect v-model="group" :options="allGroups" placeholder="Gruppe suchen" label="combinedInfo" track-by="combinedInfo" deselectLabel="" selectLabel="" />
+      <multiselect :allowEmpty="false" v-model="training.group" :options="allGroups" placeholder="Gruppe suchen" label="combinedInfo" track-by="combinedInfo" deselectLabel="" selectLabel="" />
       <br>
 
       <p class="entry">Datum:</p>
@@ -35,17 +35,19 @@
       <br>
 
 
-      <p class="entry">Dauer:</p>
-      <b-form-input type="number" class="detailsInput" v-model="training.durationMinutes" placeholder="Dauer in Minuten"></b-form-input>
+      <p class="entry" :class="{'errorBg': $v.durationMinutes.$invalid}">Dauer:</p>
+      <b-form-input type="number" v-model="durationMinutes" min="1" placeholder="Dauer in Minuten" :class="[$v.durationMinutes.$invalid ? 'form-error' : 'detailsInput']"></b-form-input>
+      <div class="errorText" v-if="!$v.durationMinutes.required">Bitte ausfüllen!</div>
       <br>
 
-      <p class="entry">Court:</p>
-      <b-form-input type="number" v-model="training.court" class="detailsInput"></b-form-input>
+      <p class="entry" :class="{'errorBg': $v.court.$invalid}">Court:</p>
+      <b-form-input type="number" v-model="court" min="1" :class="[$v.court.$invalid ? 'form-error' : 'detailsInput']"></b-form-input>
+      <div class="errorText" v-if="!$v.court.required">Bitte ausfüllen!</div>
       <br>
 
 
       <p class="entry">TrainerIn:</p>
-      <multiselect v-model="trainer" :options="allTrainer" placeholder="TrainerIn suchen" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
+      <multiselect :allowEmpty="false" v-model="training.trainer" :options="allTrainer" placeholder="TrainerIn suchen" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
       <br>
 
       <div v-if="training.id != -1">
@@ -76,14 +78,12 @@
       </div>
 
       <div align="center" v-if="training.id != -1">
-        <input class="changeBtn fourth" type="submit" @click="updateTrainingDetails" value="Anpassen">
-        <button @click="deleteTraining" class="deleteBtn">Löschen</button>
-        <button v-if="isFreeable(training) == true" @click="freeTraining" class="freeBtn">Freigeben</button>
-        <button v-if="isFreeable(training) == false" @click="grabTraining" class="freeBtn">Übernehmen</button>
+        <input v-if="isFreeable(training)" class="changeBtn fourth" type="submit" @click="updateTrainingDetails" value="Anpassen">
+        <button v-if="isFreeable(training)" @click="deleteTraining" class="deleteBtn">Löschen</button>
+        <button v-if="isFreeable(training)" @click="freeTraining" class="freeBtn">Freigeben</button>
+        <button v-if="!isFreeable(training)" @click="grabTraining" class="freeBtn">Übernehmen</button>
       </div>
 
-
-      
     </form>
 
 
@@ -96,6 +96,7 @@
 <script>
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
+import { required, minValue } from 'vuelidate/lib/validators'
 
 export default {
   name: 'TrainingDetails',
@@ -104,33 +105,28 @@ export default {
     return {
       training: null,
       allClubs: [],
-      club: null,
       allGroups: [],
-      group: null,
       allTrainer: [],
-      trainer: null,
+
+      // fields to validate
+      durationMinutes: 60,
+      court: 1,
+    }
+  },
+
+  validations: {
+    durationMinutes: {
+      required,
+      minValue: minValue(1),
+    },
+    court: {
+      required,
+      minValue: minValue(1),
     }
   },
 
   async created() {
     let response;
-
-    if(this.$route.params.trainingId == -1) { // create new training
-      response = await axios.get('api/newTraining'); // fetch an empty new training
-      this.training = response.data;
-      //set defaults
-      this.training.startTime = "10:30";
-      this.training.durationMinutes = 60;
-      this.training.free = false;
-    }
-    else {
-      response = await axios.get('api/training?id=' + this.$route.params.trainingId);
-      // set defaults
-      this.training = response.data;
-      this.club = this.training.club;
-      this.trainer = this.training.trainer;
-      this.group = this.combineGroupInfo(this.training.group);
-    }
 
     response = await axios.get('api/allClubs');
     this.allClubs = response.data;
@@ -141,6 +137,19 @@ export default {
 
     response = await axios.get('api/allTrainer');
     this.allTrainer = response.data;
+
+    if(this.$route.params.trainingId == -1) { // create new training
+      response = await axios.get('api/newTraining'); // fetch an empty new training
+      this.training = response.data;
+      this.prepopulate();
+    }
+    else {
+      response = await axios.get('api/training?id=' + this.$route.params.trainingId);
+      this.training = response.data;
+      this.combineGroupInfo(this.training.group);
+      this.setValidationFields();
+    }
+
   },
 
   methods: {
@@ -148,22 +157,24 @@ export default {
       let fullNames = [];
       group.players.forEach((player) => { fullNames.push(player.fullName); });
       group.combinedInfo = 'Gruppe' + group.id + ': (' + group.club.name + ') [' + fullNames + ']';
-      return group;
-    },
-    removeCombinedGroupInfo(group) {
-      delete group.combinedGroupInfo
-      return group;
     },
 
-    updateTraining() {
-      this.training.group = this.removeCombinedGroupInfo(this.group);
-      this.training.players = this.players;
-      this.training.club = this.club;
-      this.training.trainer = this.trainer;
+    prepopulate() {
+      this.training.startTime = "10:30";
+      this.training.durationMinutes = 60;
+      this.training.free = false;
+      this.training.date = new Date();
+      this.training.club = this.allClubs[0];
+      this.training.group = this.allGroups[0];
+      this.training.trainer = this.allTrainer[0];
     },
 
     async updateTrainingDetails() {
-      this.updateTraining();
+
+      if(!this.validate())
+        return;
+
+      this.getValidationFields();
 
       const config = {headers: {'Content-Type': 'application/json'}}
       let params = JSON.stringify(this.training);
@@ -195,6 +206,26 @@ export default {
       return !training.free;
     },
 
+    validate() {
+      this.$v.$touch();
+      if(this.$v.$invalid) {
+        alert('Bitte füllen Sie das Formular korrekt aus!');
+        return false;
+      } 
+      else
+        return true;
+    },
+
+    setValidationFields() {
+      this.durationMinutes = this.training.durationMinutes;
+      this.court = this.training.court;
+    },
+
+    getValidationFields() {
+      this.training.durationMinutes = this.durationMinutes;
+      this.training.court = this.court;
+    },
+
   }
 
 
@@ -212,6 +243,25 @@ export default {
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
   margin-bottom: 0px;
+}
+
+.form-error {
+  border-color: #bf0000 !important;
+  border-top-left-radius: 0px !important;
+  border-top-right-radius: 0px !important;
+  border-top: none !important;
+}
+
+.errorText {
+  color: #bf0000;
+  font-size: 13px;
+  font-weight: bold;
+  padding-left: 15px;
+  margin-top: 5px;
+}
+
+.errorBg {
+  background: #bf0000;
 }
 
 </style>

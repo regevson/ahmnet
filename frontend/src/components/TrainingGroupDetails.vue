@@ -10,16 +10,16 @@
 
 
     <p class="entry">Club:</p>
-    <multiselect v-model="club" :options="allClubs" placeholder="Auswählen/Suchen" label="name" track-by="name" deselectLabel="" selectLabel="" />
+    <multiselect :allowEmpty="false" v-model="group.club" :options="allClubs" placeholder="Auswählen/Suchen" label="name" track-by="name" deselectLabel="" selectLabel="" />
     <br>
 
 
     <p class="entry">SpielerInnen:</p>
-  <multiselect v-model="players" :options="allPlayers" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="false" placeholder="Auswählen/Suchen" label="combinedInfo" track-by="combinedInfo" :preselect-first="false" :clearOnSelect="false" selectLabel="" deselectLabel="" selectedLabel="" />
+  <multiselect :allowEmpty="false" v-model="group.players" :options="allPlayers" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="false" placeholder="Auswählen/Suchen" label="combinedInfo" track-by="combinedInfo" :preselect-first="false" :clearOnSelect="false" selectLabel="" deselectLabel="" selectedLabel="" />
   <br>
 
     <p class="entry">TrainerIn:</p>
-    <multiselect v-model="trainer" :options="allTrainer" placeholder="Select one" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
+    <multiselect :allowEmpty="false" v-model="group.trainer" :options="allTrainer" placeholder="Select one" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
     <br>
 
     <p class="entry">Gespielte Trainings:</p>
@@ -30,7 +30,7 @@
 
     <p class="entry">Anwesenheit:</p>
       <div class="detailsInput" style="padding: 5px 5px 5px 10px">
-        <div v-for="player in players" :key="player.id">
+        <div v-for="player in group.players" :key="player.id">
           <span class="readonly">{{player.fullName}}:</span> <span class="readonly readonlyDigit">{{getAttendance(player.id)}}</span>
         </div>
       </div>
@@ -60,29 +60,13 @@ export default {
     return {
       group: null,
       allClubs: [],
-      club: null,
-      players: [],
       allPlayers: [],
       allTrainer: [],
-      trainer: null,
     }
   },
 
   async created() {
     let response;
-
-    if(this.$route.params.groupId == -1) { // create new group
-      response = await axios.get('api/newGroup'); // fetch an empty new training
-      this.group = response.data;
-    }
-
-    else { // group already exists
-      response = await axios.get('api/group?id=' + this.$route.params.groupId);
-      this.group = response.data;
-      this.players = this.group.players.map(this.combinePlayerInfo); 
-      this.club = this.group.club;
-      this.trainer = this.group.trainer;
-    }
 
     response = await axios.get('api/allClubs');
     this.allClubs = response.data;
@@ -93,6 +77,19 @@ export default {
     response = await axios.get('api/allTrainer');
     this.allTrainer = response.data;
 
+    if(this.$route.params.groupId == -1) { // create new group
+      response = await axios.get('api/newGroup'); // fetch an empty new training
+      this.group = response.data;
+      this.prepopulate();
+    }
+
+    else { // group already exists
+      response = await axios.get('api/group?id=' + this.$route.params.groupId);
+      this.group = response.data;
+      this.group.players.map(this.combinePlayerInfo); 
+    }
+
+
   },
 
   methods: {
@@ -100,20 +97,14 @@ export default {
       player.combinedInfo = player.firstName + ' ' + player.lastName + ' (' + player.id + ') (' + player.clubName + ')';
       return player;
     },
-    removeCombinedPlayerInfo(player) {
-      delete player.combinedInfo;
-      return player;
-    },
 
-    updateGroup() {
-      this.group.players = this.players.map(this.removeCombinedPlayerInfo);
-      this.group.club = this.club;
-      this.group.trainer = this.trainer;
+    prepopulate() {
+      this.group.club = this.allClubs[0];
+      this.group.players = [this.allPlayers[0]];
+      this.group.trainer = this.allTrainer[0];
     },
 
     async updateTrainingGroupDetails() {
-      this.updateGroup();
-
       const config = {headers: {'Content-Type': 'application/json'}}
       let params = JSON.stringify(this.group);
 
