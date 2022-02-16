@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("view")
-public class UserDetailController implements Serializable {
+public class UserDetailController {
 
     @Autowired
     private UserService userService;

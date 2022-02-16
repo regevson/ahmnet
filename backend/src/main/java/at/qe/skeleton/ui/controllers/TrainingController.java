@@ -1,11 +1,7 @@
 package at.qe.skeleton.ui.controllers;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.qe.skeleton.dtos.TimetableDto;
-import at.qe.skeleton.dtos.TrainingDetailsDto;
+import at.qe.skeleton.dtos.TrainingDto;
 import at.qe.skeleton.dtos.TrainingMapper;
-import at.qe.skeleton.dtos.TrainingTimeslotDto;
+import at.qe.skeleton.dtos.TrainingSnippetDto;
 import at.qe.skeleton.model.Training;
 import at.qe.skeleton.services.TrainingService;
 import at.qe.skeleton.services.UserService;
@@ -36,15 +32,15 @@ public class TrainingController {
     TrainingMapper mapper;
 
     @GetMapping("/newTraining")
-    public TrainingDetailsDto getNewTraining() {
-	TrainingDetailsDto dto = new TrainingDetailsDto();
+    public TrainingDto getNewTraining() {
+	TrainingDto dto = new TrainingDto();
 	dto.setId(-1L);
 	return dto;
     }
 
     @GetMapping("/training")
-    public TrainingDetailsDto getTrainingsById(long id) {
-	return mapper.mapToTrainingDetailsDto(this.trainingService.loadTrainingById(id));
+    public TrainingDto getTrainingsById(long id) {
+	return mapper.mapToTrainingDto(this.trainingService.loadTrainingById(id));
     }
 
     @GetMapping("/deleteTraining")
@@ -71,54 +67,34 @@ public class TrainingController {
     @GetMapping("/trainingsByWeek")
     public TimetableDto getTrainingsByWeek(String trainer, int weekNum) {
     try {
-        List<Training> trainings = this.trainingService.loadTrainingsByTrainerAndWeek(trainer, weekNum);
-	HashMap<DayOfWeek, List<Training>> trainingsByDay = this.trainingService.groupByDay(trainings);
+	List<List<Training>> trainingsByDay = this.trainingService.getTrainingsByWeek(trainer, weekNum);
+	List<List<TrainingSnippetDto>> dtoList = new ArrayList<>();
 
-	HashMap<DayOfWeek,List<TrainingTimeslotDto>> trDtoByDay = new HashMap<>();
-	for(Map.Entry<DayOfWeek,List<Training>> e : trainingsByDay.entrySet()) {
-            List<TrainingTimeslotDto> trDtoList = new ArrayList<>();
-	    List<Training> trList = e.getValue();
-            for(Training t : trList) 
-        	trDtoList.add(mapper.mapToTrainingTimeslotDto(t));
-            trDtoByDay.put(e.getKey(), trDtoList);
-	}
+	for(List<Training> dayList : trainingsByDay)
+            dtoList.add(mapper.mapToTrainingSnippetDto(dayList));
 
-	TimetableDto dto = new TimetableDto();
-	dto.setDatesInWeek(trainingService.getDatesInWeek(weekNum));
-	dto.setTrainings(trDtoByDay);
-
-        return dto;
+	return this.mapper.mapToTimetableDto(trainingService.getDatesInWeek(weekNum), dtoList);
     }catch(Exception e) { e.printStackTrace();};
         return null;
     }
     
-    @GetMapping("/freeTrainings")
+    @GetMapping("/availableTrainings")
     public TimetableDto getFreeTrainings(int weekNum) {
     try {
-	List<Training> trainings = this.trainingService.loadFreeTrainingsByWeek(weekNum);
-	HashMap<DayOfWeek, List<Training>> trainingsByDay = this.trainingService.groupByDay(trainings);
+	List<List<Training>> trainingsByDay = this.trainingService.loadFreeTrainingsByWeek(weekNum);
+	List<List<TrainingSnippetDto>> dtoList = new ArrayList<>();
 
-	HashMap<DayOfWeek,List<TrainingTimeslotDto>> trDtoByDay = new HashMap<>();
-	for(Map.Entry<DayOfWeek,List<Training>> e : trainingsByDay.entrySet()) {
-            List<TrainingTimeslotDto> trDtoList = new ArrayList<>();
-	    List<Training> trList = e.getValue();
-            for(Training t : trList) 
-        	trDtoList.add(mapper.mapToTrainingTimeslotDto(t));
-            trDtoByDay.put(e.getKey(), trDtoList);
-	}
+	for(List<Training> dayList : trainingsByDay)
+            dtoList.add(mapper.mapToTrainingSnippetDto(dayList));
 
-	TimetableDto dto = new TimetableDto();
-	dto.setDatesInWeek(trainingService.getDatesInWeek(weekNum));
-	dto.setTrainings(trDtoByDay);
-
-        return dto;
+	return this.mapper.mapToTimetableDto(trainingService.getDatesInWeek(weekNum), dtoList);
     }catch(Exception e) { e.printStackTrace();};
         return null;
     }
     
 
     @PostMapping("/updateTrainingDetails")
-    public void setTrainingsDetails(@RequestBody TrainingDetailsDto trainingDto) {
+    public void setTrainingsDetails(@RequestBody TrainingDto trainingDto) {
     try {
         Training training = null;
         if(trainingDto.getId() != -1)

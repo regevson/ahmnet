@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class TrainingTimeslotDto {
+public class TrainingSnippetDto {
 
     private long id;
     private Club club;

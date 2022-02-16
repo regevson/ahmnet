@@ -13,10 +13,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class TrainingDetailsDto {
+public class TrainingDto {
 
     private Long id;
-    private TrainingGroupDto group;
+    private TrainingGroupSnippetDto group;
     private Club club;
     private LocalDate date;
     private String timeslot;

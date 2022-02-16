@@ -2,14 +2,13 @@ package at.qe.skeleton.dtos;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import at.qe.skeleton.model.Training;
-import at.qe.skeleton.model.User;
 import at.qe.skeleton.services.TrainingGroupService;
 import at.qe.skeleton.services.TrainingService;
 import at.qe.skeleton.services.UserService;
@@ -26,8 +25,8 @@ public class TrainingMapper {
     @Autowired
     TrainingGroupService trainingGroupService;
 
-    public TrainingTimeslotDto mapToTrainingTimeslotDto(Training tr) {
-	TrainingTimeslotDto dto = new TrainingTimeslotDto();
+    public TrainingSnippetDto mapToTrainingSnippetDto(Training tr) {
+	TrainingSnippetDto dto = new TrainingSnippetDto();
 	dto.setId(tr.getId());
 	dto.setClub(tr.getClub());
 	dto.setDate(trainingService.convertDateToGerman(tr.getDateTime().toLocalDate()));
@@ -40,17 +39,17 @@ public class TrainingMapper {
 	dto.setOriginalTrainerId(tr.getOriginalTrainer().getId());
 	return dto;
     }
-    public Collection<TrainingTimeslotDto> mapToUserDto(Collection<Training> trainings) {
-	Collection<TrainingTimeslotDto> dtos = new ArrayList<>();
+    public List<TrainingSnippetDto> mapToTrainingSnippetDto(List<Training> trainings) {
+	List<TrainingSnippetDto> dtos = new ArrayList<>();
 	for(Training t : trainings)
-	    dtos.add(mapToTrainingTimeslotDto(t));
+	    dtos.add(mapToTrainingSnippetDto(t));
 	return dtos;
     }
 
-    public TrainingDetailsDto mapToTrainingDetailsDto(Training tr) {
-	TrainingDetailsDto dto = new TrainingDetailsDto();
+    public TrainingDto mapToTrainingDto(Training tr) {
+	TrainingDto dto = new TrainingDto();
 	dto.setId(tr.getId());
-	dto.setGroup(groupMapper.mapToTrainingGroupDto(tr.getTrainingGroup()));
+	dto.setGroup(groupMapper.mapToTrainingGroupSnippetDto(tr.getTrainingGroup()));
 	dto.setClub(tr.getClub());
 	dto.setCourt(tr.getCourt());
 	dto.setDate(tr.getDateTime().toLocalDate());
@@ -67,7 +66,7 @@ public class TrainingMapper {
 	return dto;
     }
     
-    public void mapFromTrainingDetailsDto(TrainingDetailsDto dto, Training tr) {
+    public void mapFromTrainingDetailsDto(TrainingDto dto, Training tr) {
         tr.setTrainingGroup(trainingGroupService.loadTrainingGroupById(dto.getGroup().getId()));
         tr.setTrainer(userService.loadUser(dto.getTrainer().getId()));
         tr.setClub(dto.getClub());
@@ -80,5 +79,12 @@ public class TrainingMapper {
         tr.setBulletPoints(dto.getBulletPoints());
         tr.setComment(dto.getComments());
         tr.setIsFree(dto.isFree());
+    }
+
+    public TimetableDto mapToTimetableDto(List<String> dates, List<List<TrainingSnippetDto>> trsByDay) {
+	TimetableDto dto = new TimetableDto();
+	dto.setDatesInWeek(dates);
+	dto.setTrainings(trsByDay);
+	return dto;
     }
 }

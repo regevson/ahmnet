@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import at.qe.skeleton.dtos.TrainingGroupDto;
 import at.qe.skeleton.dtos.TrainingGroupMapper;
+import at.qe.skeleton.dtos.TrainingGroupSnippetDto;
 import at.qe.skeleton.model.Club;
 import at.qe.skeleton.model.TrainingGroup;
 import at.qe.skeleton.services.TrainingGroupService;
@@ -40,8 +41,8 @@ public class TrainingGroupController {
     }
 
     @GetMapping("/allGroups")
-    public Collection<TrainingGroupDto> getAllGroups() {
-	return this.trainingGroupMapper.mapToTrainingGroupDto(trainingGroupService.loadAllGroups());
+    public Collection<TrainingGroupSnippetDto> getAllGroups() {
+	return this.trainingGroupMapper.mapToTrainingGroupSnippetDto(trainingGroupService.loadAllGroups());
     }
     
     @GetMapping("/deleteGroup")
@@ -52,14 +53,16 @@ public class TrainingGroupController {
     }
 
     @GetMapping("/groupsByClub")
-    public Collection<TrainingGroupDto> getClubsByClub(String clubName) {
-        return this.trainingGroupMapper.mapToTrainingGroupDto(trainingGroupService.loadTrainingGroupsByClub(clubName));
+    public Collection<TrainingGroupSnippetDto> getGroupsByClub(String clubName) {
+        return this.trainingGroupMapper.mapToTrainingGroupSnippetDto(trainingGroupService.loadTrainingGroupsByClub(clubName));
     }
 
     @GetMapping("/group")
     public TrainingGroupDto getGroupById(long id) {
 	TrainingGroup group = trainingGroupService.loadTrainingGroupById(id);
-	TrainingGroupDto dto = this.trainingGroupMapper.mapToTrainingGroupDto(group);
+	int numPlayedTr = this.trainingGroupService.calcNumPlayedSessions(group);
+	Map<String, Integer> attendance = this.trainingGroupService.calcAttendance(group);
+	TrainingGroupDto dto = this.trainingGroupMapper.mapToTrainingGroupDto(group, numPlayedTr, attendance);
 	return dto;
     }
 

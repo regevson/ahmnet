@@ -1,13 +1,11 @@
 package at.qe.skeleton.services;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -83,17 +81,17 @@ public class TrainingService {
         trainingRepository.delete(training);
     }
 
-    public HashMap<DayOfWeek, List<Training>> groupByDay(List<Training> trainings) {
-	HashMap<DayOfWeek, List<Training>> group = new HashMap<>();
+    public List<List<Training>> groupByDay(List<Training> trainings) {
+	List<List<Training>> trainingsByDay = new ArrayList<>();
+	for(int i = 0; i < 7; i++)
+	   trainingsByDay.add(new ArrayList<>()); 
+
 	for(Training training : trainings) {
-	    DayOfWeek day = training.getDateTime().getDayOfWeek();
-	    if(group.get(day) == null)
-		group.put(day, new ArrayList<>());
-	    List<Training> dayList = group.get(day);
-	    dayList.add(training);
-	    group.put(day, dayList);
+	    int day = training.getDateTime().getDayOfWeek().getValue()-1;
+	    trainingsByDay.get(day).add(training);
 	}
-	return group;
+	
+	return trainingsByDay;
     }
     
     public List<Training> orderTrainingsAsc(Set<Training> trs) {
@@ -117,8 +115,9 @@ public class TrainingService {
         return date.format(formatter);
     }
 
-    public List<Training> loadFreeTrainingsByWeek(int weekNum) {
-	return this.trainingRepository.findFreeTrainingsByWeek(weekNum);
+    public List<List<Training>> loadFreeTrainingsByWeek(int weekNum) {
+	List<Training> trainings = this.trainingRepository.findFreeTrainingsByWeek(weekNum);
+	return this.groupByDay(trainings);
     }
 
     public void freeTraining(long id) {
@@ -134,6 +133,11 @@ public class TrainingService {
 	User user = this.userService.getAuthenticatedUser();
 	tr.setTrainer(user);
 	this.saveTraining(tr);
+    }
+
+    public List<List<Training>> getTrainingsByWeek(String trainerId, int weekNum) {
+        List<Training> trainings = this.loadTrainingsByTrainerAndWeek(trainerId, weekNum);
+	return this.groupByDay(trainings);
     }
 
 }

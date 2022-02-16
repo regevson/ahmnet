@@ -2,6 +2,7 @@ package at.qe.skeleton.dtos;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,21 +22,15 @@ public class TrainingGroupMapper {
     @Autowired
     TrainingGroupService trainingGroupService;
 
-    public TrainingGroupDto mapToTrainingGroupDto(TrainingGroup trg) {
+    public TrainingGroupDto mapToTrainingGroupDto(TrainingGroup trg, int numPlayedSessions, Map<String, Integer> attendance) {
 	TrainingGroupDto dto = new TrainingGroupDto();
 	dto.setId(trg.getId());
 	dto.setTrainer(UserMapper.mapToUserDto(trg.getTrainer()));
 	dto.setClub(trg.getClub());
 	dto.setPlayers(UserMapper.mapToUserDto(trg.getPlayers()));
-	dto.setNumPlayedSessions(this.trainingGroupService.calcNumPlayedSessions(trg));
-	dto.setAttendance(this.trainingGroupService.calcAttendance(trg));
+	dto.setNumPlayedSessions(numPlayedSessions);
+	dto.setAttendance(attendance);
 	return dto;
-    }
-    public Collection<TrainingGroupDto> mapToTrainingGroupDto(Collection<TrainingGroup> groups) {
-	Collection<TrainingGroupDto> dtos = new ArrayList<>();
-	for(TrainingGroup tg : groups)
-	    dtos.add(mapToTrainingGroupDto(tg));
-	return dtos;
     }
 
     public void mapFromTrainingGroupDto(TrainingGroupDto dto, TrainingGroup trg) {
@@ -44,6 +39,23 @@ public class TrainingGroupMapper {
         Set<User> players = dto.getPlayers().stream().map(p -> userService.loadUser(p.getId())).collect(Collectors.toSet());
 	trg.setPlayers(players);
 	trg.setNumPlayedSessions(dto.getNumPlayedSessions());
+    }
+    
+
+    
+    public TrainingGroupSnippetDto mapToTrainingGroupSnippetDto(TrainingGroup trg) {
+	TrainingGroupSnippetDto dto = new TrainingGroupSnippetDto();
+	dto.setId(trg.getId());
+	dto.setTrainer(UserMapper.mapToUserDto(trg.getTrainer()));
+	dto.setClub(trg.getClub());
+	dto.setPlayers(UserMapper.mapToUserDto(trg.getPlayers()));
+	return dto;
+    }
+    public Collection<TrainingGroupSnippetDto> mapToTrainingGroupSnippetDto(Collection<TrainingGroup> groups) {
+	Collection<TrainingGroupSnippetDto> dtos = new ArrayList<>();
+	for(TrainingGroup tg : groups)
+	    dtos.add(mapToTrainingGroupSnippetDto(tg));
+	return dtos;
     }
 
 }

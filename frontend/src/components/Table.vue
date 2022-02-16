@@ -19,25 +19,25 @@
       <tbody>
         <tr>
           <td>
-            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.MONDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings[0]"/>
           </td>
           <td>
-            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.TUESDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings[1]"/>
           </td>
           <td>
-            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.WEDNESDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings[2]"/>
           </td>
           <td>
-            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.THURSDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings[3]"/>
           </td>
           <td>
-            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.FRIDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings[4]"/>
           </td>
           <td>
-            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.SATURDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings[5]"/>
           </td>
           <td>
-            <Trainingslot :selectedTrainer="trainer" :trainings="trainings.SUNDAY"/>
+            <Trainingslot :selectedTrainer="trainer" :trainings="trainings[6]"/>
           </td>
         </tr>
       </tbody>
@@ -87,7 +87,7 @@ export default {
       let response;
       let timetable;
       if(this.isVacationTable) {
-        response = await axios.get('api/freeTrainings?weekNum=' + this.weekNum);
+        response = await axios.get('api/availableTrainings?weekNum=' + this.weekNum);
         timetable = response.data
       }
       else {
