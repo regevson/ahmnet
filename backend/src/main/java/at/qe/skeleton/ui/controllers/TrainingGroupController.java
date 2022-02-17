@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,54 +31,69 @@ public class TrainingGroupController {
     TrainingGroupMapper trainingGroupMapper;
 
     @GetMapping("/newGroup")
-    public TrainingGroupDto getNewGroup() {
+    public ResponseEntity<?> getNewGroup() {
 	TrainingGroupDto dto = new TrainingGroupDto();
 	dto.setId(-1L);
-	return dto;
+        return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(dto);
     }
 
     @GetMapping("/allClubs")
-    public Collection<Club> getAllClubs() {
-	return this.trainingGroupService.loadAllClubs();
+    public ResponseEntity<?> getAllClubs() {
+	Collection<Club> dtos = this.trainingGroupService.loadAllClubs();
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .body(dtos);
     }
 
     @GetMapping("/allGroups")
-    public Collection<TrainingGroupSnippetDto> getAllGroups() {
-	return this.trainingGroupMapper.mapToTrainingGroupSnippetDto(trainingGroupService.loadAllGroups());
+    public ResponseEntity<?> getAllGroups() {
+	Collection<TrainingGroupSnippetDto> dtos = this.trainingGroupMapper.mapToTrainingGroupSnippetDto(trainingGroupService.loadAllGroups());
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .body(dtos);
     }
     
     @GetMapping("/deleteGroup")
-    public void deleteGroup(long id) {
-    try {
-	this.trainingGroupService.deleteGroup(id);
-    }catch(Exception e) { e.printStackTrace();};
+    public ResponseEntity<?> deleteGroup(long id) {
+	this.trainingGroupService.deleteGroup(this.trainingGroupService.loadTrainingGroupById(id));
+        return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .build();
     }
 
     @GetMapping("/groupsByClub")
-    public Collection<TrainingGroupSnippetDto> getGroupsByClub(String clubName) {
-        return this.trainingGroupMapper.mapToTrainingGroupSnippetDto(trainingGroupService.loadTrainingGroupsByClub(clubName));
+    public ResponseEntity<?> getGroupsByClub(String clubName) {
+        Collection<TrainingGroupSnippetDto> dtos = this.trainingGroupMapper.mapToTrainingGroupSnippetDto(trainingGroupService.loadTrainingGroupsByClub(clubName));
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .body(dtos);
     }
 
     @GetMapping("/group")
-    public TrainingGroupDto getGroupById(long id) {
+    public ResponseEntity<?> getGroupById(long id) {
 	TrainingGroup group = trainingGroupService.loadTrainingGroupById(id);
 	int numPlayedTr = this.trainingGroupService.calcNumPlayedSessions(group);
 	Map<String, Integer> attendance = this.trainingGroupService.calcAttendance(group);
 	TrainingGroupDto dto = this.trainingGroupMapper.mapToTrainingGroupDto(group, numPlayedTr, attendance);
-	return dto;
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .body(dto);
     }
 
     @PostMapping("/updateTrainingGroupDetails")
-    public void updateTrainingGroupDetails(@RequestBody TrainingGroupDto groupDto) {
-        try {
-            TrainingGroup group = null;
-            if(groupDto.getId() != -1)
-        	group = this.trainingGroupService.loadTrainingGroupById(groupDto.getId());
-            else
-        	group = new TrainingGroup();
-            this.trainingGroupMapper.mapFromTrainingGroupDto(groupDto, group);
-            this.trainingGroupService.saveGroup(group);
-        }catch (Exception e) {e.printStackTrace();}
+    public ResponseEntity<?> updateTrainingGroupDetails(@RequestBody TrainingGroupDto groupDto) {
+        TrainingGroup group = null;
+        if(groupDto.getId() != -1)
+            group = this.trainingGroupService.loadTrainingGroupById(groupDto.getId());
+        else
+            group = new TrainingGroup();
+        this.trainingGroupMapper.mapFromTrainingGroupDto(groupDto, group);
+        this.trainingGroupService.saveGroup(group);
+        return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .build();
     }
 
 

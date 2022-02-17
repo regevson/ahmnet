@@ -1,31 +1,37 @@
 <template>
-<div>
-  <div align="center">
-    <h1>Trainingsgruppen</h1>
+  <div>
     <div align="center">
-      <button class="newBtn" v-on:click="createGroup">Neue Gruppe erstellen</button>
+      <h1>TRAININGSGRUPPEN</h1>
+      <div align="center">
+        <button class="newBtn" v-on:click="createGroup">
+          Neue Gruppe erstellen
+        </button>
+      </div>
+    </div>
+
+    <div v-for="(club, idx) in clubs" :key="idx">
+      <b-card no-body class="mb-1">
+        <b-card-header header-tag="header" class="p-1" role="tab">
+          <button block class="cardBtn" v-b-toggle="'accordion-'+idx">
+            {{club.name}}
+          </button>
+        </b-card-header>
+        <b-collapse
+          :id="'accordion-'+idx"
+          accordion="my-accordion"
+          role="tabpanel"
+        >
+          <b-card-body>
+            <TrainingGroupSnippet :club="club" />
+          </b-card-body>
+        </b-collapse>
+      </b-card>
     </div>
   </div>
-
- <div v-for="(club, idx) in clubs" :key="idx">
-    <b-card no-body class="mb-1">
-      <b-card-header header-tag="header" class="p-1" role="tab">
-        <button block class="cardBtn" v-b-toggle="'accordion-'+idx">{{club.name}} - Gruppen</button>
-      </b-card-header>
-      <b-collapse :id="'accordion-'+idx" accordion="my-accordion" role="tabpanel">
-        <b-card-body>
-          <TrainingGroupSnippet :club="club"/>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
-</div>
-
-
-</div>
 </template>
 
 <script>
-import axios from 'axios'
+import { axiosReq } from '../axios'
 import TrainingGroupSnippet from "./TrainingGroupSnippet";
 
 export default {
@@ -42,23 +48,21 @@ export default {
   },
 
   async created() {
-    const response = await axios.get('api/allClubs');
+    const response = await axiosReq('allClubs');
     this.clubs = response.data;
   },
 
   methods: {
     createGroup() {
       this.$router.push({name: 'traininggroupdetails', params: {groupId: -1}});
-    }
+    },
+
   }
 
 }
-
-
 </script>
 
 <style scoped>
-
 .card {
   border: 2px solid #3e6d63;
 }
@@ -83,7 +87,5 @@ export default {
   padding: 5px;
   width: 100%;
 }
-
-
-
 </style>
+

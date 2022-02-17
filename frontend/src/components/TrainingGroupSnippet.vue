@@ -1,30 +1,36 @@
 <template>
-<div>
-  
- <div v-for="(group, idx) in groups" :key="idx">
-  <router-link :to="{name: 'traininggroupdetails', params: {groupId: group.id}}" class="link">
-    <div id="groupSnippet">
-      <div class="top">
-        Gruppe {{group.id}}<br>
-      </div>
-      <div class="bot">
-        <b>Trainer:</b> <span class="player trainer">{{group.trainer.firstName}} {{group.trainer.lastName}}</span><br>
-        <hr style="margin: 5px 0px 5px 0px">
-        <b>SpielerInnen:</b><br>
-        <span class="player" v-for="player in group.players" :key="player.id">
-        {{player.firstName}} {{player.lastName}}
-        </span>
-      </div>
+  <div>
+    <div v-for="(group, idx) in groups" :key="idx">
+      <router-link
+        :to="{name: 'traininggroupdetails', params: {groupId: group.id}}"
+        class="link"
+      >
+        <div id="groupSnippet">
+          <div class="top">Gruppe {{group.id}}<br /></div>
+          <div class="bot">
+            <b>Trainer: </b>
+            <span class="player trainer"
+              >{{group.trainer.firstName}} {{group.trainer.lastName}}</span
+            ><br />
+            <hr style="margin: 5px 0px 5px 0px" />
+            <b>SpielerInnen:</b><br />
+            <span
+              class="player"
+              v-for="player in group.players"
+              :key="player.id"
+            >
+              {{player.firstName}} {{player.lastName}}
+            </span>
+          </div>
+        </div>
+      </router-link>
     </div>
-    </router-link>
+    <div style="clear: both"></div>
   </div>
-  <div style="clear: both"></div>
-
-</div>
 </template>
 
 <script>
-import axios from 'axios'
+import { axiosReq } from '../axios'
 
 export default {
   name: 'TrainingGroupSnippet',
@@ -38,12 +44,11 @@ export default {
   },
 
   async created() {
-    const response = await axios.get('api/groupsByClub?clubName=' + this.club.name);
+    const response = await axiosReq('groupsByClub?clubName=' + this.club.name);
     this.groups = response.data;
   },
 
 }
-
 </script>
 
 <style scoped>
@@ -87,6 +92,5 @@ export default {
   background: #c28b8b;
   font-weight: bold;
 }
-
-
 </style>
+

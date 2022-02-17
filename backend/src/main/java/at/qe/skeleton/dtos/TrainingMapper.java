@@ -28,6 +28,7 @@ public class TrainingMapper {
     public TrainingSnippetDto mapToTrainingSnippetDto(Training tr) {
 	TrainingSnippetDto dto = new TrainingSnippetDto();
 	dto.setId(tr.getId());
+	dto.setGroupId(tr.getTrainingGroup().getId());
 	dto.setClub(tr.getClub());
 	dto.setDate(trainingService.convertDateToGerman(tr.getDateTime().toLocalDate()));
 	LocalTime startTime = tr.getDateTime().toLocalTime();

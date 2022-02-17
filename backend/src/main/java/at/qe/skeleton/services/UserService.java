@@ -51,7 +51,7 @@ public class UserService {
      * @param username the username to search for
      * @return the user with the given username
      */
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER') or authentication.getName() eq #username")
+    //@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER') or authentication.getName() eq #username")
     public User loadUser(String username) {
         return userRepository.findFirstByUsername(username);
     }

@@ -1,7 +1,6 @@
 package at.qe.skeleton.ui.controllers;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,29 +40,36 @@ public class UserListController {
     @Autowired
     private UserService userService;
 
-    /**
-     * Returns a list of all users.
-     *
-     * @return
-     */
     @GetMapping("/users")
-    public Collection<User> getUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<?> getUsers() {
+        Collection<UserDto> dtos = UserMapper.mapToUserDto(userService.getAllUsers());
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .body(dtos);
     }
 
-    @GetMapping("/allTrainer")
-    public Collection<UserDto> getAllTrainer() {
-        return UserMapper.mapToUserDto(userService.getAllTrainer());
+    @GetMapping("/allTrainers")
+    public ResponseEntity<?> getAllTrainers() {
+        Collection<UserDto> dtos = UserMapper.mapToUserDto(userService.getAllTrainer());
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .body(dtos);
     }
 
-    @GetMapping("/allPlayer")
-    public Collection<UserDto> getAllPlayer() {
-        return UserMapper.mapToUserDto(userService.getAllPlayer());
+    @GetMapping("/allPlayers")
+    public ResponseEntity<?> getAllPlayers() {
+        Collection<UserDto> dtos = UserMapper.mapToUserDto(userService.getAllPlayer());
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .body(dtos);
     }
 
     @GetMapping("/user")
-    public User getUser(String username) {
-        return userService.loadUser(username);
+    public ResponseEntity<?> getUser(String username) {
+        UserDto dto = UserMapper.mapToUserDto(userService.loadUser(username));
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .body(dto);
     }
 
     @GetMapping("/token/refresh")
@@ -100,7 +108,7 @@ public class UserListController {
         }
 
         else
-        throw new RuntimeException("Refresh token is missing");
+            throw new RuntimeException("Refresh token is missing");
     }
     
 

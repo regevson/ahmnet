@@ -14,6 +14,7 @@ public class UserMapper {
 	dto.setLastName(user.getLastName());
 	dto.setFullName(user.getFirstName() + " " + user.getLastName());
 	dto.setClubName(user.getClub().getName());
+	dto.setRoles(user.getRoles());
 	return dto;
     }
     public static Collection<UserDto> mapToUserDto(Collection<User> users) {

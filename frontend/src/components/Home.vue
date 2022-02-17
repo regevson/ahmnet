@@ -1,15 +1,14 @@
 <template>
-<div align="center">
-  <Nav v-on:newRoute="changeRoute" v-bind:user="user"/>
-  <!--
+  <div align="center">
+    <Nav v-on:newRoute="changeRoute" v-bind:user="user" />
+    <!--
   <h2 v-if="user">Welcome Home {{user.firstName}}! </h2>
   <h3 v-if="!user">Oops... sth. went wrong!</h3>
   -->
-  <div class="wrapper">
-    <router-view :user="user"/>
+    <div class="wrapper">
+      <router-view :user="user" />
+    </div>
   </div>
-
-</div>
 </template>
 
 <script>
@@ -27,12 +26,12 @@ export default {
   },
 
   async created() {
-    const username = localStorage.getItem('username');
+    const username = sessionStorage.getItem('username');
     const response = await axios.get('api/user?username=' + username);
     console.log(response.data);
 
     this.user = response.data;
-    localStorage.setItem('user', JSON.stringify(this.user));
+    sessionStorage.setItem('user', JSON.stringify(this.user));
 
     // in case user navigates to '/home', he gets redirected to '/timetable'
     if(this.$route.name === 'home')
@@ -48,7 +47,7 @@ export default {
 
   /*
   beforeRouteUpdate(to, from, next) {
-    if(to.name === '/') 
+    if(to.name === '/')
       next({name: 'timetable'});
     else
       next();
@@ -56,12 +55,9 @@ export default {
   */
 
 }
-
-
 </script>
 
 <style>
-
 .wrapper {
   padding: 10px;
 }
@@ -161,7 +157,6 @@ h1 {
   transition: all 0.3s ease-in-out;
 }
 
-
 .arrow {
   font-size: 20px;
   color: #4b9183;
@@ -171,6 +166,5 @@ h1 {
   cursor: pointer;
   color: green;
 }
-
 </style>
 

@@ -11,7 +11,7 @@ public interface TrainingRepository extends AbstractRepository<Training, Long> {
 
     Training findById(long trainingId);
 
-    List<Training> findByTrainingGroupIdOrderByDateTimeAsc(long trainingGroupId);
+    //List<Training> findByTrainingGroupIdOrderByDateTimeAsc(long trainingGroupId);
 
     List<Training> findByIsFreeTrueOrderByDateTimeAsc();
 

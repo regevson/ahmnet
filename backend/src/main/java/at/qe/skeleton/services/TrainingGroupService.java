@@ -28,6 +28,8 @@ public class TrainingGroupService {
     TrainingGroupRepository trainingGroupRepository;
     @Autowired
     ClubRepository clubRepository;
+    @Autowired
+    UserService us;
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public List<Club> loadAllClubs() {
@@ -44,12 +46,12 @@ public class TrainingGroupService {
 	return this.trainingGroupRepository.findByClub_NameContaining(clubName);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public Set<TrainingGroup> loadTrainingGroupByTrainer(User trainer) {
 	return this.trainingGroupRepository.findByTrainer_Username(trainer.getUsername());
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public Set<TrainingGroup> loadTrainingGroupByPlayer(User player) {
 	return this.trainingGroupRepository.findByPlayer_Username(player.getUsername());
     }
@@ -59,23 +61,18 @@ public class TrainingGroupService {
 	return this.trainingGroupRepository.findById(id);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #group.trainer.getId")
     public TrainingGroup saveGroup(TrainingGroup group) {
         return trainingGroupRepository.save(group);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public void deleteGroup(long id) {
-	TrainingGroup group = this.loadTrainingGroupById(id);
-	deleteGroup(group);
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #group.trainer.getId")
     public void deleteGroup(TrainingGroup group) {
 	group.getPlayers().removeAll(group.getPlayers());
         trainingGroupRepository.delete(group);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public Map<String, Integer> calcAttendance(TrainingGroup group) {
 	Map<String, Integer> attendance = new HashMap<>();
 	Set<Training> trainings = group.getTrainings();
@@ -87,9 +84,9 @@ public class TrainingGroupService {
 	return attendance;
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public int calcNumPlayedSessions(TrainingGroup trg) {
 	return this.trainingGroupRepository.countPlayedTrainingsByGroupId(trg.getId(), LocalDateTime.now());
     }
-
 
 }

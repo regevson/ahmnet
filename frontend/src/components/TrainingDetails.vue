@@ -1,100 +1,194 @@
 <template>
   <div align="left">
-
     <form v-if="training" @submit.prevent="">
+      <div align="center" v-if="training.id != -1">
+        <p class="entry" style="background: #1b2730; border-radius: 5px">
+          Training {{training.id}}
+          <i
+            v-if="isFree()"
+            class="fa-solid fa-lock fa-sm"
+            style="color: orange; margin-left: 5px"
+          ></i>
+        </p>
+      </div>
+      <br />
 
       <p class="entry">Club:</p>
-      <multiselect :allowEmpty="false" v-model="training.club" :options="allClubs" placeholder="Club suchen" label="name" track-by="name" deselectLabel="" selectLabel="" />
-      <br>
+      <multiselect
+        :disabled="isFree()"
+        :allowEmpty="false"
+        v-model="training.club"
+        :options="allClubs"
+        placeholder="Club suchen"
+        label="name"
+        track-by="name"
+        deselectLabel=""
+        selectLabel=""
+      />
+      <br />
 
       <p class="entry">Gruppe:</p>
-      <multiselect :allowEmpty="false" v-model="training.group" :options="allGroups" placeholder="Gruppe suchen" label="combinedInfo" track-by="combinedInfo" deselectLabel="" selectLabel="" />
-      <br>
+      <multiselect
+        :disabled="isFree()"
+        :allowEmpty="false"
+        v-model="training.group"
+        :options="allGroups"
+        placeholder="Gruppe suchen"
+        label="combinedInfo"
+        track-by="combinedInfo"
+        deselectLabel=""
+        selectLabel=""
+      />
+      <br />
 
       <p class="entry">Datum:</p>
-      <b-form-datepicker v-model="training.date" class="mb-2 detailsInput"
-            locale="de" 
-            :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit'}" 
-            :showDecadeNav="false" 
-            :start-weekday="1"
-            :hide-header="true"
-            calendar-width="100%"
-            menu-class="w-100"
-            >
+      <b-form-datepicker
+        :disabled="isFree()"
+        v-model="training.date"
+        class="mb-2 detailsInput"
+        locale="de"
+        :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit'}"
+        :showDecadeNav="false"
+        :start-weekday="1"
+        :hide-header="true"
+        calendar-width="100%"
+        menu-class="w-100"
+      >
       </b-form-datepicker>
-      <br>
+      <br />
 
       <p class="entry">Zeit:</p>
-      <b-form-timepicker v-model="training.startTime" class="detailsInput"
-            locale="de"
-            :minutes-step="15"
-            :hide-header="true"
-            :start-time="10"
-            >
+      <b-form-timepicker
+        :disabled="isFree()"
+        v-model="training.startTime"
+        class="detailsInput"
+        locale="de"
+        :minutes-step="15"
+        :hide-header="true"
+        :start-time="10"
+      >
       </b-form-timepicker>
-      <br>
+      <br />
 
-
-      <p class="entry" :class="{'errorBg': $v.durationMinutes.$invalid}">Dauer:</p>
-      <b-form-input type="number" v-model="durationMinutes" min="1" placeholder="Dauer in Minuten" :class="[$v.durationMinutes.$invalid ? 'form-error' : 'detailsInput']"></b-form-input>
-      <div class="errorText" v-if="!$v.durationMinutes.required">Bitte ausfüllen!</div>
-      <br>
+      <p class="entry" :class="{'errorBg': $v.durationMinutes.$invalid}">
+        Dauer:
+      </p>
+      <b-form-input
+        :disabled="isFree()"
+        type="number"
+        v-model="durationMinutes"
+        min="1"
+        placeholder="Dauer in Minuten"
+        :class="[$v.durationMinutes.$invalid ? 'form-error' : 'detailsInput']"
+      ></b-form-input>
+      <div class="errorText" v-if="!$v.durationMinutes.required">
+        Bitte ausfüllen!
+      </div>
+      <br />
 
       <p class="entry" :class="{'errorBg': $v.court.$invalid}">Court:</p>
-      <b-form-input type="number" v-model="court" min="1" :class="[$v.court.$invalid ? 'form-error' : 'detailsInput']"></b-form-input>
+      <b-form-input
+        :disabled="isFree()"
+        type="number"
+        v-model="court"
+        min="1"
+        :class="[$v.court.$invalid ? 'form-error' : 'detailsInput']"
+      ></b-form-input>
       <div class="errorText" v-if="!$v.court.required">Bitte ausfüllen!</div>
-      <br>
-
+      <br />
 
       <p class="entry">TrainerIn:</p>
-      <multiselect :allowEmpty="false" v-model="training.trainer" :options="allTrainer" placeholder="TrainerIn suchen" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
-      <br>
+      <multiselect
+        :disabled="!isAdmin || isFree()"
+        :allowEmpty="false"
+        v-model="training.trainer"
+        :options="allTrainers"
+        placeholder="TrainerIn suchen"
+        label="fullName"
+        track-by="fullName"
+        deselectLabel=""
+        selectLabel=""
+      />
+      <br />
 
       <div v-if="training.id != -1">
         <p class="entry">Anwesenheit SpielerInnen:</p>
         <div style="margin-top: 10px" class="form-check">
           <div v-for="player in training.players" :key="player.id">
-            <input class="form-check-input" type="checkbox" :value="player.id" :id="player.id" v-model="training.attendees">
+            <input
+              class="form-check-input"
+              :disabled="isFree()"
+              type="checkbox"
+              :value="player.id"
+              :id="player.id"
+              v-model="training.attendees"
+            />
             <label class="form-check-label" :for="player.id">
               <span> {{player.firstName}} {{player.lastName}} </span>
             </label>
           </div>
         </div>
+        <br />
       </div>
-      <br>
 
       <p class="entry">Schwerpunkte:</p>
-      <textarea v-model="training.bulletPoints" rows="4" style="width: 100%; padding: 5px;" class="detailsInput">
+      <textarea
+        :disabled="isFree()"
+        v-model="training.bulletPoints"
+        rows="4"
+        style="width: 100%; padding: 5px"
+        class="detailsInput"
+      >
       </textarea>
-      <br>
+      <br />
+      <br />
 
       <p class="entry">Kommentare:</p>
-      <textarea v-model="training.comments" rows="4" style="width: 100%; padding: 5px;" class="detailsInput">
+      <textarea
+        :disabled="isFree()"
+        v-model="training.comments"
+        rows="4"
+        style="width: 100%; padding: 5px"
+        class="detailsInput"
+      >
       </textarea>
-      <br>
+      <br />
 
       <div align="center" v-if="training.id == -1">
-        <input class="changeBtn fourth" type="submit" @click="updateTrainingDetails" value="Erstellen">
+        <input
+          class="changeBtn fourth"
+          type="submit"
+          @click="updateTrainingDetails"
+          value="Erstellen"
+        />
       </div>
 
       <div align="center" v-if="training.id != -1">
-        <input v-if="isFreeable(training)" class="changeBtn fourth" type="submit" @click="updateTrainingDetails" value="Anpassen">
-        <button v-if="isFreeable(training)" @click="deleteTraining" class="deleteBtn">Löschen</button>
-        <button v-if="isFreeable(training)" @click="freeTraining" class="freeBtn">Freigeben</button>
-        <button v-if="!isFreeable(training)" @click="grabTraining" class="freeBtn">Übernehmen</button>
+        <input
+          v-if="!isFree()"
+          class="changeBtn fourth"
+          type="submit"
+          @click="updateTrainingDetails"
+          value="Anpassen"
+        />
+        <button v-if="!isFree()" @click="deleteTraining" class="deleteBtn">
+          Löschen
+        </button>
+        <button v-if="!isFree()" @click="freeTraining" class="freeBtn">
+          Freigeben
+        </button>
+        <button v-if="isFree()" @click="grabTraining" class="freeBtn">
+          Übernehmen
+        </button>
       </div>
-
     </form>
 
-
-
     <h3 v-if="!training">Oops... sth. went wrong!</h3>
-
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import { axiosReq } from '../axios'
 import Multiselect from 'vue-multiselect'
 import { required, minValue } from 'vuelidate/lib/validators'
 
@@ -103,10 +197,12 @@ export default {
   components: {Multiselect},
   data() {
     return {
+      user: null,
+      isAdmin: false,
       training: null,
       allClubs: [],
       allGroups: [],
-      allTrainer: [],
+      allTrainers: [],
 
       // fields to validate
       durationMinutes: 60,
@@ -126,37 +222,48 @@ export default {
   },
 
   async created() {
-    let response;
-
-    response = await axios.get('api/allClubs');
-    this.allClubs = response.data;
-
-    response = await axios.get('api/allGroups');
-    this.allGroups = response.data;
-    this.allGroups.map(this.combineGroupInfo);
-
-    response = await axios.get('api/allTrainer');
-    this.allTrainer = response.data;
-
-    if(this.$route.params.trainingId == -1) { // create new training
-      response = await axios.get('api/newTraining'); // fetch an empty new training
-      this.training = response.data;
-      this.prepopulate();
-    }
-    else {
-      response = await axios.get('api/training?id=' + this.$route.params.trainingId);
-      this.training = response.data;
-      this.combineGroupInfo(this.training.group);
-      this.setValidationFields();
-    }
-
+    this.getUserRole();
+    this.getFormData();
   },
 
   methods: {
-    combineGroupInfo(group) {
-      let fullNames = [];
-      group.players.forEach((player) => { fullNames.push(player.fullName); });
-      group.combinedInfo = 'Gruppe' + group.id + ': (' + group.club.name + ') [' + fullNames + ']';
+    getUserRole() {
+      this.user = JSON.parse(sessionStorage.getItem('user'));
+      this.isAdmin = this.user.roles.includes("ADMIN");
+    },
+
+    async getFormData() {
+      await this.getAllClubs();
+      await this.getAllGroups();
+      if(this.isAdmin)
+        await this.getAllTrainer();
+
+      if(this.$route.params.trainingId == -1) // is new training
+        this.setupNewTraining();
+      else
+        this.setupTraining();
+    },
+
+    async getAllClubs() {
+      const res = await axiosReq('allClubs');
+      this.allClubs = res.data;
+    },
+
+    async getAllGroups() {
+      const res = await axiosReq('allGroups');
+      this.allGroups = res.data;
+      this.allGroups.map(this.combineGroupInfo);
+    },
+
+    async getAllTrainer() {
+      const res = await axiosReq('allTrainers');
+      this.allTrainers = res.data;
+    },
+
+    async setupNewTraining() {
+      const res = await axiosReq('newTraining');
+      this.training = res.data;
+      this.prepopulate();
     },
 
     prepopulate() {
@@ -166,54 +273,21 @@ export default {
       this.training.date = new Date();
       this.training.club = this.allClubs[0];
       this.training.group = this.allGroups[0];
-      this.training.trainer = this.allTrainer[0];
+      this.training.trainer = this.user;
     },
 
-    async updateTrainingDetails() {
-
-      if(!this.validate())
-        return;
-
-      this.getValidationFields();
-
-      const config = {headers: {'Content-Type': 'application/json'}}
-      let params = JSON.stringify(this.training);
-
-      const response = await axios.post('api/updateTrainingDetails', params, config);
-      console.log(response);
-      this.$router.push({name: 'timetable'});
+    async setupTraining() {
+      const res = await axiosReq('training?id=' + this.$route.params.trainingId);
+      this.training = res.data;
+      this.combineGroupInfo(this.training.group);
+      this.setValidationFields();
     },
 
-    async deleteTraining() {
-      const response = await axios.get('api/deleteTraining?id=' + this.training.id);
-      console.log(response);
-      this.$router.push({name: 'timetable'});
-    },
-
-    async freeTraining() {
-      const response = await axios.get('api/freeTraining?id=' + this.training.id);
-      console.log(response);
-      this.$router.push({name: 'timetable'});
-    },
-
-    async grabTraining() {
-      const response = await axios.get('api/grabTraining?id=' + this.training.id);
-      console.log(response);
-      this.$router.push({name: 'timetable'});
-    },
-
-    isFreeable(training) {
-      return !training.free;
-    },
-
-    validate() {
-      this.$v.$touch();
-      if(this.$v.$invalid) {
-        alert('Bitte füllen Sie das Formular korrekt aus!');
-        return false;
-      } 
-      else
-        return true;
+    // group should also display info about participants in multiselect-row
+    combineGroupInfo(group) {
+      let fullNames = [];
+      group.players.forEach((player) => { fullNames.push(player.fullName); });
+      group.combinedInfo = 'Gruppe' + group.id + ': (' + group.club.name + ') [' + fullNames + ']';
     },
 
     setValidationFields() {
@@ -221,17 +295,58 @@ export default {
       this.court = this.training.court;
     },
 
+    async updateTrainingDetails() {
+      if(!this.validate())
+        return;
+
+      this.getValidationFields();
+
+      const config = {headers: {'Content-Type': 'application/json'}}
+      let params = JSON.stringify(this.training);
+      await axiosReq('updateTrainingDetails', params, config);
+
+      this.$router.push({name: 'timetable'});
+    },
+
+    validate() {
+      this.$v.$touch();
+      if(this.$v.$invalid) {
+        alert('Bitte füllen Sie das Formular korrekt aus!');
+        return false;
+      }
+      else
+        return true;
+    },
+
+    // copy validation-fields into dto to be sent
     getValidationFields() {
       this.training.durationMinutes = this.durationMinutes;
       this.training.court = this.court;
+    },
+
+    async deleteTraining() {
+      await axiosReq('deleteTraining?id=' + this.training.id);
+      this.$router.push({name: 'timetable'});
+    },
+
+    async freeTraining() {
+      await axiosReq('freeTraining?id=' + this.training.id);
+      this.$router.push({name: 'timetable'});
+    },
+
+    async grabTraining() {
+      await axiosReq('grabTraining?id=' + this.training.id);
+      this.$router.push({name: 'vacationtable'});
+    },
+
+    isFree() {
+      return this.training.free;
     },
 
   }
 
 
 }
-
-
 </script>
 
 <style>
@@ -263,5 +378,5 @@ export default {
 .errorBg {
   background: #bf0000;
 }
-
 </style>
+

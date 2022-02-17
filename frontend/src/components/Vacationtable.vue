@@ -1,7 +1,7 @@
 <template>
 
   <div align="center">
-    <h1>URLAUBSTAFEL</h1><br>
+    <h1>VERFÜGBARE TRAININGS</h1><br>
 
     
     <Table :isVacationTable="true"/>

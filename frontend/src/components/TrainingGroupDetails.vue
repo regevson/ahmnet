@@ -1,56 +1,112 @@
 <template>
   <div>
-
     <form style="text-align: left" v-if="group" @submit.prevent="">
-
       <div align="center" v-if="group.id != -1">
-        <p class="entry" style="background: #1b2730; border-radius: 5px;">Gruppe {{group.id}}</p>
+        <p class="entry" style="background: #1b2730; border-radius: 5px">
+          Gruppe {{group.id}}
+          <i
+            v-if="!permChangeGroup()"
+            class="fa-solid fa-lock fa-sm"
+            style="color: orange; margin-left: 5px"
+          ></i>
+        </p>
       </div>
-      <br>
+      <br />
 
+      <p class="entry">Club:</p>
+      <multiselect
+        :disabled="!permChangeGroup()"
+        :allowEmpty="false"
+        v-model="group.club"
+        :options="allClubs"
+        placeholder="Auswählen/Suchen"
+        label="name"
+        track-by="name"
+        deselectLabel=""
+        selectLabel=""
+      />
+      <br />
 
-    <p class="entry">Club:</p>
-    <multiselect :allowEmpty="false" v-model="group.club" :options="allClubs" placeholder="Auswählen/Suchen" label="name" track-by="name" deselectLabel="" selectLabel="" />
-    <br>
+      <p class="entry">SpielerInnen:</p>
+      <multiselect
+        :disabled="!permChangeGroup()"
+        :allowEmpty="false"
+        v-model="group.players"
+        :options="allPlayers"
+        :multiple="true"
+        :close-on-select="false"
+        :clear-on-select="false"
+        :preserve-search="false"
+        placeholder="Auswählen/Suchen"
+        label="combinedInfo"
+        track-by="combinedInfo"
+        :preselect-first="false"
+        :clearOnSelect="false"
+        selectLabel=""
+        deselectLabel=""
+        selectedLabel=""
+      />
+      <br />
 
+      <p class="entry">TrainerIn:</p>
+      <multiselect
+        :disabled="!isAdmin"
+        :allowEmpty="false"
+        v-model="group.trainer"
+        :options="allTrainers"
+        placeholder="Select one"
+        label="fullName"
+        track-by="fullName"
+        deselectLabel=""
+        selectLabel=""
+      />
+      <br />
 
-    <p class="entry">SpielerInnen:</p>
-  <multiselect :allowEmpty="false" v-model="group.players" :options="allPlayers" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="false" placeholder="Auswählen/Suchen" label="combinedInfo" track-by="combinedInfo" :preselect-first="false" :clearOnSelect="false" selectLabel="" deselectLabel="" selectedLabel="" />
-  <br>
+      <p class="entry">Gespielte Trainings:</p>
+      <div class="detailsInput" style="padding: 5px 5px 5px 10px">
+        <span class="readonly readonlyDigit">{{group.numPlayedSessions}}</span>
+      </div>
+      <br />
 
-    <p class="entry">TrainerIn:</p>
-    <multiselect :allowEmpty="false" v-model="group.trainer" :options="allTrainer" placeholder="Select one" label="fullName" track-by="fullName" deselectLabel="" selectLabel=""/>
-    <br>
-
-    <p class="entry">Gespielte Trainings:</p>
-    <div class="detailsInput" style="padding: 5px 5px 5px 10px">
-      <span class="readonly readonlyDigit">{{group.numPlayedSessions}}</span>
-    </div>
-    <br>
-
-    <p class="entry">Anwesenheit:</p>
+      <p class="entry">Anwesenheit:</p>
       <div class="detailsInput" style="padding: 5px 5px 5px 10px">
         <div v-for="player in group.players" :key="player.id">
-          <span class="readonly">{{player.fullName}}:</span> <span class="readonly readonlyDigit">{{getAttendance(player.id)}}</span>
+          <span class="readonly">{{player.fullName}}:</span>
+          <span
+            class="readonly readonlyDigit"
+            >{{getAttendance(player.id)}}</span
+          >
         </div>
       </div>
-    <br>
+      <br />
 
       <div align="center" v-if="group.id == -1">
-        <input class="changeBtn fourth" type="submit" @click="updateTrainingGroupDetails" value="Erstellen">
+        <input
+          class="changeBtn fourth"
+          type="submit"
+          @click="updateTrainingGroupDetails"
+          value="Erstellen"
+        />
       </div>
 
       <div align="center" v-if="group.id != -1">
-        <input class="changeBtn fourth" type="submit" @click="updateTrainingGroupDetails" value="Anpassen">
-        <button v-if="group.id != -1" @click="deleteGroup" class="deleteBtn">Löschen</button>
+        <input
+          v-if="permChangeGroup()"
+          class="changeBtn fourth"
+          type="submit"
+          @click="updateTrainingGroupDetails"
+          value="Anpassen"
+        />
+        <button v-if="permChangeGroup()" @click="deleteGroup" class="deleteBtn">
+          Löschen
+        </button>
       </div>
-
     </form>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import { axiosReq } from '../axios'
 import Multiselect from 'vue-multiselect'
 
 export default {
@@ -58,64 +114,88 @@ export default {
   components: {Multiselect},
   data() {
     return {
+      user: null,
+      isAdmin: false,
       group: null,
       allClubs: [],
       allPlayers: [],
-      allTrainer: [],
+      allTrainers: [],
     }
   },
 
   async created() {
-    let response;
-
-    response = await axios.get('api/allClubs');
-    this.allClubs = response.data;
-
-    response = await axios.get('api/allPlayer');
-    this.allPlayers = response.data.map(this.combinePlayerInfo); 
-
-    response = await axios.get('api/allTrainer');
-    this.allTrainer = response.data;
-
-    if(this.$route.params.groupId == -1) { // create new group
-      response = await axios.get('api/newGroup'); // fetch an empty new training
-      this.group = response.data;
-      this.prepopulate();
-    }
-
-    else { // group already exists
-      response = await axios.get('api/group?id=' + this.$route.params.groupId);
-      this.group = response.data;
-      this.group.players.map(this.combinePlayerInfo); 
-    }
-
-
+    this.getUserRole();
+    this.getFormData();
   },
 
   methods: {
+    getUserRole() {
+      this.user = JSON.parse(sessionStorage.getItem('user'));
+      this.isAdmin = this.user.roles.includes("ADMIN");
+    },
+
+    async getFormData() {
+      await this.getAllClubs();
+      await this.getAllPlayers();
+      if(this.isAdmin)
+        await this.getAllTrainers();
+
+      if(this.$route.params.groupId == -1) // is new group
+        this.setupNewGroup();
+      else
+        this.setupGroup();
+    },
+
+    async getAllClubs() {
+      const res = await axiosReq('allClubs');
+      this.allClubs = res.data;
+    },
+
+    async getAllPlayers() {
+      const res = await axiosReq('allPlayers');
+      this.allPlayers = res.data.map(this.combinePlayerInfo);
+    },
+
+    async getAllTrainers() {
+      const res = await axiosReq('allTrainers');
+      this.allTrainers = res.data;
+    },
+
+    // players should also display info about their club,id,... in multiselect-row
     combinePlayerInfo(player) {
-      player.combinedInfo = player.firstName + ' ' + player.lastName + ' (' + player.id + ') (' + player.clubName + ')';
+      player.combinedInfo = player.firstName + ' '
+          + player.lastName + ' (' + player.id + ') (' + player.clubName + ')';
       return player;
+    },
+
+    async setupNewGroup() {
+      const res = await axiosReq('newGroup');
+      this.group = res.data;
+      this.prepopulate();
     },
 
     prepopulate() {
       this.group.club = this.allClubs[0];
       this.group.players = [this.allPlayers[0]];
-      this.group.trainer = this.allTrainer[0];
+      console.log(this.group.players);
+      this.group.trainer = this.user;
+    },
+
+    async setupGroup() {
+      const res = await axiosReq('group?id=' + this.$route.params.groupId);
+      this.group = res.data;
+      this.group.players.map(this.combinePlayerInfo);
     },
 
     async updateTrainingGroupDetails() {
       const config = {headers: {'Content-Type': 'application/json'}}
       let params = JSON.stringify(this.group);
-
-      const response = await axios.post('api/updateTrainingGroupDetails', params, config);
-      console.log(response);
+      await axiosReq('updateTrainingGroupDetails', params, config);
       this.$router.push({name: 'traininggroups'});
     },
 
     async deleteGroup() {
-      const response = await axios.get('api/deleteGroup?id=' + this.group.id);
-      console.log(response);
+      await axiosReq('deleteGroup?id=' + this.group.id);
       this.$router.push({name: 'traininggroups'});
     },
 
@@ -124,12 +204,15 @@ export default {
         return this.group.attendance[playerId];
       else // if group is newly created
         return '?';
-    }
+    },
+
+    permChangeGroup() {
+      return this.isAdmin || this.user.id === this.group.trainer.id;
+    },
 
   },
 
 }
-
 </script>
 
 <!--
@@ -146,19 +229,19 @@ export default {
 }
 
 .readonly {
-  background: #316286; 
-  border-radius: 5px; 
-  color: white; 
-  padding: 5px; 
-  font-weight: bold; 
-  font-size: 13px; 
-  margin: 3px; 
-  display: inline-block; 
+  background: #316286;
+  border-radius: 5px;
+  color: white;
+  padding: 5px;
+  font-weight: bold;
+  font-size: 13px;
+  margin: 3px;
+  display: inline-block;
 }
 
 .readonlyDigit {
-  background: #c28b8b; 
-  padding: 4px 18px 4px 18px; 
+  background: #c28b8b;
+  padding: 4px 18px 4px 18px;
 }
 
 /* multiselect */
@@ -635,3 +718,4 @@ fieldset[disabled] .multiselect {
   }
 }
 </style>
+

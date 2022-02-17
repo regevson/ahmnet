@@ -61,20 +61,13 @@ public class TrainingService {
 	return this.trainingRepository.findByTrainerIdAndWeek(trainerUsername, weekNum);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.trainer.getId")
     public Training saveTraining(Training training) {
         return trainingRepository.save(training);
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public void deleteTraining(long id) {
-	Training training = this.loadTrainingById(id);
-	deleteTraining(training);
-    }
-
-    @Transactional
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.trainer.getId")
     public void deleteTraining(Training training) {
 	training.getAttendees().removeAll(training.getAttendees());
 	training.getTrainingGroup().getTrainings().remove(training);
@@ -83,7 +76,7 @@ public class TrainingService {
 
     public List<List<Training>> groupByDay(List<Training> trainings) {
 	List<List<Training>> trainingsByDay = new ArrayList<>();
-	for(int i = 0; i < 7; i++)
+	for(int i = 0; i < 7; i++) // init list
 	   trainingsByDay.add(new ArrayList<>()); 
 
 	for(Training training : trainings) {
@@ -115,26 +108,28 @@ public class TrainingService {
         return date.format(formatter);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public List<List<Training>> loadFreeTrainingsByWeek(int weekNum) {
 	List<Training> trainings = this.trainingRepository.findFreeTrainingsByWeek(weekNum);
 	return this.groupByDay(trainings);
     }
 
-    public void freeTraining(long id) {
-	Training tr = this.loadTrainingById(id);
-	tr.setIsFree(true);
-	tr.setTrainer(tr.getOriginalTrainer());
-	this.saveTraining(tr);
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.trainer.getId")
+    public void freeTraining(Training training) {
+	training.setIsFree(true);
+	training.setTrainer(training.getOriginalTrainer());
+	this.saveTraining(training);
     }
 
-    public void grabTraining(long id) {
-	Training tr = this.loadTrainingById(id);
-	tr.setIsFree(false);
+    @PreAuthorize("hasAuthority('ADMIN') or #training.getIsFree()")
+    public void grabTraining(Training training) {
+	training.setIsFree(false);
 	User user = this.userService.getAuthenticatedUser();
-	tr.setTrainer(user);
-	this.saveTraining(tr);
+	training.setTrainer(user);
+	this.saveTraining(training);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainerId")
     public List<List<Training>> getTrainingsByWeek(String trainerId, int weekNum) {
         List<Training> trainings = this.loadTrainingsByTrainerAndWeek(trainerId, weekNum);
 	return this.groupByDay(trainings);
