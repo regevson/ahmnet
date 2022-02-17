@@ -1,15 +1,13 @@
 <template>
 
   <div align="center">
-    <h1>VERFÜGBARE TRAININGS</h1><br>
+    <div v-if="user">
+      <h1>VERFÜGBARE TRAININGS</h1><br>
 
-    
-    <Table :isVacationTable="true"/>
+      <Table :isVacationTable="true"/>
+    </div>
 
-
-<!--
-    <h3 v-if="!trainings">Oops... sth. went wrong!</h3> 
--->
+    <h5 v-if="!user" class="loading">LOADING...</h5>
 
   </div>
 

@@ -166,5 +166,59 @@ h1 {
   cursor: pointer;
   color: green;
 }
+
+.loading {
+  color: silver;
+  margin-top: 100px;
+  text-align: center;
+}
+
+
+/* DIALOG */
+.modal-content {
+  border: 5px solid #499082 !important;
+  border-radius: 10px !important;
+}
+
+.modal-title {
+  font-weight: bold;
+}
+
+.modal-body {
+  font-weight: bold;
+}
+
+.modal-content .btn-primary {
+  color: white;
+  background: #4b9183;
+  border: 2px solid #4b9183;
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  width: 60px;
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-content .btn-primary:hover {
+  background: #4b9183;
+  border: 2px solid #4b9183;
+}
+
+.modal-content .btn-secondary {
+  color: white;
+  background: gray;
+  border: 2px solid gray;
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  width: 80px;
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-content .btn-secondary:hover {
+  background: gray;
+  border: 2px solid gray;
+}
+
 </style>
 

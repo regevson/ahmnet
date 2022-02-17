@@ -106,7 +106,7 @@
       </tbody>
     </table>
 
-    <h3 v-if="!trainings">Oops... sth. went wrong!</h3>
+    <h5 v-if="!trainings" class="loading">LOADING...</h5>
   </div>
 </template>
 

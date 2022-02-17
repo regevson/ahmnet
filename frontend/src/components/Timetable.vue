@@ -26,7 +26,7 @@
       <Table :selectedTrainer="selectedTrainer" :isVacationTable="false" />
     </div>
 
-    <h3 v-if="!selectedTrainer">Oops... sth. went wrong!</h3>
+    <h5 v-if="!user || !selectedTrainer" class="loading">LOADING...</h5>
   </div>
 </template>
 

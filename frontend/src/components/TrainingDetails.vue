@@ -9,6 +9,11 @@
             class="fa-solid fa-lock fa-sm"
             style="color: orange; margin-left: 5px"
           ></i>
+          <i
+            v-if="!isFree()"
+            class="fa-solid fa-pen-to-square fa-sm"
+            style="color: orange; margin-left: 5px"
+          ></i>
         </p>
       </div>
       <br />
@@ -158,7 +163,8 @@
         <input
           class="changeBtn fourth"
           type="submit"
-          @click="updateTrainingDetails"
+          @click="setDialogTxt('create')"
+          v-b-modal="'createDialog'"
           value="Erstellen"
         />
       </div>
@@ -168,22 +174,78 @@
           v-if="!isFree()"
           class="changeBtn fourth"
           type="submit"
-          @click="updateTrainingDetails"
+          @click="setDialogTxt('change')"
+          v-b-modal="'changeDialog'"
           value="Anpassen"
         />
-        <button v-if="!isFree()" @click="deleteTraining" class="deleteBtn">
+        <button
+          v-if="!isFree()"
+          v-b-modal="'deleteDialog'"
+          @click="setDialogTxt('delete')"
+          class="deleteBtn"
+        >
           Löschen
         </button>
-        <button v-if="!isFree()" @click="freeTraining" class="freeBtn">
+        <button
+          v-if="!isFree()"
+          v-b-modal="'freeDialog'"
+          @click="setDialogTxt('free')"
+          class="freeBtn"
+        >
           Freigeben
         </button>
-        <button v-if="isFree()" @click="grabTraining" class="freeBtn">
+        <button
+          v-if="isFree()"
+          v-b-modal="'grabDialog'"
+          @click="setDialogTxt('grab')"
+          class="freeBtn"
+        >
           Übernehmen
         </button>
       </div>
     </form>
 
-    <h3 v-if="!training">Oops... sth. went wrong!</h3>
+    <b-modal
+      centered
+      @ok="updateTrainingDetails"
+      id="createDialog"
+      title="Bestätigung"
+      >{{dialogTxt}}</b-modal
+    >
+
+    <b-modal
+      centered
+      @ok="updateTrainingDetails"
+      id="changeDialog"
+      title="Bestätigung"
+      >{{dialogTxt}}</b-modal
+    >
+
+    <b-modal
+      centered
+      @ok="deleteTraining"
+      id="deleteDialog"
+      title="Bestätigung"
+      >{{dialogTxt}}</b-modal
+    >
+
+    <b-modal
+      centered
+      @ok="freeTraining"
+      id="freeDialog"
+      title="Bestätigung"
+      >{{dialogTxt}}</b-modal
+    >
+
+    <b-modal
+      centered
+      @ok="grabTraining"
+      id="grabDialog"
+      title="Bestätigung"
+      >{{dialogTxt}}</b-modal
+    >
+
+    <h5 v-if="!training" class="loading">LOADING...</h5>
   </div>
 </template>
 
@@ -207,6 +269,8 @@ export default {
       // fields to validate
       durationMinutes: 60,
       court: 1,
+
+      dialogTxt: '',
     }
   },
 
@@ -341,6 +405,19 @@ export default {
 
     isFree() {
       return this.training.free;
+    },
+
+    setDialogTxt(cmd) {
+      if(cmd === 'create')
+        this.dialogTxt = "Training erstellen?";
+      else if(cmd === 'change')
+        this.dialogTxt = "Training verändern?";
+      else if(cmd === 'delete')
+        this.dialogTxt = "Trainig löschen?";
+      else if(cmd === 'free')
+        this.dialogTxt = "Trainig veröffentlichen?";
+      else if(cmd === 'grab')
+        this.dialogTxt = "Trainig übernehmen?";
     },
 
   }

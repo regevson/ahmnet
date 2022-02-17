@@ -1,42 +1,46 @@
 <template>
-  <div class="wrapper fadeInDown">
-    <div id="formContent">
-      <!-- Tabs Titles -->
-
-      <!-- Icon -->
-      <div class="fadeIn first" style="margin-top: 20px; margin-bottom: 10px">
-        <h3>ahmNet-Login</h3>
+  <div class="container" style="margin-top: 20px; max-width: 700px">
+    <div class="card card-login mx-auto text-center bg-dark" style="border-radius: 20px;">
+      <div class="card-header mx-auto bg-dark">
+        <br />
+        <span>
+          <img src="../../public/img/logo.png" class="w-75" alt="Logo" /> </span
+        ><br />
       </div>
+      <div class="card-body">
+        <form @submit.prevent="handleSubmit">
+          <div class="input-group form-group">
+            <div class="input-group-prepend">
+              <span
+                class="loginIcon"
+                ><i class="fas fa-user"></i
+              ></span>
+            </div>
+            <b-form-input
+              type="text"
+              v-model="username"
+              placeholder="Username"
+            ></b-form-input>
+          </div>
 
-      <!-- Login Form -->
-      <form @submit.prevent="handleSubmit">
-        <input
-          v-model="username"
-          type="text"
-          id="login"
-          class="fadeIn second"
-          name="login"
-          placeholder="Username"
-        />
-        <input
-          v-model="password"
-          type="text"
-          id="password"
-          class="fadeIn third"
-          name="login"
-          placeholder="Password"
-        />
-        <input
-          type="submit"
-          class="fadeIn fourth"
-          value="Log In"
-          style="margin-top: 30px"
-        />
-      </form>
+          <div class="input-group form-group">
+            <div class="input-group-prepend">
+              <span
+                class="loginIcon"
+                ><i class="fas fa-key"></i
+              ></span>
+            </div>
+            <b-form-input
+              type="password"
+              v-model="password"
+              placeholder="Password"
+            ></b-form-input>
+          </div>
 
-      <!-- Remind Passowrd -->
-      <div id="formFooter">
-        <a class="underlineHover" href="#">Passwort vergessen?</a>
+          <div align="center">
+            <input type="submit" class="changeBtn" value="Log In" />
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -77,4 +81,15 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.loginIcon {
+  border-radius: 5px; 
+  padding: 7px 15px 0 15px; 
+  background: #4b9183; 
+  color: white;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+</style>
 

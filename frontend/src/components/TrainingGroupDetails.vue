@@ -9,6 +9,11 @@
             class="fa-solid fa-lock fa-sm"
             style="color: orange; margin-left: 5px"
           ></i>
+          <i
+            v-if="permChangeGroup()"
+            class="fa-solid fa-pen-to-square fa-sm"
+            style="color: orange; margin-left: 5px"
+          ></i>
         </p>
       </div>
       <br />
@@ -84,8 +89,9 @@
         <input
           class="changeBtn fourth"
           type="submit"
-          @click="updateTrainingGroupDetails"
+          v-b-modal="'createDialog'"
           value="Erstellen"
+          @click="setDialogTxt('create')"
         />
       </div>
 
@@ -94,14 +100,47 @@
           v-if="permChangeGroup()"
           class="changeBtn fourth"
           type="submit"
-          @click="updateTrainingGroupDetails"
+          v-b-modal="'changeDialog'"
           value="Anpassen"
+          @click="setDialogTxt('change')"
         />
-        <button v-if="permChangeGroup()" @click="deleteGroup" class="deleteBtn">
+
+        <button
+          v-if="permChangeGroup()"
+          @click="setDialogTxt('delete')"
+          v-b-modal="'deleteDialog'"
+          class="deleteBtn"
+        >
           Löschen
         </button>
       </div>
     </form>
+
+    <b-modal
+      centered
+      @ok="updateTrainingGroupDetails"
+      id="createDialog"
+      title="Bestätigung"
+      >{{dialogTxt}}</b-modal
+    >
+
+    <b-modal
+      centered
+      @ok="updateTrainingGroupDetails"
+      id="changeDialog"
+      title="Bestätigung"
+      >{{dialogTxt}}</b-modal
+    >
+
+    <b-modal
+      centered
+      @ok="deleteGroup"
+      id="deleteDialog"
+      title="Bestätigung"
+      >{{dialogTxt}}</b-modal
+    >
+
+    <h5 v-if="!group" class="loading">LOADING...</h5>
   </div>
 </template>
 
@@ -120,6 +159,8 @@ export default {
       allClubs: [],
       allPlayers: [],
       allTrainers: [],
+
+      dialogTxt: '',
     }
   },
 
@@ -197,6 +238,7 @@ export default {
     async deleteGroup() {
       await axiosReq('deleteGroup?id=' + this.group.id);
       this.$router.push({name: 'traininggroups'});
+
     },
 
     getAttendance(playerId) {
@@ -208,6 +250,15 @@ export default {
 
     permChangeGroup() {
       return this.isAdmin || this.user.id === this.group.trainer.id;
+    },
+
+    setDialogTxt(cmd) {
+      if(cmd === 'create')
+        this.dialogTxt = "Gruppe erstellen?";
+      else if(cmd === 'change')
+        this.dialogTxt = "Gruppe verändern?";
+      else if(cmd === 'delete')
+        this.dialogTxt = "Gruppe löschen?";
     },
 
   },

@@ -16,6 +16,8 @@ export const bus = new Vue();
 Vue.use(bootstrap)
 Vue.use(vuelidate)
 
+
+
 new Vue({
   store,
   router,
