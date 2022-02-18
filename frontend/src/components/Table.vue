@@ -1,5 +1,19 @@
 <template>
   <div align="center">
+
+      <b-form-datepicker
+        v-model="date"
+        locale="de"
+        :showDecadeNav="false"
+        :start-weekday="1"
+        :hide-header="true"
+        size="sm"
+        button-only
+        label-help=""
+        class="btnOnlyPicker"
+      />
+      <br>
+
     <i
       @click="prevWeek"
       class="fa-solid fa-circle-arrow-left arrow leftArrow"
@@ -11,95 +25,20 @@
       class="fa-solid fa-circle-arrow-right arrow rightArrow"
       style="margin-left: 60px"
     ></i>
-    <table v-if="trainings" class="timetable table table-responsive">
+    <table class="timetable table table-responsive">
       <thead>
         <tr align="center">
-          <th :class="{activeth: isCurrentDay(1)}" scope="col">
-            <span
-              style="font-weight: normal; font-size: 13px"
-              >{{dates[0]}}</span
-            ><br />Mo
-          </th>
-          <th :class="{activeth: isCurrentDay(2)}" scope="col">
-            <span
-              style="font-weight: normal; font-size: 13px"
-              >{{dates[1]}}</span
-            ><br />Di
-          </th>
-          <th :class="{activeth: isCurrentDay(3)}" scope="col">
-            <span
-              style="font-weight: normal; font-size: 13px"
-              >{{dates[2]}}</span
-            ><br />Mi
-          </th>
-          <th :class="{activeth: isCurrentDay(4)}" scope="col">
-            <span
-              style="font-weight: normal; font-size: 13px"
-              >{{dates[3]}}</span
-            ><br />Do
-          </th>
-          <th :class="{activeth: isCurrentDay(5)}" scope="col">
-            <span
-              style="font-weight: normal; font-size: 13px"
-              >{{dates[4]}}</span
-            ><br />Fr
-          </th>
-          <th :class="{activeth: isCurrentDay(6)}" scope="col">
-            <span
-              style="font-weight: normal; font-size: 13px"
-              >{{dates[5]}}</span
-            ><br />Sa
-          </th>
-          <th :class="{activeth: isCurrentDay(0)}" scope="col">
-            <span
-              style="font-weight: normal; font-size: 13px"
-              >{{dates[6]}}</span
-            ><br />So
+          <th :ref="'day' + day_idx" :class="{activeth: isCurrentDay(day_idx)}" scope="col" v-for="(dayName, day_idx) in weekDays" :key="day_idx">
+            <span style="font-weight: normal; font-size: 13px">{{dates[day_idx]}}</span><br/>{{dayName}}
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>
+        <tr v-if="trainings">
+          <td v-for="idx in 7" :key="idx">
             <Trainingslot
               :selectedTrainer="trainer"
-              :trainings="trainings[0]"
-            />
-          </td>
-          <td>
-            <Trainingslot
-              :selectedTrainer="trainer"
-              :trainings="trainings[1]"
-            />
-          </td>
-          <td>
-            <Trainingslot
-              :selectedTrainer="trainer"
-              :trainings="trainings[2]"
-            />
-          </td>
-          <td>
-            <Trainingslot
-              :selectedTrainer="trainer"
-              :trainings="trainings[3]"
-            />
-          </td>
-          <td>
-            <Trainingslot
-              :selectedTrainer="trainer"
-              :trainings="trainings[4]"
-            />
-          </td>
-          <td>
-            <Trainingslot
-              :selectedTrainer="trainer"
-              :trainings="trainings[5]"
-            />
-          </td>
-          <td>
-            <Trainingslot
-              :selectedTrainer="trainer"
-              :trainings="trainings[6]"
+              :trainings="trainings[idx-1]"
             />
           </td>
         </tr>
@@ -126,24 +65,44 @@ export default {
     return {
       trainings: null,
       trainer: null,
+      weekDays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
       dates: [],
+      date: '', 
     }
   },
 
   watch: {
     selectedTrainer: function() {
       this.trainer = this.selectedTrainer;
-      this.getWeek(this.weekNum);
+      this.getTrainingsByWeekNum(this.weekNum);
+    },
+
+    date: async function(date) {
+      date = this.convertToDate(date);
+      this.weekNum = this.calcWeekNum(date);
+      await this.getTrainingsByWeekNum(this.weekNum);
+      this.highlightChosenDay(date);
     }
   },
 
-  created() {
+  mounted() {
     this.trainer = this.selectedTrainer;
-    this.getWeek(this.weekNum);
+    this.getTrainingsByWeekNum(this.weekNum);
+    this.highlightChosenDay(new Date());
   },
 
   methods: {
-    async getWeek(weekNum) {
+    calcWeekNum(date) {
+      const onejan = new Date(date.getFullYear(), 0, 1);
+      return Math.ceil((((date.getTime() - onejan.getTime()) / 86400000) + onejan.getDay()) / 7) - 1;
+    },
+
+    convertToDate(dateStr) {
+      var parts = dateStr.split("-");
+      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    },
+
+    async getTrainingsByWeekNum(weekNum) {
       let response;
       if(this.isVacationTable)
         response = await axiosReq('availableTrainings?weekNum=' + this.weekNum);
@@ -159,17 +118,37 @@ export default {
     },
 
     prevWeek() {
-      this.getWeek(--this.weekNum);
+      this.getTrainingsByWeekNum(--this.weekNum);
     },
 
     nextWeek() {
-      this.getWeek(++this.weekNum);
+      this.getTrainingsByWeekNum(++this.weekNum);
     },
 
-    isCurrentDay(day_idx) { // 0 -> sunday, 1 -> monday, ...
+    isCurrentDay(day_idx) { // 0 -> monday, ..., 6 -> sunday 
       const d = new Date();
-      return d.getDay() == day_idx;
+      return this.getDay(d) == day_idx;
     },
+
+    async highlightChosenDay(chosenDate) {
+      let obj = this.$refs["day" + this.getDay(chosenDate)][0];
+      obj.scrollIntoView(true);
+      // let it blink
+      for(let i = 0; i < 3; i++) {
+        await this.blink(obj, "#e1dddd");
+        await this.blink(obj, "white");
+      }
+    },
+
+    blink(obj, bg) {
+      return new Promise((resolve) => {
+        setTimeout(() => {obj.style.background = bg; resolve();}, 100);
+      })
+    },
+
+    getDay(date) {
+      return (date.getDay() + 6) % 7;
+    }
 
   },
 
@@ -201,5 +180,36 @@ export default {
   background: #4b9183 !important;
   color: white;
 }
+
+.btnOnlyPicker .btn-secondary {
+  background-color: #4b9183 !important;
+  border-radius: 5px;
+  width: 100% !important;
+  border: none !important;
+  padding: 3px 10px 5px 10px;
+}
+
+/* date-button */
+.btnOnlyPicker .dropdown-menu {
+  transform: translate3d(-126px, 34px, 0px) !important;
+  outline: none !important;
+}
+
+/* dates-grid inside datepicker */
+.b-calendar-grid {
+  padding: 0 10px 0 10px !important;
+}
+
+/* selected date circle */
+.btn-primary:not(:disabled):not(.disabled).active {
+ background: #4b9183; 
+ outline: none;
+}
+
+/* all date-circles */
+.b-calendar-grid-body .btn {
+}
+
+
 </style>
 

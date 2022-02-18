@@ -36,18 +36,6 @@ export default {
 </script>
 
 <style>
-.timetable td {
-  border-top: none !important;
-}
-.timetable th {
-  min-width: 86px;
-  border-bottom: 2px solid #4b9183 !important;
-  border-top: 2px solid #4b9183 !important;
-}
-.timetable .activeth {
-  background: #4b9183 !important;
-  color: white;
-}
 
 </style>
 

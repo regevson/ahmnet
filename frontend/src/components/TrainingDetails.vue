@@ -57,6 +57,7 @@
         :start-weekday="1"
         :hide-header="true"
         calendar-width="100%"
+        label-help=""
         menu-class="w-100"
       >
       </b-form-datepicker>
