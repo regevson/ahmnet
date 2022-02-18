@@ -8,6 +8,7 @@
         </button>
       </div>
     </div>
+    <br>
 
     <div v-for="(club, idx) in clubs" :key="idx">
       <b-card no-body class="mb-1">

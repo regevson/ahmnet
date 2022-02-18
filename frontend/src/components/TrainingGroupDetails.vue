@@ -147,6 +147,7 @@
 <script>
 import { axiosReq } from '../axios'
 import Multiselect from 'vue-multiselect'
+import qs from 'qs'
 
 export default {
   name: 'TrainingGroupDetails',
@@ -236,9 +237,10 @@ export default {
     },
 
     async deleteGroup() {
-      await axiosReq('deleteGroup?id=' + this.group.id);
+      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      let params = qs.stringify({'id': this.group.id});
+      await axiosReq('deleteGroup', params, config);
       this.$router.push({name: 'traininggroups'});
-
     },
 
     getAttendance(playerId) {

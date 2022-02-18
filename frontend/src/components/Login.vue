@@ -37,9 +37,13 @@
             ></b-form-input>
           </div>
 
+
+      <div style="color: red; font-size: 15px; text-align: left;" class="errorText" v-if="wrongCredentials">Login fehlgeschlagen!</div>
+
           <div align="center">
             <input type="submit" class="changeBtn" value="Log In" />
           </div>
+      <div style="color: white; font-size: 15px; text-align: left;" >Passwort vergessen?<br>Wenden Sie sich bitte an 069910983630.</div>
         </form>
       </div>
     </div>
@@ -56,23 +60,26 @@ export default {
     return {
       username: '',
       password: '',
+      wrongCredentials: false,
     }
   },
 
   methods: {
     async handleSubmit() {
 
+      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
       const params = new URLSearchParams()
       params.append('username', this.username)
       params.append('password', this.password)
 
-      const config = {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+      let response;
+      try {
+        response = await axios.post('http://10.0.0.242:8080/login', params, config);
+      } catch(err) { 
+          this.wrongCredentials = true;
+          return null; 
       }
 
-      const response = await axios.post('http://10.0.0.242:8080/login', params, config);
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access_token;
       sessionStorage.setItem('accessToken', response.data.access_token);
       sessionStorage.setItem('username', this.username);

@@ -65,7 +65,7 @@ public class UserService {
      * @param user the user to save
      * @return the updated user
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #user.getUsername()")
     public User saveUser(User user) {
         if (user.isNew()) {
             user.setCreateDate(new Date());
@@ -93,6 +93,12 @@ public class UserService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findFirstByUsername(auth.getName());
         return user;
+    }
+
+    public void changePassword(String password) {
+	User loggedInUser = this.getAuthenticatedUser();
+	loggedInUser.setPassword(password);
+	this.saveUser(loggedInUser);
     }
 
 }

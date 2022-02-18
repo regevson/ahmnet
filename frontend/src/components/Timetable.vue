@@ -8,6 +8,7 @@
           Neues Training erstellen
         </button>
       </div>
+      <br>
 
       <div v-if="hasRole('ADMIN')" align="left">
         <p class="entry">TrainerIn auswählen:</p>
@@ -20,8 +21,8 @@
           deselectLabel=""
           selectLabel=""
         />
+        <br>
       </div>
-      <br />
 
       <Table :selectedTrainer="selectedTrainer" :isVacationTable="false" />
     </div>

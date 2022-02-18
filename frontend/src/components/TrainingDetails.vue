@@ -254,6 +254,7 @@
 import { axiosReq } from '../axios'
 import Multiselect from 'vue-multiselect'
 import { required, minValue } from 'vuelidate/lib/validators'
+import qs from 'qs'
 
 export default {
   name: 'TrainingDetails',
@@ -390,17 +391,23 @@ export default {
     },
 
     async deleteTraining() {
-      await axiosReq('deleteTraining?id=' + this.training.id);
+      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      let params = qs.stringify({'id': this.training.id});
+      await axiosReq('deleteTraining', params, config);
       this.$router.push({name: 'timetable'});
     },
 
     async freeTraining() {
-      await axiosReq('freeTraining?id=' + this.training.id);
+      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      let params = qs.stringify({'id': this.training.id});
+      await axiosReq('freeTraining', params, config);
       this.$router.push({name: 'timetable'});
     },
 
     async grabTraining() {
-      await axiosReq('grabTraining?id=' + this.training.id);
+      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      let params = qs.stringify({'id': this.training.id});
+      await axiosReq('grabTraining', params, config);
       this.$router.push({name: 'vacationtable'});
     },
 

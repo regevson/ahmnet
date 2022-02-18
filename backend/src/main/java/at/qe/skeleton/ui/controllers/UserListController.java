@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -70,6 +72,14 @@ public class UserListController {
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .body(dto);
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<?> changePassword(String password) {
+        this.userService.changePassword(password);
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .build();
     }
 
     @GetMapping("/token/refresh")

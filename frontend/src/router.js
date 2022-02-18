@@ -7,6 +7,7 @@ import Vacationtable from './components/Vacationtable.vue'
 import TrainingDetails from './components/TrainingDetails.vue'
 import TrainingGroups from './components/TrainingGroups.vue'
 import TrainingGroupDetails from './components/TrainingGroupDetails.vue'
+import Password from './components/Password.vue'
 
 Vue.use(Router)
 
@@ -21,7 +22,8 @@ export default new Router ({
         { path: '/vacationtable', name: 'vacationtable', component: Vacationtable },
         { path: '/traininggroups', name: 'traininggroups', component: TrainingGroups },
         { path: '/traininggroupdetails/group:groupId', name: 'traininggroupdetails', components: {default: TrainingGroupDetails} },
-        { path: '/trainingdetails/training:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}}
+        { path: '/trainingdetails/training:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}},
+        { path: '/password', name: 'password', components: {default: Password}},
       ]
     }
   ]

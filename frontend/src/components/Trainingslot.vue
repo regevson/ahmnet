@@ -78,8 +78,8 @@ export default {
 
     getCurrentDateTime() {
       //return new Date();
-      let curr = new Date("2022-02-16");
-      curr.setHours(21, 37, 0);
+      let curr = new Date("2022-02-14");
+      curr.setHours(14, 40, 0);
       return curr;
     },
 

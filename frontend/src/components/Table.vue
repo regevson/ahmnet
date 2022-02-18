@@ -28,14 +28,15 @@
     <table class="timetable table table-responsive">
       <thead>
         <tr align="center">
-          <th :ref="'day' + day_idx" :class="{activeth: isCurrentDay(day_idx)}" scope="col" v-for="(dayName, day_idx) in weekDays" :key="day_idx">
+          <th :ref="'thday' + day_idx" scope="col" :class="{activeth: isCurrentDay(day_idx)}" v-for="(dayName, day_idx) in weekDays" :key="day_idx">
             <span style="font-weight: normal; font-size: 13px">{{dates[day_idx]}}</span><br/>{{dayName}}
           </th>
         </tr>
       </thead>
       <tbody>
         <tr v-if="trainings">
-          <td v-for="idx in 7" :key="idx">
+          <td v-for="idx in 7" :key="idx" :class="{activecol: isCurrentDay(idx-1), selectedcol: isSelectedDay(idx-1)}" >
+
             <Trainingslot
               :selectedTrainer="trainer"
               :trainings="trainings[idx-1]"
@@ -78,6 +79,8 @@ export default {
     },
 
     date: async function(date) {
+      if(date === '') 
+        return;
       date = this.convertToDate(date);
       this.weekNum = this.calcWeekNum(date);
       await this.getTrainingsByWeekNum(this.weekNum);
@@ -119,10 +122,12 @@ export default {
 
     prevWeek() {
       this.getTrainingsByWeekNum(--this.weekNum);
+      this.date = '';
     },
 
     nextWeek() {
       this.getTrainingsByWeekNum(++this.weekNum);
+      this.date = '';
     },
 
     isCurrentDay(day_idx) { // 0 -> monday, ..., 6 -> sunday 
@@ -130,14 +135,21 @@ export default {
       return this.getDay(d) == day_idx;
     },
 
+    isSelectedDay(day_idx) { // 0 -> monday, ..., 6 -> sunday 
+      const date = this.convertToDate(this.date);
+      return this.getDay(date) == day_idx;
+    },
+
     async highlightChosenDay(chosenDate) {
-      let obj = this.$refs["day" + this.getDay(chosenDate)][0];
-      obj.scrollIntoView(true);
+      let th = this.$refs["thday" + this.getDay(chosenDate)][0];
+      th.scrollIntoView({block: 'center'});
       // let it blink
       for(let i = 0; i < 3; i++) {
-        await this.blink(obj, "#e1dddd");
-        await this.blink(obj, "white");
+        await this.blink(th, "#e1dddd");
+        await this.blink(th, "white");
       }
+      /*
+      */
     },
 
     blink(obj, bg) {
@@ -178,7 +190,22 @@ export default {
 }
 .timetable .activeth {
   background: #4b9183 !important;
+  border-right: 2px solid #4b9183;
+  border-left: 2px solid #4b9183;
   color: white;
+}
+
+.timetable .activecol {
+  background: #0080002b;
+  border-right: 2px solid #4b9183;
+  border-left: 2px solid #4b9183;
+  box-sizing: border-box;
+}
+
+.timetable .selectedcol {
+  background: #8080803d;
+  border-right: 2px solid gray;
+  border-left: 2px solid gray;
 }
 
 .btnOnlyPicker .btn-secondary {

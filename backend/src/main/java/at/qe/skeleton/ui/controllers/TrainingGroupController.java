@@ -55,8 +55,8 @@ public class TrainingGroupController {
 	            .body(dtos);
     }
     
-    @GetMapping("/deleteGroup")
-    public ResponseEntity<?> deleteGroup(long id) {
+    @PostMapping("/deleteGroup")
+    public ResponseEntity<?> deleteGroup(Long id) {
 	this.trainingGroupService.deleteGroup(this.trainingGroupService.loadTrainingGroupById(id));
         return ResponseEntity
                     .status(HttpStatus.OK)
@@ -72,7 +72,7 @@ public class TrainingGroupController {
     }
 
     @GetMapping("/group")
-    public ResponseEntity<?> getGroupById(long id) {
+    public ResponseEntity<?> getGroupById(Long id) {
 	TrainingGroup group = trainingGroupService.loadTrainingGroupById(id);
 	int numPlayedTr = this.trainingGroupService.calcNumPlayedSessions(group);
 	Map<String, Integer> attendance = this.trainingGroupService.calcAttendance(group);

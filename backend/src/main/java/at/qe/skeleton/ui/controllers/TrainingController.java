@@ -43,31 +43,31 @@ public class TrainingController {
     }
 
     @GetMapping("/training")
-    public ResponseEntity<?> getTrainingsById(long id) {
+    public ResponseEntity<?> getTrainingsById(Long id) {
 	TrainingDto dto = mapper.mapToTrainingDto(this.trainingService.loadTrainingById(id));
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .body(dto);
     }
 
-    @GetMapping("/deleteTraining")
-    public ResponseEntity<?> deleteTraining(long id) {
+    @PostMapping("/deleteTraining")
+    public ResponseEntity<?> deleteTraining(Long id) {
 	this.trainingService.deleteTraining(this.trainingService.loadTrainingById(id));
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .build();
     }
 
-    @GetMapping("/freeTraining")
-    public ResponseEntity<?> freeTraining(long id) {
+    @PostMapping("/freeTraining")
+    public ResponseEntity<?> freeTraining(Long id) {
 	this.trainingService.freeTraining(trainingService.loadTrainingById(id));
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .build();
     }
 
-    @GetMapping("/grabTraining")
-    public ResponseEntity<?> grabTraining(long id) {
+    @PostMapping("/grabTraining")
+    public ResponseEntity<?> grabTraining(Long id) {
 	this.trainingService.grabTraining(trainingService.loadTrainingById(id));
 	return ResponseEntity
 	            .status(HttpStatus.OK)
@@ -75,7 +75,7 @@ public class TrainingController {
     }
 
     @GetMapping("/trainingsByWeek")
-    public ResponseEntity<?> getTrainingsByWeek(String trainer, int weekNum) {
+    public ResponseEntity<?> getTrainingsByWeek(String trainer, Integer weekNum) {
         List<List<Training>> trainingsByDay = this.trainingService.getTrainingsByWeek(trainer, weekNum);
         List<List<TrainingSnippetDto>> dtoList = new ArrayList<>();
 
@@ -90,7 +90,7 @@ public class TrainingController {
     }
     
     @GetMapping("/availableTrainings")
-    public ResponseEntity<?> getFreeTrainings(int weekNum) {
+    public ResponseEntity<?> getFreeTrainings(Integer weekNum) {
 	List<List<Training>> trainingsByDay = this.trainingService.loadFreeTrainingsByWeek(weekNum);
 	List<List<TrainingSnippetDto>> dtoList = new ArrayList<>();
 

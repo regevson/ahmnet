@@ -88,7 +88,7 @@ h1 {
   padding: 5px;
   font-weight: bold;
   color: green;
-  margin: 20px 0 30px 0;
+  margin: 20px 0 0px 0;
   transition: all 0.3s ease-in-out;
 }
 

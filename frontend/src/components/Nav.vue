@@ -53,12 +53,15 @@
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
-          <b-nav-item-dropdown right>
+          <b-nav-item-dropdown right v-if="user">
             <!-- Using 'button-content' slot -->
             <template #button-content>
-              <a class="nav-link" style="display: inline-block">PROFIL</a>
+              <a class="nav-link" style="display: inline-block">{{user.id}}</a>
             </template>
-            <b-dropdown-item :to="{name: 'login'}">LOG OUT</b-dropdown-item>
+            <span class="role">{{user.roles[0]}}</span>
+            <b-dropdown-item class="dropdownLink" :to="{name: 'login'}">LOG OUT</b-dropdown-item>
+            <hr style="margin: 0">
+            <b-dropdown-item class="dropdownLink" :to="{name: 'password'}">PASSWORT</b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
       </b-collapse>
@@ -111,6 +114,20 @@ export default {
   color: #bf8a4a !important;
   font-weight: 800;
   font-size: 19px;
+}
+
+.role {
+  font-weight: bold;
+  font-size: 12px;
+  margin-left: 5px;
+  background: #c28b8b;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.dropdownLink {
+  padding: 5px 0 5px 0;
 }
 </style>
 
