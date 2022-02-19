@@ -38,7 +38,7 @@
           <td v-for="idx in 7" :key="idx" :class="{activecol: isCurrentDay(idx-1), selectedcol: isSelectedDay(idx-1)}" >
 
             <Trainingslot
-              :selectedTrainer="trainer"
+              :selectedTrainer="selectedTrainer"
               :trainings="trainings[idx-1]"
             />
           </td>
@@ -65,7 +65,6 @@ export default {
   data() {
     return {
       trainings: null,
-      trainer: null,
       weekDays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
       dates: [],
       date: '', 
@@ -74,7 +73,6 @@ export default {
 
   watch: {
     selectedTrainer: function() {
-      this.trainer = this.selectedTrainer;
       this.getTrainingsByWeekNum(this.weekNum);
     },
 
@@ -83,21 +81,22 @@ export default {
         return;
       date = new Date(date);
       this.weekNum = this.calcWeekNum(date);
+      console.log(this.weekNum);
       await this.getTrainingsByWeekNum(this.weekNum);
       this.highlightChosenDay(date);
     }
   },
 
   mounted() {
-    this.trainer = this.selectedTrainer;
     this.getTrainingsByWeekNum(this.weekNum);
     this.highlightChosenDay(new Date());
   },
 
   methods: {
     calcWeekNum(date) {
+      console.log(date);
       const onejan = new Date(date.getFullYear(), 0, 1);
-      return Math.ceil((((date.getTime() - onejan.getTime()) / 86400000) + onejan.getDay()) / 7) - 1;
+      return Math.ceil((((date.getTime() - onejan.getTime()) / 86400000) + onejan.getDay()-1) / 7) - 1;
     },
 
     async getTrainingsByWeekNum(weekNum) {
@@ -106,7 +105,7 @@ export default {
         response = await axiosReq('availableTrainings?weekNum=' + this.weekNum);
       else
         response = await axiosReq('trainingsByWeek?trainer='
-                              + this.trainer.id + '&weekNum=' + weekNum);
+                              + this.selectedTrainer.id + '&weekNum=' + weekNum);
       if(response == null)
         return;
 
@@ -142,7 +141,8 @@ export default {
     },
 
     async highlightChosenDay(chosenDate) {
-      console.log('refs ' + this.$refs["thday" + this.getDay(chosenDate)]);
+      if(this.dates.length != 7)
+        return;
       let th = this.$refs["thday" + this.getDay(chosenDate)][0];
       th.scrollIntoView({block: 'center'});
       // let it blink
