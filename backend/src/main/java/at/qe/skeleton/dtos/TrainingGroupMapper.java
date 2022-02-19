@@ -57,5 +57,5 @@ public class TrainingGroupMapper {
 	    dtos.add(mapToTrainingGroupSnippetDto(tg));
 	return dtos;
     }
-
+    
 }

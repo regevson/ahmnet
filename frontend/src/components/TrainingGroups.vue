@@ -14,7 +14,7 @@
       <b-card no-body class="mb-1">
         <b-card-header header-tag="header" class="p-1" role="tab">
           <button block class="cardBtn" v-b-toggle="'accordion-'+idx">
-            {{club.name}}
+            {{club[0]}} ({{club[1]}})
           </button>
         </b-card-header>
         <b-collapse
@@ -23,7 +23,7 @@
           role="tabpanel"
         >
           <b-card-body>
-            <TrainingGroupSnippet :club="club" />
+            <TrainingGroupSnippet :club="club[0]" />
           </b-card-body>
         </b-collapse>
       </b-card>
@@ -49,8 +49,8 @@ export default {
   },
 
   async created() {
-    const response = await axiosReq('allClubs');
-    this.clubs = response.data;
+    const response = await axiosReq('allClubsWithGroupNum');
+    this.clubs = Object.entries(response.data);
   },
 
   methods: {

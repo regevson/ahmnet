@@ -1,6 +1,7 @@
 package at.qe.skeleton.services;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,8 +29,6 @@ public class TrainingGroupService {
     TrainingGroupRepository trainingGroupRepository;
     @Autowired
     ClubRepository clubRepository;
-    @Autowired
-    UserService us;
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public List<Club> loadAllClubs() {
@@ -87,6 +86,13 @@ public class TrainingGroupService {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public int calcNumPlayedSessions(TrainingGroup trg) {
 	return this.trainingGroupRepository.countPlayedTrainingsByGroupId(trg.getId(), LocalDateTime.now());
+    }
+
+    public Map<String, Integer> getNumOfGroups(Collection<Club> clubs) {
+	Map<String, Integer> map = new HashMap<>();
+	for(Club club : clubs)
+	    map.put(club.getName(), this.loadTrainingGroupsByClub(club.getName()).size());
+	return map;
     }
 
 }

@@ -99,13 +99,8 @@ public class TrainingService {
                 .with(WeekFields.of(Locale.GERMANY).getFirstDayOfWeek())
                 .with(WeekFields.of(Locale.GERMANY).weekOfWeekBasedYear(), weekNum);
         return IntStream.range(0, 7).mapToObj(monday::plusDays)
-        	.map(d -> this.convertDateToGerman(d))
+        	.map(d -> d.toString())
         	.collect(Collectors.toList());
-    }
-
-    public String convertDateToGerman(LocalDate date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        return date.format(formatter);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")

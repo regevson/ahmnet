@@ -19,17 +19,17 @@
       class="fa-solid fa-circle-arrow-left arrow leftArrow"
       style="margin-right: 60px"
     ></i>
-    <span style="font-weight: bold">{{dates[0]}} - {{dates[6]}}</span>
+    <span v-if="dates.length == 7" style="font-weight: bold">{{convDateToGerman(dates[0])}} - {{convDateToGerman(dates[6])}}</span>
     <i
       @click="nextWeek"
       class="fa-solid fa-circle-arrow-right arrow rightArrow"
       style="margin-left: 60px"
     ></i>
-    <table class="timetable table table-responsive">
+    <table v-if="dates.length == 7" class="timetable table table-responsive">
       <thead>
         <tr align="center">
           <th :ref="'thday' + day_idx" scope="col" :class="{activeth: isCurrentDay(day_idx)}" v-for="(dayName, day_idx) in weekDays" :key="day_idx">
-            <span style="font-weight: normal; font-size: 13px">{{dates[day_idx]}}</span><br/>{{dayName}}
+            <span style="font-weight: normal; font-size: 13px">{{convDateToGerman(dates[day_idx])}}</span><br/>{{dayName}}
           </th>
         </tr>
       </thead>
@@ -81,7 +81,7 @@ export default {
     date: async function(date) {
       if(date === '') 
         return;
-      date = this.convertToDate(date);
+      date = new Date(date);
       this.weekNum = this.calcWeekNum(date);
       await this.getTrainingsByWeekNum(this.weekNum);
       this.highlightChosenDay(date);
@@ -98,11 +98,6 @@ export default {
     calcWeekNum(date) {
       const onejan = new Date(date.getFullYear(), 0, 1);
       return Math.ceil((((date.getTime() - onejan.getTime()) / 86400000) + onejan.getDay()) / 7) - 1;
-    },
-
-    convertToDate(dateStr) {
-      var parts = dateStr.split("-");
-      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
     },
 
     async getTrainingsByWeekNum(weekNum) {
@@ -130,17 +125,24 @@ export default {
       this.date = '';
     },
 
-    isCurrentDay(day_idx) { // 0 -> monday, ..., 6 -> sunday 
-      const d = new Date();
-      return this.getDay(d) == day_idx;
+    isCurrentDay(day_idx) {
+      const dayDate = new Date(this.dates[day_idx]);
+      const today = new Date();
+      return this.isToday(dayDate) && this.getDay(today) == day_idx;
+    },
+
+    isToday(someDate) {
+      const today = new Date();
+      return someDate.getDate() == today.getDate() && someDate.getMonth() == today.getMonth() && someDate.getFullYear() == today.getFullYear();
     },
 
     isSelectedDay(day_idx) { // 0 -> monday, ..., 6 -> sunday 
-      const date = this.convertToDate(this.date);
+      const date = new Date(this.date);
       return this.getDay(date) == day_idx;
     },
 
     async highlightChosenDay(chosenDate) {
+      console.log('refs ' + this.$refs["thday" + this.getDay(chosenDate)]);
       let th = this.$refs["thday" + this.getDay(chosenDate)][0];
       th.scrollIntoView({block: 'center'});
       // let it blink
@@ -148,8 +150,6 @@ export default {
         await this.blink(th, "#e1dddd");
         await this.blink(th, "white");
       }
-      /*
-      */
     },
 
     blink(obj, bg) {
@@ -160,7 +160,12 @@ export default {
 
     getDay(date) {
       return (date.getDay() + 6) % 7;
-    }
+    },
+
+    convDateToGerman(date) {
+      let d = date.split("-");
+      return d[2] + "-" + d[1] + "-" + d[0];
+    },
 
   },
 

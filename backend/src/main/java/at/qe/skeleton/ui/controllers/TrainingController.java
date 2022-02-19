@@ -107,10 +107,10 @@ public class TrainingController {
     @PostMapping("/updateTrainingDetails")
     public ResponseEntity<?> setTrainingsDetails(@RequestBody TrainingDto trainingDto) {
         Training training = null;
-        if(trainingDto.getId() != -1)
-            training = this.trainingService.loadTrainingById(trainingDto.getId());
-        else
+        if(trainingDto.getId() == -1)
             training = new Training();
+        else
+            training = this.trainingService.loadTrainingById(trainingDto.getId());
 	mapper.mapFromTrainingDetailsDto(trainingDto, training);
 	this.trainingService.saveTraining(training);
         return ResponseEntity

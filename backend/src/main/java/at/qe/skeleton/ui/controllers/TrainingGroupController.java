@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,10 +42,19 @@ public class TrainingGroupController {
 
     @GetMapping("/allClubs")
     public ResponseEntity<?> getAllClubs() {
-	Collection<Club> dtos = this.trainingGroupService.loadAllClubs();
+	Collection<Club> clubs = this.trainingGroupService.loadAllClubs();
 	return ResponseEntity
 	            .status(HttpStatus.OK)
-	            .body(dtos);
+	            .body(clubs);
+    }
+
+    @GetMapping("/allClubsWithGroupNum")
+    public ResponseEntity<?> getAllClubsWithGroupNum() {
+	Collection<Club> clubs = this.trainingGroupService.loadAllClubs();
+	Map<String, Integer> club_groupNum = this.trainingGroupService.getNumOfGroups(clubs);
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .body(club_groupNum);
     }
 
     @GetMapping("/allGroups")
@@ -54,7 +64,7 @@ public class TrainingGroupController {
 	            .status(HttpStatus.OK)
 	            .body(dtos);
     }
-    
+
     @PostMapping("/deleteGroup")
     public ResponseEntity<?> deleteGroup(Long id) {
 	this.trainingGroupService.deleteGroup(this.trainingGroupService.loadTrainingGroupById(id));
@@ -85,10 +95,10 @@ public class TrainingGroupController {
     @PostMapping("/updateTrainingGroupDetails")
     public ResponseEntity<?> updateTrainingGroupDetails(@RequestBody TrainingGroupDto groupDto) {
         TrainingGroup group = null;
-        if(groupDto.getId() != -1)
-            group = this.trainingGroupService.loadTrainingGroupById(groupDto.getId());
-        else
+        if(groupDto.getId() == -1) // group is brand-new
             group = new TrainingGroup();
+        else
+            group = this.trainingGroupService.loadTrainingGroupById(groupDto.getId());
         this.trainingGroupMapper.mapFromTrainingGroupDto(groupDto, group);
         this.trainingGroupService.saveGroup(group);
         return ResponseEntity

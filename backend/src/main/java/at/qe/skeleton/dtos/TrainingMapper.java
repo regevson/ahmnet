@@ -30,7 +30,7 @@ public class TrainingMapper {
 	dto.setId(tr.getId());
 	dto.setGroupId(tr.getTrainingGroup().getId());
 	dto.setClub(tr.getClub());
-	dto.setDate(trainingService.convertDateToGerman(tr.getDateTime().toLocalDate()));
+	dto.setDate(tr.getDateTime().toLocalDate().toString());
 	LocalTime startTime = tr.getDateTime().toLocalTime();
 	dto.setTimeslot(startTime.toString() + " - " + startTime.plusMinutes(tr.getDurationMinutes()).toString());
 	dto.setStartTime(startTime);

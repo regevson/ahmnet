@@ -44,7 +44,7 @@ export default {
   },
 
   async created() {
-    const response = await axiosReq('groupsByClub?clubName=' + this.club.name);
+    const response = await axiosReq('groupsByClub?clubName=' + this.club);
     this.groups = response.data;
   },
 
