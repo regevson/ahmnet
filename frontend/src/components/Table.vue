@@ -87,14 +87,13 @@ export default {
     }
   },
 
-  mounted() {
-    this.getTrainingsByWeekNum(this.weekNum);
+  async mounted() {
+    await this.getTrainingsByWeekNum(this.weekNum);
     this.highlightChosenDay(new Date());
   },
 
   methods: {
     calcWeekNum(date) {
-      console.log(date);
       const onejan = new Date(date.getFullYear(), 0, 1);
       return Math.ceil((((date.getTime() - onejan.getTime()) / 86400000) + onejan.getDay()-1) / 7) - 1;
     },
@@ -116,12 +115,12 @@ export default {
 
     prevWeek() {
       this.getTrainingsByWeekNum(--this.weekNum);
-      this.date = '';
+      this.date = ''; // as calendar doesn't trigger action when selected date is chosen again
     },
 
     nextWeek() {
       this.getTrainingsByWeekNum(++this.weekNum);
-      this.date = '';
+      this.date = ''; // as calendar doesn't trigger action when selected date is chosen again
     },
 
     isCurrentDay(day_idx) {
@@ -141,8 +140,6 @@ export default {
     },
 
     async highlightChosenDay(chosenDate) {
-      if(this.dates.length != 7)
-        return;
       let th = this.$refs["thday" + this.getDay(chosenDate)][0];
       th.scrollIntoView({block: 'center'});
       // let it blink

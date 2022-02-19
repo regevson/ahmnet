@@ -42,13 +42,6 @@
           >
             TAUSCHBÖRSE
           </b-nav-item>
-          <b-nav-item
-            v-if="isLoggedIn && hasRole('ADMIN')"
-            href="#"
-            class="nav-link"
-          >
-            ADMIN-FUNKTIONEN
-          </b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
