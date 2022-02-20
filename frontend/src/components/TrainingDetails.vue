@@ -174,8 +174,9 @@
         :disabled="isFree()"
         type="checkbox"
         v-model="isRecurring"
+        id="recurring"
       />
-      <label class="form-check-label">
+      <label class="form-check-label" for="recurring">
         <span>Regelmäßiges Training?</span>
       </label>
       <br>
@@ -298,7 +299,7 @@
 <script>
 import { axiosReq } from '../axios'
 import Multiselect from 'vue-multiselect'
-import { required, minValue } from 'vuelidate/lib/validators'
+import { required, requiredIf, minValue } from 'vuelidate/lib/validators'
 import qs from 'qs'
 
 export default {
@@ -333,9 +334,11 @@ export default {
       minValue: minValue(1),
     },
     lastDate: {
-      required,
+      required: requiredIf(function() {
+        return this.isRecurring;
+      }),
       minValue(lastDate) {
-        return new Date(lastDate) > new Date();
+        return !this.isRecurring || new Date(lastDate) > new Date();
       }
     }
   },
