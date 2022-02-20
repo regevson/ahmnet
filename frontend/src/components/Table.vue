@@ -38,6 +38,7 @@
           <td v-for="idx in 7" :key="idx" :class="{activecol: isCurrentDay(idx-1), selectedcol: isSelectedDay(idx-1)}" >
 
             <Trainingslot
+              :trainer="trainer"
               :selectedTrainer="selectedTrainer"
               :trainings="trainings[idx-1]"
               @checkedSlot="changeChecked"
@@ -59,6 +60,7 @@ export default {
   name: 'Table',
   components: {Trainingslot},
   props: {
+    trainer: Object,
     selectedTrainer: Object,
     isVacationTable: Boolean,
   },

@@ -14,6 +14,7 @@
             <span style="margin-left: 18px" class="groupLink">Gruppe {{training.groupId}}</span>
         </router-link>
             <input
+              :disabled="getSlotType(tr_idx) === 'pastslot' && trainer.roles[0] !== 'ADMIN'"
               class="checkedSlotBox form-check-input"
               type="checkbox"
               v-on:change="$emit('checkedSlot', training.id)"
@@ -47,8 +48,8 @@
 export default {
   name: 'TrainingSlot',
   props: {
+    trainer: Object,
     trainings: Array,
-    user: Object,
     selectedTrainer: Object
   },
 
@@ -74,15 +75,10 @@ export default {
     },
 
     getStartDateTime(tr) {
-      let startDateTime = this.convertToDate(tr.date);
+      let startDateTime = new Date(tr.date);
       let startTime = tr.startTime.split(':');
       startDateTime.setHours(startTime[0], startTime[1], startTime[2]);
       return startDateTime;
-    },
-
-    convertToDate(dateStr) {
-      var parts = dateStr.split("-");
-      return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
     },
 
     getEndDateTime(start, duration) {
@@ -91,8 +87,8 @@ export default {
 
     getCurrentDateTime() {
       //return new Date();
-      let curr = new Date("2022-02-14");
-      curr.setHours(14, 40, 0);
+      let curr = new Date("2022-02-20");
+      curr.setHours(12, 40, 0);
       return curr;
     },
 
@@ -115,6 +111,7 @@ body {
 td {
   border-top: none !important;
 }
+
 .trainingPreview {
   font-weight: 700;
   padding: 5px 0 5px 0;

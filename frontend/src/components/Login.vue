@@ -59,14 +59,18 @@ export default {
   data() {
     return {
       username: '',
-      password: '',
+      password: 'passwd',
       wrongCredentials: false,
     }
   },
 
+  created() {
+    // login with clean vuex-state
+    this.$store.commit("selectedTrainer", null);
+  },
+
   methods: {
     async handleSubmit() {
-
       const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
       const params = new URLSearchParams()
       params.append('username', this.username)

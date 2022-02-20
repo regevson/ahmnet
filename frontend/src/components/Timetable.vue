@@ -45,6 +45,7 @@
       </div>
 
       <Table 
+        :trainer="user"
         :selectedTrainer="selectedTrainer" 
         :isVacationTable="false"
         @checkedSlots="setCheckedSlots"
