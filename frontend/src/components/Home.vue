@@ -87,7 +87,7 @@ h1 {
   border-radius: 8px;
   padding: 5px;
   font-weight: bold;
-  color: green;
+  color: #499082;
   margin: 20px 0 0px 0;
   transition: all 0.3s ease-in-out;
 }
@@ -97,6 +97,41 @@ h1 {
   background: #4b9183;
   transition: all 0.3s ease-in-out;
 }
+
+.deleteBulkBtn {
+  background: none;
+  border: 2px solid red;
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  margin: 20px 0 0px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.deleteBulkBtn:hover {
+  color: white;
+  background: red;
+  transition: all 0.3s ease-in-out;
+}
+
+.freeBulkBtn {
+  background: none;
+  border: 2px solid orange;
+  border-radius: 8px;
+  padding: 5px;
+  font-weight: bold;
+  color: orange;
+  margin: 20px 0 0px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.freeBulkBtn:hover {
+  color: white;
+  background: orange;
+  transition: all 0.3s ease-in-out;
+}
+
 
 .changeBtn {
   color: white;

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.qe.skeleton.dtos.TimetableDto;
@@ -58,6 +59,14 @@ public class TrainingController {
 	            .build();
     }
 
+    @PostMapping("/deleteTrainings")
+    public ResponseEntity<?> deleteTrainings(Long[] trainingIds) {
+	this.trainingService.deleteTrainings(trainingIds);
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .build();
+    }
+
     @PostMapping("/freeTraining")
     public ResponseEntity<?> freeTraining(Long id) {
 	this.trainingService.freeTraining(trainingService.loadTrainingById(id));
@@ -66,9 +75,25 @@ public class TrainingController {
 	            .build();
     }
 
+    @PostMapping("/freeTrainings")
+    public ResponseEntity<?> freeTrainings(Long[] trainingIds) {
+	this.trainingService.freeTrainings(trainingIds);
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .build();
+    }
+
     @PostMapping("/grabTraining")
     public ResponseEntity<?> grabTraining(Long id) {
 	this.trainingService.grabTraining(trainingService.loadTrainingById(id));
+	return ResponseEntity
+	            .status(HttpStatus.OK)
+	            .build();
+    }
+
+    @PostMapping("/grabTrainings")
+    public ResponseEntity<?> grabTrainings(Long[] trainingIds) {
+	this.trainingService.grabTrainings(trainingIds);
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .build();

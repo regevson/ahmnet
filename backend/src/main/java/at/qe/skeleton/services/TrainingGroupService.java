@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import at.qe.skeleton.model.Club;
+import at.qe.skeleton.model.SmsRequest;
 import at.qe.skeleton.model.Training;
 import at.qe.skeleton.model.TrainingGroup;
 import at.qe.skeleton.model.User;
@@ -29,6 +30,10 @@ public class TrainingGroupService {
     TrainingGroupRepository trainingGroupRepository;
     @Autowired
     ClubRepository clubRepository;
+    @Autowired
+    private SmsService smsService;
+    @Autowired
+    private UserService userService;
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public List<Club> loadAllClubs() {
@@ -62,6 +67,11 @@ public class TrainingGroupService {
 
     @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #group.trainer.getId")
     public TrainingGroup saveGroup(TrainingGroup group) {
+
+	User admin = this.userService.loadUser("admin");
+	String phone = admin.getPhone();
+        smsService.sendWAMessage(new SmsRequest(phone, "hello"));
+
         return trainingGroupRepository.save(group);
     }
 

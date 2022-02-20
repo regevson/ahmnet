@@ -40,6 +40,7 @@
             <Trainingslot
               :selectedTrainer="selectedTrainer"
               :trainings="trainings[idx-1]"
+              @checkedSlot="changeChecked"
             />
           </td>
         </tr>
@@ -68,6 +69,8 @@ export default {
       weekDays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
       dates: [],
       date: '', 
+      checkedSlots: [],
+      showButtons: false,
     }
   },
 
@@ -84,7 +87,7 @@ export default {
       console.log(this.weekNum);
       await this.getTrainingsByWeekNum(this.weekNum);
       this.highlightChosenDay(date);
-    }
+    },
   },
 
   async mounted() {
@@ -162,6 +165,14 @@ export default {
     convDateToGerman(date) {
       let d = date.split("-");
       return d[2] + "-" + d[1] + "-" + d[0];
+    },
+
+    changeChecked(id) {
+      if(this.checkedSlots.includes(id))
+        this.checkedSlots = this.checkedSlots.filter(slotId => slotId != id);
+      else
+        this.checkedSlots.push(id)
+      this.$emit('checkedSlots', this.checkedSlots)
     },
 
   },

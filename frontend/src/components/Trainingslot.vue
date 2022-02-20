@@ -7,16 +7,21 @@
       :class="{currentslot: getSlotType(tr_idx) === 'currentslot', pastslot: getSlotType(tr_idx) === 'pastslot', vacationslot: checkVacation(tr_idx) == 'vacationslot'}"
       class="trainingPreview"
     >
-      <router-link
-        :to="{name: 'trainingdetails', params: {trainingId: training.id}}"
-      >
+          <div align="center">
         <router-link
           :to="{name: 'traininggroupdetails', params: {groupId: training.groupId}}"
         >
-          <div align="center">
-            <span class="groupLink">Gruppe {{training.groupId}}</span>
-          </div>
+            <span style="margin-left: 18px" class="groupLink">Gruppe {{training.groupId}}</span>
         </router-link>
+            <input
+              class="checkedSlotBox form-check-input"
+              type="checkbox"
+              v-on:change="$emit('checkedSlot', training.id)"
+            />
+          </div>
+      <router-link
+        :to="{name: 'trainingdetails', params: {trainingId: training.id}}"
+      >
         <div id="inner" class="trainingPreviewInner">
           <span>{{training.club.name}}</span
           ><br />
@@ -24,8 +29,15 @@
           <span>{{training.timeslot}}</span
           ><br />
         </div>
-        <span class="court">Court {{training.court}}</span>
+
+          <span class="court">Court {{training.court}}</span>
+
       </router-link>
+
+
+
+
+
     </div>
   </div>
 </template>
@@ -42,6 +54,7 @@ export default {
 
   data() {
     return {
+      isChecked: false,
     }
   },
 
@@ -181,11 +194,11 @@ td {
 }
 
 .vacationslot a {
-  color: black;
+  color: #774e00;
 }
 
 .vacationslot a:hover {
-  color: black;
+  color: #774e00;
 }
 
 .vacationslot hr {
@@ -196,5 +209,28 @@ td {
   background: #ffffff6b;
   color: #774e00;
 }
+
+.checkedSlotBox {
+  border: none !important; 
+  background-color: #6bab9f !important; 
+  position: static !important; 
+  margin-left: 7px !important; 
+  vertically-align: middle !important; 
+  width: 15px !important; 
+  height: 20px !important; 
+  border-radius: 5px !important;
+}
+
+.vacationslot .checkedSlotBox {
+  border: none !important; 
+  background-color: #ffb400 !important; 
+  position: static !important; 
+  margin-left: 7px !important; 
+  vertically-align: middle !important; 
+  width: 15px !important; 
+  height: 20px !important; 
+  border-radius: 5px !important;
+}
+
 </style>
 

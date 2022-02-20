@@ -5,12 +5,14 @@ import java.time.LocalTime;
 import java.time.Year;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -18,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import at.qe.skeleton.model.SmsRequest;
 import at.qe.skeleton.model.Training;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.TrainingRepository;
@@ -147,6 +150,30 @@ public class TrainingService {
             startDate = startDate.plusWeeks(1);
 	}
 	
+    }
+
+    @Transactional
+    public void deleteTrainings(Long[] trainingIds) {
+	for(int i = 0; i < trainingIds.length; i++) {
+	    Training t = loadTrainingById(trainingIds[i]);
+	    deleteTraining(t);
+	}
+    }
+
+    @Transactional
+    public void freeTrainings(Long[] trainingIds) {
+	for(int i = 0; i < trainingIds.length; i++) {
+	    Training t = loadTrainingById(trainingIds[i]);
+	    freeTraining(t);
+	}
+    }
+
+    @Transactional
+    public void grabTrainings(Long[] trainingIds) {
+	for(int i = 0; i < trainingIds.length; i++) {
+	    Training t = loadTrainingById(trainingIds[i]);
+	    grabTraining(t);
+	}
     }
 
 }
