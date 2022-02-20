@@ -1,8 +1,8 @@
 package at.qe.skeleton.services;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Year;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -128,6 +128,25 @@ public class TrainingService {
     public List<List<Training>> getTrainingsByWeek(String trainerId, int weekNum) {
         List<Training> trainings = this.loadTrainingsByTrainerAndWeek(trainerId, weekNum);
 	return this.groupByDay(trainings);
+    }
+
+    @Transactional
+    public void saveRecurringTrainings(Training training) {
+	LocalDate lastDate = training.getLastDate();
+	if(lastDate == null) {
+            saveTraining(training);
+            return;
+	}
+
+	LocalDate startDate = training.getDateTime().toLocalDate();
+	LocalTime startTime = training.getDateTime().toLocalTime();
+	while(startDate.isBefore(lastDate) || startDate.isEqual(lastDate)) {
+            Training tmp = new Training(training);
+            tmp.setDateTime(startDate.atTime(startTime));
+            this.saveTraining(tmp);
+            startDate = startDate.plusWeeks(1);
+	}
+	
     }
 
 }

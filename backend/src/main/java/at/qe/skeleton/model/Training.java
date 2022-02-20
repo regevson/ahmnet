@@ -16,9 +16,11 @@ import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
+@NoArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -32,6 +34,9 @@ public class Training {
     @Setter(AccessLevel.NONE)
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime dateTime;
+
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDate lastDate;
 
     private int weekNum;
     private int durationMinutes;
@@ -59,6 +64,21 @@ public class Training {
 
     @ManyToOne
     private Club club;
+    
+    public Training(Training toClone) {
+        this.setTrainingGroup(toClone.getTrainingGroup());
+        this.setTrainer(toClone.getTrainer());
+        this.setOriginalTrainer(toClone.getOriginalTrainer());
+        this.setClub(toClone.getClub());
+	this.setCourt(toClone.getCourt());
+        this.setDateTime(toClone.getDateTime());
+        this.setLastDate(toClone.getLastDate());
+        this.setDurationMinutes(toClone.getDurationMinutes());
+        this.setAttendees(toClone.getAttendees());
+        this.setBulletPoints(toClone.getBulletPoints());
+        this.setComment(toClone.getComment());
+        this.setIsFree(toClone.getIsFree());
+    }
 
     public void setDateTime(LocalDateTime dateTime) {
 	this.dateTime = dateTime;
@@ -73,7 +93,11 @@ public class Training {
     public void setTrainer(User trainer) {
 	this.trainer = trainer;
 	if(this.getOriginalTrainer() == null)
-	    this.originalTrainer = trainer;
+	    this.setOriginalTrainer(trainer);
+    }
+    
+    private void setOriginalTrainer(User originalTrainer) {
+	this.originalTrainer = originalTrainer;
     }
 
 }

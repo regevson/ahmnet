@@ -54,6 +54,7 @@ public class TrainingMapper {
 	dto.setClub(tr.getClub());
 	dto.setCourt(tr.getCourt());
 	dto.setDate(tr.getDateTime().toLocalDate());
+	dto.setLastDate(tr.getLastDate());	
 	LocalTime startTime = tr.getDateTime().toLocalTime();
 	dto.setStartTime(startTime);
 	dto.setTimeslot(startTime.toString() + " - " + startTime.plusMinutes(tr.getDurationMinutes()).toString());
@@ -73,6 +74,7 @@ public class TrainingMapper {
         tr.setClub(dto.getClub());
 	tr.setCourt(dto.getCourt());
         tr.setDateTime(dto.getDate().atTime(dto.getStartTime()));
+        tr.setLastDate(dto.getLastDate());
         tr.setDurationMinutes(dto.getDurationMinutes());
         //List<User> players = dto.getPlayers().stream().map(p -> userService.loadUser(p.getId())).collect(Collectors.toList());
         if(dto.getAttendees() != null)

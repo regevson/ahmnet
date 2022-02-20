@@ -1,7 +1,8 @@
 <template>
   <div align="left">
     <form v-if="training" @submit.prevent="">
-      <div align="center" v-if="training.id != -1">
+
+      <div align="center" v-if="!isNewTraining()">
         <p class="entry" style="background: #1b2730; border-radius: 5px">
           Training {{training.id}}
           <i
@@ -10,12 +11,18 @@
             style="color: orange; margin-left: 5px"
           ></i>
           <i
-            v-if="!isFree()"
-            class="fa-solid fa-pen-to-square fa-sm"
+            v-if="isRecurring"
+            class="fa-solid fa-repeat fa-sm"
             style="color: orange; margin-left: 5px"
           ></i>
         </p>
+          <span v-if="isRecurring" style="font-size: 13px; float: right; margin-top: 3px;"> (bis {{training.lastDate}})</span>
+
       </div>
+
+      <p v-if="isNewTraining()" class="entry" style="background: #1b2730; border-radius: 5px; text-align: center;">
+        Neues Training
+      </p>
       <br />
 
       <p class="entry">Club:</p>
@@ -83,7 +90,8 @@
         :disabled="isFree()"
         type="number"
         v-model="durationMinutes"
-        min="1"
+        step="15"
+        min="0"
         placeholder="Dauer in Minuten"
         :class="[$v.durationMinutes.$invalid ? 'form-error' : 'detailsInput']"
       ></b-form-input>
@@ -159,6 +167,43 @@
       >
       </textarea>
       <br />
+
+    <div v-if="isNewTraining()" style="margin-top: 10px" class="form-check">
+      <input
+        class="form-check-input"
+        :disabled="isFree()"
+        type="checkbox"
+        v-model="isRecurring"
+      />
+      <label class="form-check-label">
+        <span>Regelmäßiges Training?</span>
+      </label>
+      <br>
+    </div>
+
+
+      <div v-if="isNewTraining() && isRecurring">
+        <p class="entry" :class="{'errorBg': $v.lastDate.$invalid}">Bis wann eintragen? <span style="font-size: 13px; color: silver;">(Datum letztes Training)</span></p>
+        <b-form-datepicker
+          :disabled="isFree()"
+          v-model="lastDate"
+          class="mb-2 detailsInput"
+          locale="de"
+          :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit'}"
+          :showDecadeNav="false"
+          :start-weekday="1"
+          :hide-header="true"
+          :class="[$v.lastDate.$invalid ? 'form-error' : 'detailsInput']"
+          calendar-width="100%"
+          label-help=""
+          menu-class="w-100"
+        >
+        </b-form-datepicker>
+        <div class="errorText" v-if="!$v.lastDate.required">Bitte ausfüllen!</div>
+      </div>
+
+
+
 
       <div align="center" v-if="training.id == -1">
         <input
@@ -273,6 +318,8 @@ export default {
       court: 1,
 
       dialogTxt: '',
+      isRecurring: false,
+      lastDate: '',
     }
   },
 
@@ -284,6 +331,12 @@ export default {
     court: {
       required,
       minValue: minValue(1),
+    },
+    lastDate: {
+      required,
+      minValue(lastDate) {
+        return new Date(lastDate) > new Date();
+      }
     }
   },
 
@@ -305,9 +358,9 @@ export default {
         await this.getAllTrainer();
 
       if(this.$route.params.trainingId == -1) // is new training
-        this.setupNewTraining();
+        await this.setupNewTraining();
       else
-        this.setupTraining();
+        await this.setupTraining();
     },
 
     async getAllClubs() {
@@ -336,16 +389,24 @@ export default {
       this.training.startTime = "10:30";
       this.training.durationMinutes = 60;
       this.training.free = false;
-      this.training.date = new Date();
+      const currDate = this.getCurrentDate();
+      this.training.date = currDate;
       this.training.club = this.allClubs[0];
       this.training.group = this.allGroups[0];
       this.training.trainer = this.user;
+    },
+
+    getCurrentDate() {
+      let curr = new Date();
+      curr.setMinutes(curr.getMinutes()-curr.getTimezoneOffset())
+      return curr;
     },
 
     async setupTraining() {
       const res = await axiosReq('training?id=' + this.$route.params.trainingId);
       this.training = res.data;
       this.combineGroupInfo(this.training.group);
+      this.isRecurring = this.training.lastDate != null;
       this.setValidationFields();
     },
 
@@ -369,6 +430,7 @@ export default {
 
       const config = {headers: {'Content-Type': 'application/json'}}
       let params = JSON.stringify(this.training);
+      console.log(params);
       await axiosReq('updateTrainingDetails', params, config);
 
       this.$router.push({name: 'timetable'});
@@ -388,6 +450,7 @@ export default {
     getValidationFields() {
       this.training.durationMinutes = this.durationMinutes;
       this.training.court = this.court;
+      this.training.lastDate = this.lastDate;
     },
 
     async deleteTraining() {
@@ -413,6 +476,10 @@ export default {
 
     isFree() {
       return this.training.free;
+    },
+
+    isNewTraining() {
+      return this.training.id == -1;
     },
 
     setDialogTxt(cmd) {

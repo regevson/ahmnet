@@ -112,7 +112,7 @@ public class TrainingController {
         else
             training = this.trainingService.loadTrainingById(trainingDto.getId());
 	mapper.mapFromTrainingDetailsDto(trainingDto, training);
-	this.trainingService.saveTraining(training);
+	this.trainingService.saveRecurringTrainings(training);
         return ResponseEntity
                     .status(HttpStatus.OK)
                     .build();

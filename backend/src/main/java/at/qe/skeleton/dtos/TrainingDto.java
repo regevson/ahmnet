@@ -19,6 +19,7 @@ public class TrainingDto {
     private TrainingGroupSnippetDto group;
     private Club club;
     private LocalDate date;
+    private LocalDate lastDate;
     private String timeslot;
     private int court;
     private LocalTime startTime;
