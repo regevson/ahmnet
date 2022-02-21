@@ -21,6 +21,7 @@ public class TrainingSnippetDto {
     private int durationMinutes;
     private int court;
     private boolean isFree;
+    private String trainerId;
     private String originalTrainerId;
 
 }

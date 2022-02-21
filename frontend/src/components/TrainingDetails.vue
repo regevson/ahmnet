@@ -11,12 +11,12 @@
             style="color: orange; margin-left: 5px"
           ></i>
           <i
-            v-if="isRecurring"
+            v-if="training.lastDate"
             class="fa-solid fa-repeat fa-sm"
             style="color: orange; margin-left: 5px"
           ></i>
         </p>
-          <span v-if="isRecurring" style="font-size: 13px; float: right; margin-top: 3px;"> (bis {{training.lastDate}})</span>
+          <span v-if="training.lastDate" style="font-size: 13px; float: right; margin-top: 3px;"> (bis {{training.lastDate}})</span>
 
       </div>
 
@@ -409,7 +409,6 @@ export default {
       const res = await axiosReq('training?id=' + this.$route.params.trainingId);
       this.training = res.data;
       this.combineGroupInfo(this.training.group);
-      this.isRecurring = this.training.lastDate != null;
       this.setValidationFields();
     },
 
@@ -433,7 +432,6 @@ export default {
 
       const config = {headers: {'Content-Type': 'application/json'}}
       let params = JSON.stringify(this.training);
-      console.log(params);
       await axiosReq('updateTrainingDetails', params, config);
 
       this.$router.push({name: 'timetable'});
@@ -491,11 +489,11 @@ export default {
       else if(cmd === 'change')
         this.dialogTxt = "Training verändern?";
       else if(cmd === 'delete')
-        this.dialogTxt = "Trainig löschen?";
+        this.dialogTxt = "Training löschen?";
       else if(cmd === 'free')
-        this.dialogTxt = "Trainig veröffentlichen?";
+        this.dialogTxt = "Training freigeben?";
       else if(cmd === 'grab')
-        this.dialogTxt = "Trainig übernehmen?";
+        this.dialogTxt = "Training übernehmen?";
     },
 
   }

@@ -6,7 +6,7 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
     selectedTrainer: null,
-    weekNum: null,
+    selectedDate: null,
   },
 
   getters: {
@@ -14,10 +14,8 @@ export const store = new Vuex.Store({
       return state.selectedTrainer;
     },
 
-    weekNum(state) {
-      if(state.weekNum == null)
-        state.weekNum = calcCurrentWeekNum();
-      return state.weekNum;
+    selectedDate(state) {
+      return state.selectedDate;
     },
 
   },
@@ -27,15 +25,10 @@ export const store = new Vuex.Store({
       state.selectedTrainer = trainer;
     },
 
-    weekNum(state, weekNum) {
-      state.weekNum = weekNum;
+    selectedDate(state, selectedDate) {
+      state.selectedDate = selectedDate;
     },
   }
 
 });
 
-function calcCurrentWeekNum() {
-  const date = new Date();
-  const onejan = new Date(date.getFullYear(), 0, 1);
-  return Math.ceil((((date.getTime() - onejan.getTime()) / 86400000) + onejan.getDay()-1) / 7) - 1;
-}

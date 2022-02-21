@@ -91,12 +91,13 @@ public class Training {
     }
 
     public void setTrainer(User trainer) {
-        this.setOriginalTrainer(this.getTrainer());
 	this.trainer = trainer;
+	if(this.originalTrainer == null)
+	    this.setOriginalTrainer(trainer);
     }
     
-    private void setOriginalTrainer(User originalTrainer) {
-	this.originalTrainer = originalTrainer;
+    public void setOriginalTrainer(User originalTrainer) {
+        this.originalTrainer = originalTrainer;
     }
 
 }

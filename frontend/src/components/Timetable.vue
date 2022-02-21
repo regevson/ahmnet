@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="user && selectedTrainer" align="center">
+    <div v-if="user" align="center">
       <h1>MEINE TRAININGS</h1>
 
       <div align="center">
@@ -30,7 +30,7 @@
       </div>
       <br>
 
-      <div v-if="hasRole('ADMIN')" align="left">
+      <div v-if="user.roles.includes('ADMIN')" align="left">
         <p class="entry">TrainerIn auswählen:</p>
         <multiselect
           v-model="selectedTrainer"
@@ -44,12 +44,20 @@
         <br>
       </div>
 
-      <Table 
-        :trainer="user"
-        :selectedTrainer="selectedTrainer" 
-        :isVacationTable="false"
-        @checkedSlots="setCheckedSlots"
+      <DateBar
+        :startDate="startDate" 
+        :endDate="endDate" 
+        @dateChanged="changeDate" 
       />
+
+      <Table
+        :isAdmin="user.roles.includes('ADMIN')"
+        :timetable="timetable"
+        :selectedDate="selectedDate"
+        @checkedSlots="setCheckedSlots" 
+      />
+
+
     </div>
 
 
@@ -70,21 +78,19 @@
     >
 
 
-
-
-    <h5 v-if="!user || !selectedTrainer" class="loading">LOADING...</h5>
+    <h5 v-if="!user" class="loading">LOADING...</h5>
   </div>
 </template>
 
 <script>
+import DateBar from "./DateBar";
 import Table from "./Table";
 import Multiselect from 'vue-multiselect'
 import { axiosReq } from '../axios'
-//import qs from 'qs'
 
 export default {
   name: 'Timetable',
-  components: {Multiselect, Table},
+  components: {Multiselect, DateBar, Table},
   props: {
     user: Object
   },
@@ -92,8 +98,13 @@ export default {
   data() {
     return {
       allTrainers: [],
+      timetable: null,
+      selectedDate: new Date(),
+      weekNum: null,
       checkedSlots: [],
       dialogTxt: '',
+      startDate: null,
+      endDate: null,
     }
   },
 
@@ -111,26 +122,40 @@ export default {
       this.allTrainers = response.data;
     },
 
-    hasRole: function(role) {
-      return this.user.roles.includes(role);
+    async getTrainings(weekNum) {
+      let response;
+      response = await axiosReq('trainingsByWeek?trainer='
+                            + this.selectedTrainer.id + '&weekNum=' + weekNum);
+      if(response == null)
+        return;
+
+      this.timetable = response.data
+      this.startDate = this.timetable.datesInWeek[0];
+      this.endDate = this.timetable.datesInWeek[6];
     },
 
     setCheckedSlots(checkedSlots) {
       this.checkedSlots = checkedSlots; 
     },
 
+    changeDate(selectedDate) {
+      this.selectedDate = selectedDate;
+      this.weekNum = this.$funcs.calcWeekNum(this.selectedDate);
+      this.getTrainings(this.weekNum);
+    },
+
     async deleteTrainings() {
       const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
       let params = "trainingIds=" + this.checkedSlots.toString();
       await axiosReq('deleteTrainings', params, config);
-      this.$router.go();
+      this.getTrainings(this.weekNum);
     },
 
     async freeTrainings() {
       const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
       let params = "trainingIds=" + this.checkedSlots.toString();
       await axiosReq('freeTrainings', params, config);
-      this.$router.go();
+      this.getTrainings(this.weekNum);
     },
 
     setDialogTxt(cmd) {
@@ -140,17 +165,21 @@ export default {
         this.dialogTxt = "Ausgewählte Trainings freigeben?";
     },
 
+
   },
 
   computed: {
     selectedTrainer: {
       get() {
-        if(this.$store.getters["selectedTrainer"] == null)
-          this.$store.commit("selectedTrainer", this.user);
+        if(this.$store.getters["selectedTrainer"] == null) {
+          let user = JSON.parse(sessionStorage.user);
+          this.$store.commit("selectedTrainer", user);
+        }
         return this.$store.getters["selectedTrainer"];
       },
       set(selectedTrainer) {
-        return this.$store.commit("selectedTrainer", selectedTrainer);
+        this.$store.commit("selectedTrainer", selectedTrainer);
+        this.getTrainings(this.weekNum);
       }
     },
 

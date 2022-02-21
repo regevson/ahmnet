@@ -1,151 +1,117 @@
 <template>
   <div align="center">
 
-      <b-form-datepicker
-        v-model="date"
-        locale="de"
-        :showDecadeNav="false"
-        :start-weekday="1"
-        :hide-header="true"
-        size="sm"
-        button-only
-        label-help=""
-        class="btnOnlyPicker"
-      />
-      <br>
+    <table v-if="timetable" class="timetable table table-responsive">
 
-    <i
-      @click="prevWeek"
-      class="fa-solid fa-circle-arrow-left arrow leftArrow"
-      style="margin-right: 60px"
-    ></i>
-    <span v-if="dates.length == 7" style="font-weight: bold">{{convDateToGerman(dates[0])}} - {{convDateToGerman(dates[6])}}</span>
-    <i
-      @click="nextWeek"
-      class="fa-solid fa-circle-arrow-right arrow rightArrow"
-      style="margin-left: 60px"
-    ></i>
-    <table v-if="dates.length == 7" class="timetable table table-responsive">
       <thead>
         <tr align="center">
-          <th :ref="'thday' + day_idx" scope="col" :class="{activeth: isCurrentDay(day_idx)}" v-for="(dayName, day_idx) in weekDays" :key="day_idx">
-            <span style="font-weight: normal; font-size: 13px">{{convDateToGerman(dates[day_idx])}}</span><br/>{{dayName}}
+          <th 
+            :ref="'thday' + dayIdx" 
+            scope="col" 
+            :class="{activeth: isCurrentDay(dayIdx)}" 
+            v-for="(dayName, dayIdx) in weekDays" :key="dayIdx"
+          >
+
+            <span style="font-weight: normal; font-size: 13px">
+              {{convDateToGerman(timetable.datesInWeek[dayIdx])}}
+            </span>
+            <br/>
+            {{dayName}}
           </th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-if="trainings">
-          <td v-for="idx in 7" :key="idx" :class="{activecol: isCurrentDay(idx-1), selectedcol: isSelectedDay(idx-1)}" >
 
+      <tbody>
+        <tr v-if="timetable.trainings.length > 0">
+          <td 
+            v-for="idx in 7" 
+            :key="idx" 
+            :class="{activecol: isCurrentDay(idx-1), 
+                     selectedcol: isSelectedDay(idx-1)}"
+            >
             <Trainingslot
-              :trainer="trainer"
-              :selectedTrainer="selectedTrainer"
-              :trainings="trainings[idx-1]"
+              :isAdmin="isAdmin"
+              :trainings="timetable.trainings[idx-1]"
               @checkedSlot="changeChecked"
             />
           </td>
         </tr>
       </tbody>
+
     </table>
 
-    <h5 v-if="!trainings" class="loading">LOADING...</h5>
+    <h5 v-if="!timetable" class="loading">LOADING...</h5>
+
   </div>
 </template>
 
 <script>
 import Trainingslot from "./Trainingslot";
-import { axiosReq } from '../axios'
 
 export default {
   name: 'Table',
   components: {Trainingslot},
   props: {
-    trainer: Object,
-    selectedTrainer: Object,
-    isVacationTable: Boolean,
+    isAdmin: Boolean,
+    timetable: Object,
+    selectedDate: Date,
   },
 
   data() {
     return {
-      trainings: null,
       weekDays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
-      dates: [],
-      date: '', 
       checkedSlots: [],
-      showButtons: false,
     }
   },
 
   watch: {
-    selectedTrainer: function() {
-      this.getTrainingsByWeekNum(this.weekNum);
+    selectedDate: function() {
+      if(this.timetable)
+        this.highlightChosenDay(this.selectedDate);
     },
 
-    date: async function(date) {
-      if(date === '') 
-        return;
-      date = new Date(date);
-      this.weekNum = this.calcWeekNum(date);
-      console.log(this.weekNum);
-      await this.getTrainingsByWeekNum(this.weekNum);
-      this.highlightChosenDay(date);
+    timetable: function() {
+      this.checkedSlots = []; // reset checkboxes when table is rerendered
     },
-  },
-
-  async mounted() {
-    await this.getTrainingsByWeekNum(this.weekNum);
-    this.highlightChosenDay(new Date());
   },
 
   methods: {
-    calcWeekNum(date) {
-      const onejan = new Date(date.getFullYear(), 0, 1);
-      return Math.ceil((((date.getTime() - onejan.getTime()) / 86400000) + onejan.getDay()-1) / 7) - 1;
-    },
-
-    async getTrainingsByWeekNum(weekNum) {
-      let response;
-      if(this.isVacationTable)
-        response = await axiosReq('availableTrainings?weekNum=' + this.weekNum);
-      else
-        response = await axiosReq('trainingsByWeek?trainer='
-                              + this.selectedTrainer.id + '&weekNum=' + weekNum);
-      if(response == null)
-        return;
-
-      const timetable = response.data
-      this.trainings = timetable.trainings;
-      this.dates = timetable.datesInWeek;
-    },
-
-    prevWeek() {
-      this.getTrainingsByWeekNum(--this.weekNum);
-      this.date = ''; // as calendar doesn't trigger action when selected date is chosen again
-    },
-
-    nextWeek() {
-      this.getTrainingsByWeekNum(++this.weekNum);
-      this.date = ''; // as calendar doesn't trigger action when selected date is chosen again
-    },
-
-    isCurrentDay(day_idx) {
-      const dayDate = new Date(this.dates[day_idx]);
+    isCurrentDay(dayIdx) {
+      const dayDate = new Date(this.timetable.datesInWeek[dayIdx]);
       const today = new Date();
-      return this.isToday(dayDate) && this.getDay(today) == day_idx;
+      return this.isToday(dayDate) && this.getDay(today) == dayIdx;
     },
 
     isToday(someDate) {
       const today = new Date();
-      return someDate.getDate() == today.getDate() && someDate.getMonth() == today.getMonth() && someDate.getFullYear() == today.getFullYear();
+      return someDate.getDate() == today.getDate() 
+        && someDate.getMonth() == today.getMonth() 
+        && someDate.getFullYear() == today.getFullYear();
     },
 
-    isSelectedDay(day_idx) { // 0 -> monday, ..., 6 -> sunday 
-      const date = new Date(this.date);
-      return this.getDay(date) == day_idx;
+    getDay(date) {
+      return (date.getDay() + 6) % 7;
     },
 
-    async highlightChosenDay(chosenDate) {
-      let th = this.$refs["thday" + this.getDay(chosenDate)][0];
+    convDateToGerman(date) {
+      let d = date.split("-");
+      return d[2] + "-" + d[1] + "-" + d[0];
+    },
+
+    isSelectedDay(dayIdx) { // 0 -> monday, ..., 6 -> sunday 
+      return this.getDay(this.selectedDate) == dayIdx;
+    },
+
+    changeChecked(id) {
+      if(this.checkedSlots.includes(id))
+        this.checkedSlots = this.checkedSlots.filter(slotId => slotId != id);
+      else
+        this.checkedSlots.push(id)
+      this.$emit('checkedSlots', this.checkedSlots)
+    },
+
+    async highlightChosenDay(selectedDate) {
+      let th = this.$refs["thday" + this.getDay(selectedDate)][0];
       th.scrollIntoView({block: 'center'});
       // let it blink
       for(let i = 0; i < 3; i++) {
@@ -158,40 +124,8 @@ export default {
       return new Promise((resolve) => {
         setTimeout(() => {obj.style.background = bg; resolve();}, 100);
       })
-    },
-
-    getDay(date) {
-      return (date.getDay() + 6) % 7;
-    },
-
-    convDateToGerman(date) {
-      let d = date.split("-");
-      return d[2] + "-" + d[1] + "-" + d[0];
-    },
-
-    changeChecked(id) {
-      if(this.checkedSlots.includes(id))
-        this.checkedSlots = this.checkedSlots.filter(slotId => slotId != id);
-      else
-        this.checkedSlots.push(id)
-      this.$emit('checkedSlots', this.checkedSlots)
-    },
-
-  },
-
-  computed: {
-    weekNum: {
-      get() {
-        let tmp = this.$store.getters["weekNum"];
-        console.log('vuex ' + tmp);
-        return tmp;
-      },
-      set(weekNum) {
-        return this.$store.commit("weekNum", weekNum);
-      }
-    },
-
-  },
+    }
+  }
 
 }
 </script>

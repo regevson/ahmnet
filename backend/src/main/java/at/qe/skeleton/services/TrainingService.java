@@ -130,7 +130,9 @@ public class TrainingService {
     public void grabTraining(Training training) {
 	training.setIsFree(false);
 	User user = this.userService.getAuthenticatedUser();
+	User prevTrainer = training.getTrainer();
 	training.setTrainer(user);
+	training.setOriginalTrainer(prevTrainer);
 	this.saveTraining(training);
     }
 
@@ -141,7 +143,7 @@ public class TrainingService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainerId")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.getTrainer.getId()")
     public void saveRecurringTrainings(Training training) {
 	LocalDate lastDate = training.getLastDate();
 	if(lastDate == null) {
@@ -197,7 +199,7 @@ public class TrainingService {
 	    trainingList.add(t);
 	    prevTrainer_trainings.put(t.getOriginalTrainer(), trainingList);
 	}
-	informOfGrabbing(prevTrainer_trainings);
+	//informOfGrabbing(prevTrainer_trainings);
     }
 
     private void informOfFreeing(List<Training> trainings) {
@@ -281,7 +283,7 @@ public class TrainingService {
 
     private void authorizeTrainingOwner(Long[] trainingIds) {
 	for(int i = 0; i < trainingIds.length; i++)
-            this.authorizeTrainingOwner(loadTrainingById(i));
+            this.authorizeTrainingOwner(loadTrainingById(trainingIds[i]));
     }
 
     private void authorizeGrabTraining(Training training) {

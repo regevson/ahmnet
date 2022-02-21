@@ -38,6 +38,7 @@ public class TrainingMapper {
 	dto.setCourt(tr.getCourt());
 	dto.setFree(tr.getIsFree());
 	dto.setOriginalTrainerId(tr.getOriginalTrainer().getId());
+	dto.setTrainerId(tr.getTrainer().getId());
 	return dto;
     }
     public List<TrainingSnippetDto> mapToTrainingSnippetDto(List<Training> trainings) {

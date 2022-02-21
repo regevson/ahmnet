@@ -28,7 +28,6 @@ export default {
   async created() {
     const username = sessionStorage.getItem('username');
     const response = await axios.get('api/user?username=' + username);
-    console.log(response.data);
 
     this.user = response.data;
     sessionStorage.setItem('user', JSON.stringify(this.user));
@@ -132,6 +131,17 @@ h1 {
   transition: all 0.3s ease-in-out;
 }
 
+.disabledBtn {
+  background: #999;
+  border-color: #999;
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.disabledBtn:hover {
+  background: #999;
+}
 
 .changeBtn {
   color: white;

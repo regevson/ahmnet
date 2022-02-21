@@ -1,45 +1,43 @@
 <template>
   <div>
+
     <div
       v-for="(training,tr_idx) in trainings"
       :key="training.id"
       align="center"
-      :class="{currentslot: getSlotType(tr_idx) === 'currentslot', pastslot: getSlotType(tr_idx) === 'pastslot', vacationslot: checkVacation(tr_idx) == 'vacationslot'}"
+      :class="{currentslot: getSlotType(tr_idx) === 'currentslot', 
+               pastslot: getSlotType(tr_idx) === 'pastslot', 
+               vacationslot: checkVacation(tr_idx) == 'vacationslot'}"
       class="trainingPreview"
     >
-          <div align="center">
-        <router-link
-          :to="{name: 'traininggroupdetails', params: {groupId: training.groupId}}"
-        >
-            <span style="margin-left: 18px" class="groupLink">Gruppe {{training.groupId}}</span>
+
+      <div align="center">
+
+        <router-link :to="{name: 'traininggroupdetails', params: {groupId: training.groupId}}">
+          <span style="margin-left: 18px" class="groupLink">Gruppe {{training.groupId}}</span>
         </router-link>
-            <input
-              :disabled="getSlotType(tr_idx) === 'pastslot' && !trainer.roles.includes('ADMIN')"
-              class="checkedSlotBox form-check-input"
-              type="checkbox"
-              v-on:change="$emit('checkedSlot', training.id)"
-            />
-          </div>
-      <router-link
-        :to="{name: 'trainingdetails', params: {trainingId: training.id}}"
-      >
+        <input
+          :disabled="getSlotType(tr_idx) === 'pastslot' && !isAdmin"
+          class="checkedSlotBox form-check-input"
+          type="checkbox"
+          v-on:change="$emit('checkedSlot', training.id)"
+        />
+
+      </div>
+
+      <router-link :to="{name: 'trainingdetails', params: {trainingId: training.id}}">
         <div id="inner" class="trainingPreviewInner">
-          <span>{{training.club.name}}</span
-          ><br />
-          <hr />
-          <span>{{training.timeslot}}</span
-          ><br />
+          <span>{{training.club.name}}</span>
+          <br/>
+          <hr/>
+          <span>{{training.timeslot}}</span>
+          <br />
         </div>
-
-          <span class="court">Court {{training.court}}</span>
-
+        <span class="court">Court {{training.court}}</span>
       </router-link>
 
-
-
-
-
     </div>
+
   </div>
 </template>
 
@@ -48,9 +46,8 @@
 export default {
   name: 'TrainingSlot',
   props: {
-    trainer: Object,
+    isAdmin: Boolean,
     trainings: Array,
-    selectedTrainer: Object
   },
 
   data() {
@@ -87,14 +84,14 @@ export default {
 
     getCurrentDateTime() {
       //return new Date();
-      let curr = new Date("2022-02-20");
-      curr.setHours(12, 40, 0);
+      let curr = new Date("2022-02-21");
+      curr.setHours(17, 30, 0);
       return curr;
     },
 
     checkVacation(tr_idx) {
       const tr = this.trainings[tr_idx];
-      if(tr.free || tr.originalTrainerId != this.selectedTrainer.id)
+      if(tr.free || tr.originalTrainerId !== tr.trainerId)
         return 'vacationslot';
     },
 
@@ -103,7 +100,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 body {
   font-family: "Open Sans", sans-serif !important;
 }
@@ -208,26 +205,25 @@ td {
 }
 
 .checkedSlotBox {
-  border: none !important; 
-  background-color: #6bab9f !important; 
-  position: static !important; 
-  margin-left: 7px !important; 
-  vertically-align: middle !important; 
-  width: 15px !important; 
-  height: 20px !important; 
+  border: none !important;
+  background-color: #6bab9f !important;
+  position: static !important;
+  margin-left: 7px !important;
+  vertically-align: middle !important;
+  width: 15px !important;
+  height: 20px !important;
   border-radius: 5px !important;
 }
 
 .vacationslot .checkedSlotBox {
-  border: none !important; 
-  background-color: #ffb400 !important; 
-  position: static !important; 
-  margin-left: 7px !important; 
-  vertically-align: middle !important; 
-  width: 15px !important; 
-  height: 20px !important; 
+  border: none !important;
+  background-color: #e8af01 !important;
+  position: static !important;
+  margin-left: 7px !important;
+  vertically-align: middle !important;
+  width: 15px !important;
+  height: 20px !important;
   border-radius: 5px !important;
 }
-
 </style>
 

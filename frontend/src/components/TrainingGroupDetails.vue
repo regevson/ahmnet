@@ -219,7 +219,6 @@ export default {
     prepopulate() {
       this.group.club = this.allClubs[0];
       this.group.players = [this.allPlayers[0]];
-      console.log(this.group.players);
       this.group.trainer = this.user;
     },
 
