@@ -101,4 +101,17 @@ public class UserService {
 	this.saveUser(loggedInUser);
     }
 
+    public boolean isAdmin() {
+	return getAuthenticatedUser().getRoles().contains(UserRole.ADMIN);
+    }
+
+    public boolean isTrainer() {
+	return getAuthenticatedUser().getRoles().contains(UserRole.TRAINER);
+    }
+
+    public boolean hasTrainerRights() {
+	return isAdmin() || isTrainer();
+    }
+    
+
 }

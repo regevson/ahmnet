@@ -35,8 +35,7 @@ export const store = new Vuex.Store({
 });
 
 function calcCurrentWeekNum() {
-  let currentDate = new Date();
-  var oneJan = new Date(currentDate.getFullYear(),0,1);
-  var numberOfDays = Math.floor((currentDate - oneJan) / (24 * 60 * 60 * 1000));
-  return Math.ceil(( currentDate.getDay() + 1 + numberOfDays) / 7) - 1;
+  const date = new Date();
+  const onejan = new Date(date.getFullYear(), 0, 1);
+  return Math.ceil((((date.getTime() - onejan.getTime()) / 86400000) + onejan.getDay()-1) / 7) - 1;
 }

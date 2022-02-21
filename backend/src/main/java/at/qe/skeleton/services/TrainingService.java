@@ -6,16 +6,21 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,6 +141,7 @@ public class TrainingService {
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainerId")
     public void saveRecurringTrainings(Training training) {
 	LocalDate lastDate = training.getLastDate();
 	if(lastDate == null) {
@@ -156,6 +162,8 @@ public class TrainingService {
 
     @Transactional
     public void deleteTrainings(Long[] trainingIds) {
+	authorizeTrainingOwner(trainingIds);
+
 	for(int i = 0; i < trainingIds.length; i++) {
 	    Training t = loadTrainingById(trainingIds[i]);
 	    deleteTraining(t);
@@ -164,59 +172,127 @@ public class TrainingService {
 
     @Transactional
     public void freeTrainings(Long[] trainingIds) {
-	List<Training> list = new ArrayList<>();
+	authorizeTrainingOwner(trainingIds);
+
+	List<Training> trainingList = new ArrayList<>();
 	for(int i = 0; i < trainingIds.length; i++) {
 	    Training t = loadTrainingById(trainingIds[i]);
 	    freeTraining(t);
-	    list.add(t);
+
+	    trainingList.add(t);
 	}
-
-	informOfFreeing(list);
+	//informOfFreeing(trainingList);
     }
 
-    private void informOfFreeing(List<Training> list) {
-	String msg = createMsg(list);
-	sendToParticipants(msg);
+    @Transactional
+    public void grabTrainings(Long[] trainingIds) {
+	authorizeGrabTraining(trainingIds);
+
+	Map<User, List<Training>> prevTrainer_trainings = new HashMap<>();
+	for(int i = 0; i < trainingIds.length; i++) {
+	    Training t = loadTrainingById(trainingIds[i]);
+	    grabTraining(t);
+
+	    List<Training> trainingList = prevTrainer_trainings.getOrDefault(t.getOriginalTrainer(), new ArrayList<>());
+	    trainingList.add(t);
+	    prevTrainer_trainings.put(t.getOriginalTrainer(), trainingList);
+	}
+	informOfGrabbing(prevTrainer_trainings);
     }
 
-    private String createMsg(List<Training> list) {
+    private void informOfFreeing(List<Training> trainings) {
+	String msg = createFreeingMsg(trainings);
+	//for(User trainer : userService.getAllTrainer())
+            //sendToUser(trainer, msg);
+        sendToUser(userService.loadUser("admin"), msg);
+    }
+
+    private void informOfGrabbing(Map<User, List<Training>> prevTrainer_trainings) {
+	for(Entry<User, List<Training>> e : prevTrainer_trainings.entrySet()) {
+            String msg = createGrabbingMsg(e.getValue());
+            User prevTrainer = e.getKey();
+            sendToUser(prevTrainer, msg);
+	}
+    }
+
+    private String createFreeingMsg(List<Training> trainings) {
         User trainer = this.userService.getAuthenticatedUser();
 	String msg = trainer.getFirstName() + " " + trainer.getLastName() + " braucht Hilfe "
 		+ "bei folgenden Trainings:\n\n";
 
-        Collections.sort(list, new Comparator<Training>() {
+        sortTrainingsByDateAsc(trainings);
+        msg += listTrainingsWithDate(trainings);
+
+	msg += "\nBitte übernimm die Trainings, wenn du Zeit hast! " + trainer.getFirstName() + " "
+		+ "gibt dafür einen aus...\n"
+		+ "www.ahmacademy.at/ahmnet/vacationtable";
+	return msg;
+    }
+
+    private String createGrabbingMsg(List<Training> trainings) {
+        User currUser = this.userService.getAuthenticatedUser();
+	String msg = currUser.getFirstName() + " " + currUser.getLastName() + " hat folgende Trainings "
+		+ "von dir übernommen:\n\n";
+
+        sortTrainingsByDateAsc(trainings);
+        msg += listTrainingsWithDate(trainings);
+
+	msg += "\n" + currUser.getFirstName() + " hat was gut bei dir!";
+	return msg;
+    }
+    
+    private void sortTrainingsByDateAsc(List<Training> trainings) {
+        Collections.sort(trainings, new Comparator<Training>() {
             @Override
             public int compare(Training tr1, Training tr2) {
                 return tr1.getDateTime().isBefore(tr2.getDateTime()) ? -1 : 1;
             }
         });
+    }
 
-	for(Training t : list) {
+    private String listTrainingsWithDate(List<Training> trainings) {
+	String listing = "";
+	for(Training t : trainings) {
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E dd-MM-yyyy").withLocale(Locale.GERMAN);
 	    String date = t.getDateTime().toLocalDate().format(formatter);
 	    String startTime = t.getDateTime().toLocalTime().toString();
 	    String endTime = t.getDateTime().toLocalTime().plusMinutes(t.getDurationMinutes()).toString();
-	    msg += "- Am " + date + " von " + startTime 
+	    listing += "- Am " + date + " von " + startTime 
 		    	+ " bis " + endTime + "\n";
 	}
-	msg += "\nBitte übernimm die Trainings, wenn du Zeit hast!\n"
-		+ "www.ahmacademy.at/ahmnet/vacationtable";
-	return msg;
+	return listing;
+    }
+    
+    private void sendToUser(User user, String msg) {
+        String phone = user.getPhone();
+        SmsRequest sms = new SmsRequest(phone, msg);
+        smsService.sendWAMessage(sms);
     }
 
-    private void sendToParticipants(String msg) {
-	/* TODO: get all trainers/admins */
-	User admin = this.userService.loadUser("admin");
-	String phone = admin.getPhone();
-        smsService.sendWAMessage(new SmsRequest(phone, msg));
+
+
+// Authorization
+
+    private void authorizeTrainingOwner(Training training) {
+	User currentUser = this.userService.getAuthenticatedUser();
+	if(!userService.isAdmin() && currentUser.compareTo(training.getTrainer()) != 0)
+	    throw new AccessDeniedException("Logged in user is not trainer of this training!");
     }
 
-    @Transactional
-    public void grabTrainings(Long[] trainingIds) {
-	for(int i = 0; i < trainingIds.length; i++) {
-	    Training t = loadTrainingById(trainingIds[i]);
-	    grabTraining(t);
-	}
+    private void authorizeTrainingOwner(Long[] trainingIds) {
+	for(int i = 0; i < trainingIds.length; i++)
+            this.authorizeTrainingOwner(loadTrainingById(i));
     }
+
+    private void authorizeGrabTraining(Training training) {
+	if((!userService.isAdmin() && !training.getIsFree()) || !userService.hasTrainerRights())
+	    throw new AccessDeniedException("No rights to free training!");
+    }
+
+    private void authorizeGrabTraining(Long[] trainingIds) {
+	for(int i = 0; i < trainingIds.length; i++)
+            this.authorizeGrabTraining(loadTrainingById(trainingIds[i]));
+    }
+
 
 }

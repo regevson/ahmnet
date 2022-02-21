@@ -16,6 +16,7 @@
         <br>
 
       <Table 
+        :trainer="user"
         :isVacationTable="true"
         @checkedSlots="setCheckedSlots"
       />

@@ -182,7 +182,9 @@ export default {
   computed: {
     weekNum: {
       get() {
-        return this.$store.getters["weekNum"];
+        let tmp = this.$store.getters["weekNum"];
+        console.log('vuex ' + tmp);
+        return tmp;
       },
       set(weekNum) {
         return this.$store.commit("weekNum", weekNum);

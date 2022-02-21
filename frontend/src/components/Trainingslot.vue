@@ -14,7 +14,7 @@
             <span style="margin-left: 18px" class="groupLink">Gruppe {{training.groupId}}</span>
         </router-link>
             <input
-              :disabled="getSlotType(tr_idx) === 'pastslot' && trainer.roles[0] !== 'ADMIN'"
+              :disabled="getSlotType(tr_idx) === 'pastslot' && !trainer.roles.includes('ADMIN')"
               class="checkedSlotBox form-check-input"
               type="checkbox"
               v-on:change="$emit('checkedSlot', training.id)"
