@@ -17,7 +17,7 @@
           <span style="margin-left: 18px" class="groupLink">Gruppe {{training.groupId}}</span>
         </router-link>
         <input
-          :disabled="getSlotType(tr_idx) === 'pastslot' && !isAdmin"
+          :disabled="getSlotType(tr_idx) === 'pastslot' && !userIsAdmin"
           class="checkedSlotBox form-check-input"
           type="checkbox"
           v-on:change="$emit('checkedSlot', training.id)"
@@ -47,7 +47,8 @@
 export default {
   name: 'TrainingSlot',
   props: {
-    isAdmin: Boolean,
+    userIsAdmin: Boolean,
+    selectedTrainerId: String,
     trainings: Array,
   },
 
@@ -92,7 +93,7 @@ export default {
 
     checkVacation(tr_idx) {
       const tr = this.trainings[tr_idx];
-      if(tr.free || tr.originalTrainerId !== tr.trainerId)
+      if(tr.originalTrainerId !== tr.trainerId || tr.trainerId !== this.selectedTrainerId)
         return 'vacationslot';
     },
 

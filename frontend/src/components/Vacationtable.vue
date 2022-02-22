@@ -14,7 +14,7 @@
         size="lg"
         v-on:change="rerenderTrainings(weekNum)"
       >
-        <span class="filterLabel">Nur meine Trainings anzeigen</span>
+        <span class="filterLabel">Eigene Trainings ausblenden</span>
     </b-form-checkbox>
 
     <button 
@@ -37,7 +37,8 @@
     />
 
     <Table
-      :isAdmin="user.roles.includes('ADMIN')"
+      :userIsAdmin="user.roles.includes('ADMIN')"
+      :selectedTrainerId="user.id"
       :timetable="timetable"
       :selectedDate="selectedDate"
        @checkedSlots="setCheckedSlots" 
@@ -96,7 +97,7 @@ export default {
 
     async getAvailableTrainingsByTrainer(trainer, weekNum) {
       let response;
-      response = await axiosReq('availableTrainingsByTrainer?trainerId=' + trainer.id 
+      response = await axiosReq('availableTrainingsByExcluding?trainerId=' + trainer.id 
                                                 + '&weekNum=' + weekNum);
       this.timetable = response.data
       this.startDate = this.timetable.datesInWeek[0];

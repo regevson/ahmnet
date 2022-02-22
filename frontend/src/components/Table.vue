@@ -30,7 +30,8 @@
                      selectedcol: isSelectedDay(idx-1)}"
             >
             <Trainingslot
-              :isAdmin="isAdmin"
+              :userIsAdmin="userIsAdmin"
+              :selectedTrainerId="selectedTrainerId"
               :trainings="timetable.trainings[idx-1]"
               @checkedSlot="changeChecked"
             />
@@ -52,7 +53,8 @@ export default {
   name: 'Table',
   components: {Trainingslot},
   props: {
-    isAdmin: Boolean,
+    userIsAdmin: Boolean,
+    selectedTrainerId: String,
     timetable: Object,
     selectedDate: Date,
   },

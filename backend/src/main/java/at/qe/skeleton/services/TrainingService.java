@@ -120,8 +120,8 @@ public class TrainingService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainer.getId")
-    public List<List<Training>> loadFreeTrainingsByWeek(User trainer, int weekNum) {
-	List<Training> trs = trainingRepo.findFreeTrainingsByWeekAndTrainer(trainer.getId(), weekNum);
+    public List<List<Training>> loadFreeTrainingsByExcluding(User trainer, int weekNum) {
+	List<Training> trs = trainingRepo.findFreeTrainingsByWeekAndExcluding(trainer.getId(), weekNum);
 	return groupByDay(trs);
     }
 

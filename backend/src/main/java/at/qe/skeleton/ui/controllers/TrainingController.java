@@ -128,10 +128,10 @@ public class TrainingController {
                     .body(dto);
     }
 
-    @GetMapping("/availableTrainingsByTrainer")
-    public ResponseEntity<?> getFreeTrainingsByTrainer(String trainerId, Integer weekNum) {
+    @GetMapping("/availableTrainingsByExcluding")
+    public ResponseEntity<?> getFreeTrainingsByExcluding(String trainerId, Integer weekNum) {
 	User trainer = this.userService.loadUser(trainerId);
-	List<List<Training>> trainingsByDay = this.trainingService.loadFreeTrainingsByWeek(trainer, weekNum);
+	List<List<Training>> trainingsByDay = this.trainingService.loadFreeTrainingsByExcluding(trainer, weekNum);
 	List<List<TrainingSnippetDto>> dtoList = new ArrayList<>();
 
 	for(List<Training> dayList : trainingsByDay)
@@ -140,7 +140,6 @@ public class TrainingController {
 	TimetableDto dto = this.mapper.mapToTimetableDto(trainingService.getDatesInWeek(weekNum), dtoList);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
-    
 
     @PostMapping("/updateTrainingDetails")
     public ResponseEntity<?> setTrainingsDetails(@RequestBody TrainingDto trainingDto) {

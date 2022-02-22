@@ -7,7 +7,7 @@ export const store = new Vuex.Store({
   state: {
     selectedTrainer: null,
     selectedDate: null,
-    isFiltered: false,
+    isFiltered: true,
   },
 
   getters: {

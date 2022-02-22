@@ -44,8 +44,8 @@ public interface TrainingRepository extends AbstractRepository<Training, Long> {
 
     @Query("select t "
     	+ "from Training t "
-    	+ "where t.weekNum = :weekNum and t.isFree = true and t.trainer.username = :username "
+    	+ "where t.weekNum = :weekNum and t.isFree = true and t.trainer.username != :username "
     	+ "order by t.dateTime asc")
-    List<Training> findFreeTrainingsByWeekAndTrainer(@Param("username") String username, @Param("weekNum") int weekNum);
+    List<Training> findFreeTrainingsByWeekAndExcluding(@Param("username") String username, @Param("weekNum") int weekNum);
 
 }

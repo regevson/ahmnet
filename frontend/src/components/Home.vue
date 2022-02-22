@@ -28,7 +28,6 @@ export default {
   async created() {
     const username = sessionStorage.getItem('username');
     const response = await axios.get('api/user?username=' + username);
-    console.log(response);
 
     this.user = response.data;
     sessionStorage.setItem('user', JSON.stringify(this.user));

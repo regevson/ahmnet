@@ -51,7 +51,8 @@
       />
 
       <Table
-        :isAdmin="user.roles.includes('ADMIN')"
+        :userIsAdmin="user.roles.includes('ADMIN')"
+        :selectedTrainerId="selectedTrainer.id"
         :timetable="timetable"
         :selectedDate="selectedDate"
         @checkedSlots="setCheckedSlots" 
