@@ -28,6 +28,7 @@ export default {
   async created() {
     const username = sessionStorage.getItem('username');
     const response = await axios.get('api/user?username=' + username);
+    console.log(response);
 
     this.user = response.data;
     sessionStorage.setItem('user', JSON.stringify(this.user));
@@ -116,31 +117,31 @@ h1 {
 
 .freeBulkBtn {
   background: none;
-  border: 2px solid orange;
+  border: 2px solid #fdc110;
   border-radius: 8px;
   padding: 5px;
   font-weight: bold;
-  color: orange;
+  color: #fdc110;
   margin: 20px 0 0px 0;
   transition: all 0.3s ease-in-out;
 }
 
 .freeBulkBtn:hover {
   color: white;
-  background: orange;
+  background: #fdc110;
   transition: all 0.3s ease-in-out;
 }
 
 .disabledBtn {
-  background: #999;
-  border-color: #999;
+  background: #fdd663;
+  border-color: #fdd663;
   color: white;
   cursor: not-allowed;
   opacity: 0.5;
 }
 
 .disabledBtn:hover {
-  background: #999;
+  background: #fdd663r
 }
 
 .changeBtn {

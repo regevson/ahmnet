@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import at.qe.skeleton.model.Training;
+import at.qe.skeleton.model.User;
 
 public interface TrainingRepository extends AbstractRepository<Training, Long> {
 
@@ -41,13 +42,10 @@ public interface TrainingRepository extends AbstractRepository<Training, Long> {
     	+ "order by t.dateTime asc")
     List<Training> findFreeTrainingsByWeek(@Param("weekNum") int weekNum);
 
-/*
-    @Transactional
-    @Modifying
-    @Query("update Training t "
-    	+ "set t.attendees = :attendees, t.bulletPoints = :bulletPoints, t.comment = :comments "
-    	+ "where t.id = :id ")
-    void updateTrainingDetails(@Param("id") long id, @Param("attendees") Set<User> attendees, @Param("bulletPoints") String bulletPoints, @Param("comments") String comments);
-    */
+    @Query("select t "
+    	+ "from Training t "
+    	+ "where t.weekNum = :weekNum and t.isFree = true and t.trainer.username = :username "
+    	+ "order by t.dateTime asc")
+    List<Training> findFreeTrainingsByWeekAndTrainer(@Param("username") String username, @Param("weekNum") int weekNum);
 
 }

@@ -7,6 +7,7 @@ export const store = new Vuex.Store({
   state: {
     selectedTrainer: null,
     selectedDate: null,
+    isFiltered: false,
   },
 
   getters: {
@@ -18,6 +19,10 @@ export const store = new Vuex.Store({
       return state.selectedDate;
     },
 
+    isFiltered(state) {
+      return state.isFiltered;
+    },
+
   },
 
   mutations: {
@@ -27,6 +32,10 @@ export const store = new Vuex.Store({
 
     selectedDate(state, selectedDate) {
       state.selectedDate = selectedDate;
+    },
+
+    isFiltered(state, isFiltered) {
+      state.isFiltered = isFiltered;
     },
   }
 

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.qe.skeleton.dtos.TimetableDto;
@@ -19,6 +18,7 @@ import at.qe.skeleton.dtos.TrainingDto;
 import at.qe.skeleton.dtos.TrainingMapper;
 import at.qe.skeleton.dtos.TrainingSnippetDto;
 import at.qe.skeleton.model.Training;
+import at.qe.skeleton.model.User;
 import at.qe.skeleton.services.TrainingService;
 import at.qe.skeleton.services.UserService;
 
@@ -126,6 +126,19 @@ public class TrainingController {
         return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(dto);
+    }
+
+    @GetMapping("/availableTrainingsByTrainer")
+    public ResponseEntity<?> getFreeTrainingsByTrainer(String trainerId, Integer weekNum) {
+	User trainer = this.userService.loadUser(trainerId);
+	List<List<Training>> trainingsByDay = this.trainingService.loadFreeTrainingsByWeek(trainer, weekNum);
+	List<List<TrainingSnippetDto>> dtoList = new ArrayList<>();
+
+	for(List<Training> dayList : trainingsByDay)
+            dtoList.add(mapper.mapToTrainingSnippetDto(dayList));
+
+	TimetableDto dto = this.mapper.mapToTimetableDto(trainingService.getDatesInWeek(weekNum), dtoList);
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
     
 

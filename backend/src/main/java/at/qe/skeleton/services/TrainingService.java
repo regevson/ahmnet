@@ -37,43 +37,43 @@ public class TrainingService {
     @Autowired
     private UserService userService;
     @Autowired
-    private TrainingRepository trainingRepository;
+    private TrainingRepository trainingRepo;
     @Autowired
     private SmsService smsService;
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public Training loadTrainingById(long id) {
-	return this.trainingRepository.findById(id);
+	return trainingRepo.findById(id);
     }
 
 /*
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public List<Training> loadTrainingsByTrainingGroup(TrainingGroup group) {
-	return this.trainingRepository.findByTrainingGroupIdOrderByDateTimeAsc(group.getId());
+	return trainingRepo.findByTrainingGroupIdOrderByDateTimeAsc(group.getId());
     }
     */
 
     public List<Training> loadTrainingsByPlayer(User player) {
-	return this.trainingRepository.findByPlayerId(player.getId());
+	return trainingRepo.findByPlayerId(player.getId());
     }
 
     public List<Training> loadTrainingsByPlayerAndWeek(User player, int weekNum) {
-	return this.trainingRepository.findByPlayerIdAndWeek(player.getId(), weekNum);
+	return trainingRepo.findByPlayerIdAndWeek(player.getId(), weekNum);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public List<Training> loadTrainingsByTrainer(User trainer) {
-	return this.trainingRepository.findByTrainer_UsernameOrderByDateTimeAsc(trainer.getId());
+	return trainingRepo.findByTrainer_UsernameOrderByDateTimeAsc(trainer.getId());
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public List<Training> loadTrainingsByTrainerAndWeek(String trainerUsername, int weekNum) {
-	return this.trainingRepository.findByTrainerIdAndWeek(trainerUsername, weekNum);
+	return trainingRepo.findByTrainerIdAndWeek(trainerUsername, weekNum);
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.trainer.getId")
     public Training saveTraining(Training training) {
-        return trainingRepository.save(training);
+        return trainingRepo.save(training);
     }
 
     @Transactional
@@ -81,7 +81,7 @@ public class TrainingService {
     public void deleteTraining(Training training) {
 	training.getAttendees().removeAll(training.getAttendees());
 	training.getTrainingGroup().getTrainings().remove(training);
-        trainingRepository.delete(training);
+        trainingRepo.delete(training);
     }
 
     public List<List<Training>> groupByDay(List<Training> trainings) {
@@ -115,31 +115,37 @@ public class TrainingService {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public List<List<Training>> loadFreeTrainingsByWeek(int weekNum) {
-	List<Training> trainings = this.trainingRepository.findFreeTrainingsByWeek(weekNum);
-	return this.groupByDay(trainings);
+	List<Training> trainings = trainingRepo.findFreeTrainingsByWeek(weekNum);
+	return groupByDay(trainings);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainer.getId")
+    public List<List<Training>> loadFreeTrainingsByWeek(User trainer, int weekNum) {
+	List<Training> trs = trainingRepo.findFreeTrainingsByWeekAndTrainer(trainer.getId(), weekNum);
+	return groupByDay(trs);
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.trainer.getId")
     public void freeTraining(Training training) {
 	training.setIsFree(true);
 	training.setTrainer(training.getOriginalTrainer());
-	this.saveTraining(training);
+	saveTraining(training);
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or #training.getIsFree()")
     public void grabTraining(Training training) {
 	training.setIsFree(false);
-	User user = this.userService.getAuthenticatedUser();
+	User user = userService.getAuthenticatedUser();
 	User prevTrainer = training.getTrainer();
 	training.setTrainer(user);
 	training.setOriginalTrainer(prevTrainer);
-	this.saveTraining(training);
+	saveTraining(training);
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainerId")
     public List<List<Training>> getTrainingsByWeek(String trainerId, int weekNum) {
-        List<Training> trainings = this.loadTrainingsByTrainerAndWeek(trainerId, weekNum);
-	return this.groupByDay(trainings);
+        List<Training> trainings = loadTrainingsByTrainerAndWeek(trainerId, weekNum);
+	return groupByDay(trainings);
     }
 
     @Transactional
@@ -156,7 +162,7 @@ public class TrainingService {
 	while(startDate.isBefore(lastDate) || startDate.isEqual(lastDate)) {
             Training tmp = new Training(training);
             tmp.setDateTime(startDate.atTime(startTime));
-            this.saveTraining(tmp);
+            saveTraining(tmp);
             startDate = startDate.plusWeeks(1);
 	}
 	
@@ -218,7 +224,7 @@ public class TrainingService {
     }
 
     private String createFreeingMsg(List<Training> trainings) {
-        User trainer = this.userService.getAuthenticatedUser();
+        User trainer = userService.getAuthenticatedUser();
 	String msg = trainer.getFirstName() + " " + trainer.getLastName() + " braucht Hilfe "
 		+ "bei folgenden Trainings:\n\n";
 
@@ -232,7 +238,7 @@ public class TrainingService {
     }
 
     private String createGrabbingMsg(List<Training> trainings) {
-        User currUser = this.userService.getAuthenticatedUser();
+        User currUser = userService.getAuthenticatedUser();
 	String msg = currUser.getFirstName() + " " + currUser.getLastName() + " hat folgende Trainings "
 		+ "von dir übernommen:\n\n";
 
@@ -276,14 +282,14 @@ public class TrainingService {
 // Authorization
 
     private void authorizeTrainingOwner(Training training) {
-	User currentUser = this.userService.getAuthenticatedUser();
+	User currentUser = userService.getAuthenticatedUser();
 	if(!userService.isAdmin() && currentUser.compareTo(training.getTrainer()) != 0)
 	    throw new AccessDeniedException("Logged in user is not trainer of this training!");
     }
 
     private void authorizeTrainingOwner(Long[] trainingIds) {
 	for(int i = 0; i < trainingIds.length; i++)
-            this.authorizeTrainingOwner(loadTrainingById(trainingIds[i]));
+            authorizeTrainingOwner(loadTrainingById(trainingIds[i]));
     }
 
     private void authorizeGrabTraining(Training training) {
@@ -293,7 +299,7 @@ public class TrainingService {
 
     private void authorizeGrabTraining(Long[] trainingIds) {
 	for(int i = 0; i < trainingIds.length; i++)
-            this.authorizeGrabTraining(loadTrainingById(trainingIds[i]));
+            authorizeGrabTraining(loadTrainingById(trainingIds[i]));
     }
 
 

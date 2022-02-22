@@ -9,11 +9,6 @@
             class="fa-solid fa-lock fa-sm"
             style="color: orange; margin-left: 5px"
           ></i>
-          <i
-            v-if="permChangeGroup()"
-            class="fa-solid fa-pen-to-square fa-sm"
-            style="color: orange; margin-left: 5px"
-          ></i>
         </p>
       </div>
       <br />

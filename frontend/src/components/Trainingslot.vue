@@ -33,7 +33,8 @@
           <span>{{training.timeslot}}</span>
           <br />
         </div>
-        <span class="court">Court {{training.court}}</span>
+        <span v-if="!training.free" class="court">Court {{training.court}}</span>
+        <span v-if="training.free" class="court">{{training.trainerId}}</span>
       </router-link>
 
     </div>
@@ -213,6 +214,10 @@ td {
   width: 15px !important;
   height: 20px !important;
   border-radius: 5px !important;
+}
+
+.checkedSlotBox:focus {
+  box-shadow: none !important;
 }
 
 .vacationslot .checkedSlotBox {
