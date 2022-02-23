@@ -14,10 +14,12 @@
     />
     <br>
 
+<div class="row justify-content-center" style="--bs-gutter-x: 0;">
+    <div class="col-auto">
     <i
       @click="prevWeek"
       class="fa-solid fa-circle-arrow-left arrow leftArrow"
-      style="margin-right: 60px"
+      style="margin-right: 30px"
     ></i>
 
     <span v-if="startDate && endDate" style="font-weight: bold">
@@ -27,8 +29,10 @@
     <i
       @click="nextWeek"
       class="fa-solid fa-circle-arrow-right arrow rightArrow"
-      style="margin-left: 60px"
+      style="margin-left: 30px"
     ></i>
+  </div>
+  </div>
 
   </div>
 </template>

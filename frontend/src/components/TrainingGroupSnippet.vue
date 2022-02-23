@@ -56,13 +56,13 @@ export default {
   float: left;
   background: #273a48;
   color: white;
-  max-width: 185px;
+  max-width: 181px;
   border-radius: 15px;
   padding: 0px;
   overflow: auto;
   margin-bottom: 10px;
   text-align: left;
-  margin-right: 10px;
+  margin-right: 4px;
 }
 
 #groupSnippet .top {

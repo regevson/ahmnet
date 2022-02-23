@@ -1,5 +1,7 @@
 <template>
-  <div align="center">
+
+<div class="row justify-content-center" style="--bs-gutter-x: 0;">
+    <div class="col-auto">
 
     <table ref="tab" v-if="timetable" class="timetable table table-responsive">
 
@@ -43,6 +45,7 @@
 
     <h5 v-if="!timetable" class="loading">LOADING...</h5>
 
+  </div>
   </div>
 </template>
 
@@ -152,7 +155,7 @@ export default {
   border-top: none !important;
 }
 .timetable th {
-  min-width: 86px;
+  min-width: 110px;
   border-bottom: 2px solid #4b9183 !important;
   border-top: 2px solid #4b9183 !important;
 }

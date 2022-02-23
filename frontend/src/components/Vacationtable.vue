@@ -4,11 +4,10 @@
     <div v-if="user">
       <h1 style="color: #1b2730; background: #fdd663;">VERFÜGBARE TRAININGS</h1>
 
-      <br>
 
        <b-form-checkbox
         class="checkedSlotBox"
-        style="margin-right: 5px;"
+        style="margin: 20px 5px 0 0"
         v-model="isFiltered"
         switch
         size="lg"
@@ -104,7 +103,6 @@ export default {
 
     updateData(data) {
       this.timetable = data;
-      console.log('timetable set');
       this.startDate = this.timetable.datesInWeek[0];
       this.endDate = this.timetable.datesInWeek[6];
     },
@@ -121,7 +119,6 @@ export default {
       }
       this.highlight = selectedDate.trigger == 'calendar' ? true : false;
       this.selectedDate = selectedDate.date;
-      console.log('seldate set');
     },
 
     rerenderTrainings(weekNum) {
@@ -166,7 +163,7 @@ export default {
   padding: 3px 5px 3px 5px;
   border-radius: 5px;
   font-weight: bold;
-  font-size: 0.8em;
+  font-size: 15px;
   color: #1b2730;
 }
 

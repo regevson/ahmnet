@@ -4,7 +4,7 @@
       <h1>TRAININGSGRUPPEN</h1>
       <div align="center">
         <button class="newBtn" v-on:click="createGroup">
-          Neue Gruppe erstellen
+          Neue Gruppe
         </button>
       </div>
     </div>
@@ -77,7 +77,7 @@ export default {
 .card-body {
   border: none;
   height: auto;
-  padding: 5px;
+  padding: 5px 0 5px 5px;
 }
 
 .cardBtn {

@@ -5,7 +5,7 @@
 
       <div align="center">
         <button class="newBtn" @click="createTraining">
-          Neues Training erstellen
+          Neues Training
         </button>
 
         <button 

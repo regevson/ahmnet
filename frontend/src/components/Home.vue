@@ -58,11 +58,11 @@ export default {
 
 <style>
 .wrapper {
-  padding: 10px;
+  padding: 5px;
 }
 
 h1 {
-  font-size: 1.5vw;
+  font-size: 28px !important;
   font-weight: bold;
   background: #4b9183;
   color: white;
@@ -164,9 +164,8 @@ h1 {
 
 .deleteBtn {
   color: white;
-  background: red;
-  border: 2px solid red;
-
+  background: #b90707;
+  border: 2px solid #b90707;
   border-radius: 8px;
   padding: 5px;
   font-weight: bold;
@@ -176,8 +175,8 @@ h1 {
 
 .deleteBtn:hover {
   background: none;
-  border: 2px solid red;
-  color: red;
+  border: 2px solid #b90707;
+  color: #b90707;
 
   transition: all 0.3s ease-in-out;
 }
