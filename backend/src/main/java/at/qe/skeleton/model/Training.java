@@ -60,7 +60,7 @@ public class Training {
 
     @Setter(AccessLevel.NONE)
     @ManyToOne
-    private User originalTrainer;
+    private User prevTrainer;
 
     @ManyToOne
     private Club club;
@@ -68,7 +68,7 @@ public class Training {
     public Training(Training toClone) {
         this.setTrainingGroup(toClone.getTrainingGroup());
         this.setTrainer(toClone.getTrainer());
-        this.setOriginalTrainer(toClone.getOriginalTrainer());
+        this.setPrevTrainer(toClone.getPrevTrainer());
         this.setClub(toClone.getClub());
 	this.setCourt(toClone.getCourt());
         this.setDateTime(toClone.getDateTime());
@@ -92,12 +92,12 @@ public class Training {
 
     public void setTrainer(User trainer) {
 	this.trainer = trainer;
-	if(this.originalTrainer == null)
-	    this.setOriginalTrainer(trainer);
+	if(this.prevTrainer == null)
+	    this.setPrevTrainer(trainer);
     }
     
-    public void setOriginalTrainer(User originalTrainer) {
-        this.originalTrainer = originalTrainer;
+    public void setPrevTrainer(User prevTrainer) {
+        this.prevTrainer = prevTrainer;
     }
 
 }

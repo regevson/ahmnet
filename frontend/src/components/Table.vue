@@ -1,7 +1,7 @@
 <template>
   <div align="center">
 
-    <table v-if="timetable" class="timetable table table-responsive">
+    <table ref="tab" v-if="timetable" class="timetable table table-responsive">
 
       <thead>
         <tr align="center">
@@ -57,24 +57,30 @@ export default {
     selectedTrainerId: String,
     timetable: Object,
     selectedDate: Date,
+    highlight: Boolean,
   },
 
   data() {
     return {
       weekDays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
       checkedSlots: [],
+      dateWasUpdated: false,
     }
   },
 
   watch: {
-    selectedDate: function() {
-      if(this.timetable)
-        this.highlightChosenDay(this.selectedDate);
-    },
-
     timetable: function() {
       this.checkedSlots = []; // reset checkboxes when table is rerendered
     },
+    highlight: function() {
+      console.log(this.highlight);
+    }
+  },
+
+  async updated() {
+    await this.wait();
+    if(this.highlight)
+      this.highlightChosenDay(this.selectedDate);
   },
 
   methods: {
@@ -100,8 +106,8 @@ export default {
       return d[2] + "-" + d[1] + "-" + d[0];
     },
 
-    isSelectedDay(dayIdx) { // 0 -> monday, ..., 6 -> sunday 
-      return this.getDay(this.selectedDate) == dayIdx;
+    isSelectedDay(dayIdx) {
+      return this.getDay(this.selectedDate) == dayIdx && !this.isToday(this.selectedDate);
     },
 
     changeChecked(id) {
@@ -114,7 +120,7 @@ export default {
 
     async highlightChosenDay(selectedDate) {
       let th = this.$refs["thday" + this.getDay(selectedDate)][0];
-      th.scrollIntoView({block: 'center'});
+      th.scrollIntoView({behavior: 'smooth', inline: 'center'});
       // let it blink
       for(let i = 0; i < 3; i++) {
         await this.blink(th, "#e1dddd");
@@ -126,13 +132,22 @@ export default {
       return new Promise((resolve) => {
         setTimeout(() => {obj.style.background = bg; resolve();}, 100);
       })
-    }
-  }
+    },
 
+    wait() {
+      return new Promise((resolve) => {
+        setTimeout(() => {resolve();}, 400);
+      })
+    },
+
+  }
 }
 </script>
 
 <style>
+.timetable {
+}
+
 .timetable td {
   border-top: none !important;
 }

@@ -2,7 +2,7 @@
   <div align="center">
 
     <b-form-datepicker
-      v-model="selectedDate"
+      v-model="calendarDate"
       locale="de"
       :showDecadeNav="false"
       :start-weekday="1"
@@ -44,14 +44,21 @@ export default {
 
   data() {
     return {
+      calendarDate: '',
+    }
+  },
+
+  watch: {
+    calendarDate: function() {
+      this.selectedDate = this.calendarDate;
+      this.emitDate(this.selectedDate, 'calendar');
     }
   },
 
   created() {
     if(this.selectedDate == null)
       this.selectedDate = new Date().toString();
-    else
-      this.$emit('dateChanged', new Date(this.selectedDate));
+    this.emitDate(this.selectedDate, 'bootstrap');
   },
 
   methods: {
@@ -60,6 +67,7 @@ export default {
       let date = new Date(this.selectedDate);
       date.setDate(date.getDate() - 7);
       this.selectedDate = date.toString();
+      this.emitDate(this.selectedDate, 'prevBnt');
     },
 
     nextWeek() {
@@ -67,12 +75,17 @@ export default {
       let date = new Date(this.selectedDate);
       date.setDate(date.getDate() + 7);
       this.selectedDate = date.toString();
+      this.emitDate(this.selectedDate, 'nextBnt');
     },
 
     convDateToGerman(date) {
       date = date.split("-");
       return date[2] + "-" + date[1] + "-" + date[0];
     },
+
+    emitDate(date, trigger) {
+      this.$emit('dateChanged', {'date': new Date(date), 'trigger': trigger});
+    }
 
   },
 
@@ -82,7 +95,6 @@ export default {
         return this.$store.getters.selectedDate;
       },
       set(selectedDate) {
-        this.$emit('dateChanged', new Date(selectedDate));
         return this.$store.commit("selectedDate", selectedDate);
       }
     },

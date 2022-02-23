@@ -53,6 +53,7 @@
       <Table
         :userIsAdmin="user.roles.includes('ADMIN')"
         :selectedTrainerId="selectedTrainer.id"
+        :highlight="highlight"
         :timetable="timetable"
         :selectedDate="selectedDate"
         @checkedSlots="setCheckedSlots" 
@@ -106,6 +107,7 @@ export default {
       dialogTxt: '',
       startDate: null,
       endDate: null,
+      highlight: false,
     }
   },
 
@@ -127,10 +129,11 @@ export default {
       let response;
       response = await axiosReq('trainingsByWeek?trainer='
                             + this.selectedTrainer.id + '&weekNum=' + weekNum);
-      if(response == null)
-        return;
+      this.updateData(response.data);
+    },
 
-      this.timetable = response.data
+    updateData(data) {
+      this.timetable = data;
       this.startDate = this.timetable.datesInWeek[0];
       this.endDate = this.timetable.datesInWeek[6];
     },
@@ -139,10 +142,14 @@ export default {
       this.checkedSlots = checkedSlots; 
     },
 
-    changeDate(selectedDate) {
-      this.selectedDate = selectedDate;
-      this.weekNum = this.$funcs.calcWeekNum(this.selectedDate);
-      this.getTrainings(this.weekNum);
+    async changeDate(selectedDate) {
+      let newWeekNum = this.$funcs.calcWeekNum(selectedDate.date);
+      if(this.weekNum != newWeekNum) {
+        this.weekNum = newWeekNum;
+        await this.getTrainings(this.weekNum);
+      }
+      this.highlight = selectedDate.trigger == 'calendar' ? true : false;
+      this.selectedDate = selectedDate.date;
     },
 
     async deleteTrainings() {

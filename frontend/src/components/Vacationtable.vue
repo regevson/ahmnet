@@ -39,6 +39,7 @@
     <Table
       :userIsAdmin="user.roles.includes('ADMIN')"
       :selectedTrainerId="user.id"
+      :highlight="highlight"
       :timetable="timetable"
       :selectedDate="selectedDate"
        @checkedSlots="setCheckedSlots" 
@@ -83,6 +84,7 @@ export default {
       dialogTxt: '',
       startDate: null,
       endDate: null,
+      highlight: true,
     }
   },
 
@@ -90,16 +92,19 @@ export default {
     async getAvailableTrainings(weekNum) {
       let response;
       response = await axiosReq('availableTrainings?weekNum=' + weekNum);
-      this.timetable = response.data
-      this.startDate = this.timetable.datesInWeek[0];
-      this.endDate = this.timetable.datesInWeek[6];
+      this.updateData(response.data);
     },
 
     async getAvailableTrainingsByTrainer(trainer, weekNum) {
       let response;
       response = await axiosReq('availableTrainingsByExcluding?trainerId=' + trainer.id 
                                                 + '&weekNum=' + weekNum);
-      this.timetable = response.data
+      this.updateData(response.data);
+    },
+
+    updateData(data) {
+      this.timetable = data;
+      console.log('timetable set');
       this.startDate = this.timetable.datesInWeek[0];
       this.endDate = this.timetable.datesInWeek[6];
     },
@@ -108,10 +113,15 @@ export default {
       this.checkedSlots = checkedSlots; 
     },
 
-    changeDate(selectedDate) {
-      this.selectedDate = selectedDate;
-      this.weekNum = this.$funcs.calcWeekNum(this.selectedDate);
-      this.rerenderTrainings(this.weekNum);
+    async changeDate(selectedDate) {
+      let newWeekNum = this.$funcs.calcWeekNum(selectedDate.date);
+      if(this.weekNum != newWeekNum) {
+        this.weekNum = newWeekNum;
+        await this.rerenderTrainings(this.weekNum);
+      }
+      this.highlight = selectedDate.trigger == 'calendar' ? true : false;
+      this.selectedDate = selectedDate.date;
+      console.log('seldate set');
     },
 
     rerenderTrainings(weekNum) {

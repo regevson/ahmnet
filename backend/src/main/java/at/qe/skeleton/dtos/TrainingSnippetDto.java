@@ -22,6 +22,6 @@ public class TrainingSnippetDto {
     private int court;
     private boolean isFree;
     private String trainerId;
-    private String originalTrainerId;
+    private String prevTrainerId;
 
 }

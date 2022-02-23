@@ -100,7 +100,7 @@ public class TrainingController {
     }
 
     @GetMapping("/trainingsByWeek")
-    public ResponseEntity<?> getTrainingsByWeek(String trainer, Integer weekNum) {
+    public ResponseEntity<?> getTrainingsByWeek(String trainer, Integer weekNum) throws InterruptedException {
         List<List<Training>> trainingsByDay = this.trainingService.getTrainingsByWeek(trainer, weekNum);
         List<List<TrainingSnippetDto>> dtoList = new ArrayList<>();
 

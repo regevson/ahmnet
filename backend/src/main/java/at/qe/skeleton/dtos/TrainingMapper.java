@@ -37,7 +37,7 @@ public class TrainingMapper {
 	dto.setDurationMinutes(tr.getDurationMinutes());
 	dto.setCourt(tr.getCourt());
 	dto.setFree(tr.getIsFree());
-	dto.setOriginalTrainerId(tr.getOriginalTrainer().getId());
+	dto.setPrevTrainerId(tr.getPrevTrainer().getId());
 	dto.setTrainerId(tr.getTrainer().getId());
 	return dto;
     }

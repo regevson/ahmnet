@@ -99,18 +99,18 @@ h1 {
 
 .deleteBulkBtn {
   background: none;
-  border: 2px solid red;
+  border: 2px solid #b90707;
   border-radius: 8px;
   padding: 5px;
   font-weight: bold;
-  color: red;
+  color: #b90707;
   margin: 20px 0 0px 0;
   transition: all 0.3s ease-in-out;
 }
 
 .deleteBulkBtn:hover {
   color: white;
-  background: red;
+  background: #b90707;
   transition: all 0.3s ease-in-out;
 }
 

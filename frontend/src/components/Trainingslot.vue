@@ -93,7 +93,7 @@ export default {
 
     checkVacation(tr_idx) {
       const tr = this.trainings[tr_idx];
-      if(tr.originalTrainerId !== tr.trainerId || tr.trainerId !== this.selectedTrainerId)
+      if(tr.prevTrainerId !== tr.trainerId || tr.trainerId !== this.selectedTrainerId)
         return 'vacationslot';
     },
 

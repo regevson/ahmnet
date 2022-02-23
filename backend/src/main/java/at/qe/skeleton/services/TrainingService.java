@@ -128,7 +128,7 @@ public class TrainingService {
     @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.trainer.getId")
     public void freeTraining(Training training) {
 	training.setIsFree(true);
-	training.setTrainer(training.getOriginalTrainer());
+	training.setTrainer(training.getPrevTrainer());
 	saveTraining(training);
     }
 
@@ -138,7 +138,7 @@ public class TrainingService {
 	User user = userService.getAuthenticatedUser();
 	User prevTrainer = training.getTrainer();
 	training.setTrainer(user);
-	training.setOriginalTrainer(prevTrainer);
+	training.setPrevTrainer(prevTrainer);
 	saveTraining(training);
     }
 
@@ -201,9 +201,9 @@ public class TrainingService {
 	    Training t = loadTrainingById(trainingIds[i]);
 	    grabTraining(t);
 
-	    List<Training> trainingList = prevTrainer_trainings.getOrDefault(t.getOriginalTrainer(), new ArrayList<>());
+	    List<Training> trainingList = prevTrainer_trainings.getOrDefault(t.getPrevTrainer(), new ArrayList<>());
 	    trainingList.add(t);
-	    prevTrainer_trainings.put(t.getOriginalTrainer(), trainingList);
+	    prevTrainer_trainings.put(t.getPrevTrainer(), trainingList);
 	}
 	//informOfGrabbing(prevTrainer_trainings);
     }
