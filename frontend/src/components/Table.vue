@@ -67,23 +67,26 @@ export default {
     return {
       weekDays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
       checkedSlots: [],
-      dateWasUpdated: false,
+      highlightLocal: false,
     }
   },
 
   watch: {
     timetable: function() {
       this.checkedSlots = []; // reset checkboxes when table is rerendered
+      this.highlightLocal = false; // never highlight anything when timetable is updated
     },
-    highlight: function() {
-      console.log(this.highlight);
+    selectedDate: function() {
+      this.highlightLocal = this.highlight; // only highlight when date is updated and highlight is set
     }
   },
 
   async updated() {
-    await this.wait();
-    if(this.highlight)
+    if(this.highlightLocal) {
+      await this.wait();
       this.highlightChosenDay(this.selectedDate);
+    }
+    this.highlightLocal = false;
   },
 
   methods: {

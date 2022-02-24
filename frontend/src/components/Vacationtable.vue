@@ -91,20 +91,27 @@ export default {
     async getAvailableTrainings(weekNum) {
       let response;
       response = await axiosReq('availableTrainings?weekNum=' + weekNum);
-      this.updateData(response.data);
+      this.updateDateBarProps(response.data);
+      this.updateTableProps(response.data, 'trainings', this.selectedDate);
     },
 
     async getAvailableTrainingsByTrainer(trainer, weekNum) {
       let response;
       response = await axiosReq('availableTrainingsByExcluding?trainerId=' + trainer.id 
                                                 + '&weekNum=' + weekNum);
-      this.updateData(response.data);
+      this.updateDateBarProps(response.data);
+      this.updateTableProps(response.data, 'trainings', this.selectedDate);
     },
 
-    updateData(data) {
-      this.timetable = data;
-      this.startDate = this.timetable.datesInWeek[0];
-      this.endDate = this.timetable.datesInWeek[6];
+    updateDateBarProps(timetable) {
+      this.startDate = timetable.datesInWeek[0];
+      this.endDate = timetable.datesInWeek[6];
+    },
+
+    updateTableProps(timetable, trigger, selectedDate) {
+      this.highlight = trigger === 'calendar'; // only highlight when date in calendar was changed
+      this.selectedDate = selectedDate;
+      this.timetable = timetable;
     },
 
     setCheckedSlots(checkedSlots) {
@@ -117,8 +124,7 @@ export default {
         this.weekNum = newWeekNum;
         await this.rerenderTrainings(this.weekNum);
       }
-      this.highlight = selectedDate.trigger == 'calendar' ? true : false;
-      this.selectedDate = selectedDate.date;
+      this.updateTableProps(this.timetable, selectedDate.trigger, selectedDate.date)
     },
 
     rerenderTrainings(weekNum) {
@@ -162,7 +168,7 @@ export default {
   background: #fdd663;
   padding: 3px 5px 3px 5px;
   border-radius: 5px;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 15px;
   color: #1b2730;
 }

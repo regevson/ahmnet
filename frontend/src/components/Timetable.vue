@@ -129,13 +129,19 @@ export default {
       let response;
       response = await axiosReq('trainingsByWeek?trainer='
                             + this.selectedTrainer.id + '&weekNum=' + weekNum);
-      this.updateData(response.data);
+      this.updateDateBarProps(response.data);
+      this.updateTableProps(response.data, 'trainings', this.selectedDate);
     },
 
-    updateData(data) {
-      this.timetable = data;
-      this.startDate = this.timetable.datesInWeek[0];
-      this.endDate = this.timetable.datesInWeek[6];
+    updateDateBarProps(timetable) {
+      this.startDate = timetable.datesInWeek[0];
+      this.endDate = timetable.datesInWeek[6];
+    },
+
+    updateTableProps(timetable, trigger, selectedDate) {
+      this.highlight = trigger === 'calendar'; // only highlight when date in calendar was changed
+      this.selectedDate = selectedDate;
+      this.timetable = timetable;
     },
 
     setCheckedSlots(checkedSlots) {
@@ -148,8 +154,7 @@ export default {
         this.weekNum = newWeekNum;
         await this.getTrainings(this.weekNum);
       }
-      this.highlight = selectedDate.trigger == 'calendar' ? true : false;
-      this.selectedDate = selectedDate.date;
+      this.updateTableProps(this.timetable, selectedDate.trigger, selectedDate.date)
     },
 
     async deleteTrainings() {
