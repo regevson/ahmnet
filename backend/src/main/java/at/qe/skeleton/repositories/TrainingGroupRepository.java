@@ -18,15 +18,9 @@ public interface TrainingGroupRepository extends AbstractRepository<TrainingGrou
 
     Set<TrainingGroup> findByClub_NameContaining(String name);
 
-    @Query("select g "
-    	+ "from TrainingGroup g join g.players players "
-    	+ "where players.username=:username")
-    Set<TrainingGroup> findByPlayer_Username(@Param("username") String username);
-
     @Query("select count(t) "
     	+ "from Training t join t.trainingGroup "
     	+ "where t.trainingGroup.id = :trainingGroupId and t.dateTime < :currentDayTime")
     int countPlayedTrainingsByGroupId(@Param("trainingGroupId") long trainingGroupId, @Param("currentDayTime") LocalDateTime currentDayTime);
 
 }
-

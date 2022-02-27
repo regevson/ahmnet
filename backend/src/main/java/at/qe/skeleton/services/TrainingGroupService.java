@@ -52,11 +52,6 @@ public class TrainingGroupService {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public Set<TrainingGroup> loadTrainingGroupByPlayer(User player) {
-	return this.trainingGroupRepository.findByPlayer_Username(player.getUsername());
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public TrainingGroup loadTrainingGroupById(long id) {
 	return this.trainingGroupRepository.findById(id);
     }

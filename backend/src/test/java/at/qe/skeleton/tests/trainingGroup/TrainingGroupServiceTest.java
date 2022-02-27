@@ -1,4 +1,4 @@
-package at.qe.skeleton.tests;
+package at.qe.skeleton.tests.trainingGroup;
 
 import java.util.Set;
 
@@ -42,6 +42,7 @@ public class TrainingGroupServiceTest {
         Assertions.assertTrue(groups.size() > 1, "Wrong amount of groups");
     }
 
+/*
     @DirtiesContext
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
@@ -52,6 +53,7 @@ public class TrainingGroupServiceTest {
         for(TrainingGroup g : groups)
             Assertions.assertTrue(g.getPlayers().contains(player), "There is a group that doesn't have player " + player);
     }
+*/
 
     @DirtiesContext
     @Test

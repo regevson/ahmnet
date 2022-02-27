@@ -46,21 +46,6 @@ public class TrainingService {
 	return trainingRepo.findById(id);
     }
 
-/*
-    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
-    public List<Training> loadTrainingsByTrainingGroup(TrainingGroup group) {
-	return trainingRepo.findByTrainingGroupIdOrderByDateTimeAsc(group.getId());
-    }
-    */
-
-    public List<Training> loadTrainingsByPlayer(User player) {
-	return trainingRepo.findByPlayerId(player.getId());
-    }
-
-    public List<Training> loadTrainingsByPlayerAndWeek(User player, int weekNum) {
-	return trainingRepo.findByPlayerIdAndWeek(player.getId(), weekNum);
-    }
-
     @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
     public List<Training> loadTrainingsByTrainer(User trainer) {
 	return trainingRepo.findByTrainer_UsernameOrderByDateTimeAsc(trainer.getId());
@@ -97,13 +82,6 @@ public class TrainingService {
 	return trainingsByDay;
     }
     
-    public List<Training> orderTrainingsAsc(Set<Training> trs) {
-        List<Training> trList = new ArrayList<>(trs);
-        Comparator<Training> comparator = Comparator.comparing(Training::getDateTime);
-        trList.sort(comparator);
-        return trList;
-    }
-
     public List<String> getDatesInWeek(int weekNum) {
         LocalDate monday = LocalDate.of(Year.now().getValue(), 2, 1)
                 .with(WeekFields.of(Locale.GERMANY).getFirstDayOfWeek())
@@ -120,8 +98,8 @@ public class TrainingService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainer.getId")
-    public List<List<Training>> loadFreeTrainingsByExcluding(User trainer, int weekNum) {
-	List<Training> trs = trainingRepo.findFreeTrainingsByWeekAndExcluding(trainer.getId(), weekNum);
+    public List<List<Training>> loadFreeTrainingsByExcludingTrainer(User trainer, int weekNum) {
+	List<Training> trs = trainingRepo.findFreeTrainingsByWeekAndExcludingTrainer(trainer.getId(), weekNum);
 	return groupByDay(trs);
     }
 
@@ -150,22 +128,27 @@ public class TrainingService {
 
     @Transactional
     @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.getTrainer.getId()")
-    public void saveRecurringTrainings(Training training) {
+    public List<Training> saveRecurringTrainings(Training training) {
+	List<Training> recurringTrainings = new ArrayList<>();
 	LocalDate lastDate = training.getLastDate();
 	if(lastDate == null) {
             saveTraining(training);
-            return;
+            recurringTrainings.add(training);
 	}
 
-	LocalDate startDate = training.getDateTime().toLocalDate();
-	LocalTime startTime = training.getDateTime().toLocalTime();
-	while(startDate.isBefore(lastDate) || startDate.isEqual(lastDate)) {
-            Training tmp = new Training(training);
-            tmp.setDateTime(startDate.atTime(startTime));
-            saveTraining(tmp);
-            startDate = startDate.plusWeeks(1);
+	else {
+            LocalDate startDate = training.getDateTime().toLocalDate();
+            LocalTime startTime = training.getDateTime().toLocalTime();
+            while(startDate.isBefore(lastDate) || startDate.isEqual(lastDate)) {
+                Training tmp = new Training(training);
+                tmp.setDateTime(startDate.atTime(startTime));
+                saveTraining(tmp);
+                recurringTrainings.add(tmp);
+                startDate = startDate.plusWeeks(1);
+            }
 	}
-	
+
+	return recurringTrainings;
     }
 
     @Transactional

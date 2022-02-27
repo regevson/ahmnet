@@ -131,7 +131,7 @@ public class TrainingController {
     @GetMapping("/availableTrainingsByExcluding")
     public ResponseEntity<?> getFreeTrainingsByExcluding(String trainerId, Integer weekNum) {
 	User trainer = this.userService.loadUser(trainerId);
-	List<List<Training>> trainingsByDay = this.trainingService.loadFreeTrainingsByExcluding(trainer, weekNum);
+	List<List<Training>> trainingsByDay = this.trainingService.loadFreeTrainingsByExcludingTrainer(trainer, weekNum);
 	List<List<TrainingSnippetDto>> dtoList = new ArrayList<>();
 
 	for(List<Training> dayList : trainingsByDay)
