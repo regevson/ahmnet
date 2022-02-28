@@ -13,7 +13,6 @@ import lombok.Setter;
 @Entity
 public class Club {
 
-    @Setter(AccessLevel.NONE)
     @Id
     @Column(length = 100, name="name")
     private String name;

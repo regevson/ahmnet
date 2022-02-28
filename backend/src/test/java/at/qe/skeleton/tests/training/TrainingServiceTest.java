@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,15 +15,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.qe.skeleton.model.Training;
 import at.qe.skeleton.model.TrainingGroup;
 import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.TrainingRepository;
 import at.qe.skeleton.services.TrainingService;
 import at.qe.skeleton.services.UserService;
@@ -34,13 +30,14 @@ import at.qe.skeleton.services.UserService;
 public class TrainingServiceTest {
 
     @Mock
-    private TrainingRepository trainingRepo;
+    TrainingRepository trainingRepo;
 
     @Mock
-    private UserService userService;
+    UserService userService;
 
     @InjectMocks
-    private TrainingService trainingService;
+    TrainingService trainingService;
+
 
     @Test
     public void testDeleteTraining() {
