@@ -1,4 +1,4 @@
-package at.ahmacademy.ahmnet.ui.controllers;
+package at.ahmacademy.ahmnet.controllers;
 
 import java.util.ArrayList;
 import java.util.List;

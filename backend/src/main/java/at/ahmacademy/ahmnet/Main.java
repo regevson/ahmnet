@@ -4,8 +4,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScan.Filter;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 /**
@@ -26,7 +24,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
  * spring. It is reserved for the CDI-injection-mechanisms (Weld). Only add
  * CDI-managed components.
  */
-@ComponentScan(basePackages = "at.ahmacademy.ahmnet", excludeFilters = @Filter(type = FilterType.REGEX, pattern = "at.qe.skeleton.ui.websockets.*"))
+@ComponentScan(basePackages = "at.ahmacademy.ahmnet")
 public class Main extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

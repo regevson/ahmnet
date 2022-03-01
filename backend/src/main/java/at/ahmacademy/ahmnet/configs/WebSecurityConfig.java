@@ -50,31 +50,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .logoutSuccessUrl("/login.xhtml");
+                .deleteCookies("JSESSIONID");
 
         http.authorizeRequests()
                 //Permit access to the H2 console
                 .antMatchers("/h2-console/**").permitAll()
-                //Permit access for all to error pages
-                .antMatchers("/error/**")
-                .permitAll()
-                // Only access with admin role
-                .antMatchers("/admin/**")
-                .hasAnyAuthority("ADMIN")
-                //Permit access only for some roles
-                .antMatchers("/secured/**")
-                .hasAnyAuthority("ADMIN", "TRAINER", "PLAYER")
-                // Allow only certain roles to use websockets (only logged in users)
                 .and().formLogin()
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/secured/welcome.xhtml");
-                
-        // :TODO: user failureUrl(/login.xhtml?error) and make sure that a corresponding message is displayed
- 
-        http.exceptionHandling().accessDeniedPage("/error/access_denied.xhtml");
-        http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
-
+                .loginProcessingUrl("/login");
     }
 
     @Autowired
