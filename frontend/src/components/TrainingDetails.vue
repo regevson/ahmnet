@@ -411,9 +411,9 @@ export default {
     },
 
     async setupTraining() {
-      const trainerId = this.$route.params.trainerId;
-      const trainingId = this.$route.params.trainingId;
-      const res = await this.$ax.get('trainers/' + trainerId + '/trainings/' + trainingId);
+      const pathTrainerId = this.$route.params.trainerId;
+      const pathTrainingId = this.$route.params.trainingId;
+      const res = await this.$ax.get('trainers/' + pathTrainerId + '/trainings/' + pathTrainingId);
       this.training = res.data;
       this.combineGroupInfo(this.training.group);
       this.setValidationFields();
@@ -443,8 +443,8 @@ export default {
       if(!this.validate())
         return;
       this.getValidationFields();
-      let oldTrainerId = this.$route.params.trainerId;
-      await this.$ax.put('trainers/' + oldTrainerId + '/trainings/' + this.training.id, this.training);
+      let pathTrainerId = this.$route.params.trainerId;
+      await this.$ax.put('trainers/' + pathTrainerId + '/trainings/' + this.training.id, this.training);
       this.$router.push({name: 'timetable'});
     },
 

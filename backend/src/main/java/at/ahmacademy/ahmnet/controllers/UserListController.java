@@ -35,82 +35,76 @@ import at.ahmacademy.ahmnet.dtos.UserDto;
 import at.ahmacademy.ahmnet.dtos.UserMapper;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.model.UserRole;
-import at.ahmacademy.ahmnet.services.UserService;
+import at.ahmacademy.ahmnet.services.user.UserService;
 
 @RequestMapping("/api")
 @RestController
 @Scope("application")
 public class UserListController {
 
-    @Autowired
-    private UserService userService;
+  @Autowired
+  private UserService userService;
 
-    @GetMapping("/users")
-    public ResponseEntity<?> getUsers(Optional<UserRole> role) {
-        Collection<UserDto> dtos = null;
-        if(role.isEmpty())
-            dtos = UserMapper.mapToUserDto(userService.getAllUsers());
-        else
-            dtos = UserMapper.mapToUserDto(userService.getUsersByRole(role.get()));
-	return ResponseEntity
-	            .status(HttpStatus.OK)
-	            .body(dtos);
-    }
+  @GetMapping("/users")
+  public ResponseEntity<?> getUsers(Optional<UserRole> role) {
+    Collection<UserDto> dtos = null;
+    if(role.isEmpty())
+      dtos = UserMapper.mapToUserDto(userService.getAllUsers());
+    else
+      dtos = UserMapper.mapToUserDto(userService.getUsersByRole(role.get()));
+    return ResponseEntity.status(HttpStatus.OK).body(dtos);
+  }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getUser(@PathVariable String userId) {
-        UserDto dto = UserMapper.mapToUserDto(userService.loadUser(userId));
-	return ResponseEntity
-	            .status(HttpStatus.OK)
-	            .body(dto);
-    }
+  @GetMapping("/users/{userId}")
+  public ResponseEntity<?> getUser(@PathVariable String userId) {
+    UserDto dto = UserMapper.mapToUserDto(userService.loadUser(userId));
+    return ResponseEntity.status(HttpStatus.OK).body(dto);
+  }
 
-    @PostMapping("/users/{userId}/actions/change-password")
-    public ResponseEntity<?> changePassword(@PathVariable String userId, @RequestBody ObjectNode password) {
-        this.userService.changePassword(userId, password.get("password").asText());
-	return ResponseEntity
-	            .status(HttpStatus.OK)
-	            .build();
-    }
+  @PostMapping("/users/{userId}/actions/change-password")
+  public ResponseEntity<?> changePassword(@PathVariable String userId, 
+                                           @RequestBody ObjectNode password) {
+    this.userService.changePassword(userId, password.get("password").asText());
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
 
-    @GetMapping("/token/refresh")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException {
-        String authHeader = request.getHeader("AUTHORIZATION");
-        if(authHeader != null && authHeader.startsWith("Bearer ")) {
-            try {
-                String refresh_token = authHeader.substring("Bearer ".length());
-                Algorithm algo = Algorithm.HMAC256("secret".getBytes());
-                JWTVerifier verifier = JWT.require(algo).build();
-                DecodedJWT decodedjwt = verifier.verify(refresh_token);
-                String username = decodedjwt.getSubject();
-                User user = this.userService.loadUser(username);
+  @GetMapping("/token/refresh")
+  public void refreshToken(HttpServletRequest request, HttpServletResponse response) 
+                            throws JsonGenerationException, JsonMappingException, IOException {
+    String authHeader = request.getHeader("AUTHORIZATION");
+    if(authHeader != null && authHeader.startsWith("Bearer ")) {
+      try {
+        String refresh_token = authHeader.substring("Bearer ".length());
+        Algorithm algo = Algorithm.HMAC256("secret".getBytes());
+        JWTVerifier verifier = JWT.require(algo).build();
+        DecodedJWT decodedjwt = verifier.verify(refresh_token);
+        String username = decodedjwt.getSubject();
+        User user = this.userService.loadUser(username);
 
-                // create new access-token
-                String access_token = JWT.create()
-                    .withSubject(user.getUsername())
-                    .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                    .withIssuer(request.getRequestURL().toString())
-                    .withClaim("roles", user.getRoles().stream().map(UserRole::toString).collect(Collectors.toList()))
-                    .sign(algo);
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", access_token);
-                tokens.put("refresh_token", refresh_token);
-                response.setContentType("appication/json");
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+        // create new access-token
+        String access_token = JWT.create()
+          .withSubject(user.getUsername())
+          .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+          .withIssuer(request.getRequestURL().toString())
+          .withClaim("roles", user.getRoles().stream().map(UserRole::toString)
+                                                      .collect(Collectors.toList()))
+                                                      .sign(algo);
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("access_token", access_token);
+        tokens.put("refresh_token", refresh_token);
+        response.setContentType("appication/json");
+        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 
-            }catch(Exception ex) {
-                response.setHeader("error", ex.getMessage());
-                response.setStatus(403, "FORBIDDEN");
-                Map<String, String> error = new HashMap<>();
-                error.put("error_message", ex.getMessage());
-                response.setContentType("application/json");
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
-            }
-        }
-
-        else
-            throw new RuntimeException("Refresh token is missing");
-    }
-    
+      } catch(Exception ex) {
+        response.setHeader("error", ex.getMessage());
+        response.setStatus(403, "FORBIDDEN");
+        Map<String, String> error = new HashMap<>();
+        error.put("error_message", ex.getMessage());
+        response.setContentType("application/json");
+        new ObjectMapper().writeValue(response.getOutputStream(), error);
+      }
+    } else
+      throw new RuntimeException("Refresh token is missing");
+  }
 
 }

@@ -4,6 +4,6 @@ import at.ahmacademy.ahmnet.model.SmsRequest;
 
 public interface SmsSender {
 
-    void sendWAMessage(SmsRequest sms);
+  void sendWAMessage(SmsRequest sms);
 
 }

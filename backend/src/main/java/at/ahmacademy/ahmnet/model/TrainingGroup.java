@@ -23,23 +23,25 @@ import lombok.Setter;
 @Table(name="traininggroup")
 public class TrainingGroup {
 
-    @Setter(AccessLevel.NONE)
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // otherwise there is problem when saving with empty id
-    private long id;
+  @Setter(AccessLevel.NONE)
+  @Id
+  // otherwise there is problem when saving with empty id
+  @GeneratedValue(strategy = GenerationType.IDENTITY) 
+  private long id;
 
-    @ManyToOne
-    private User trainer;
+  @ManyToOne
+  private User trainer;
 
-    @ManyToOne
-    private Club club;
+  @ManyToOne
+  private Club club;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<User> players;
+  @ManyToMany(fetch = FetchType.EAGER)
+  private Set<User> players;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "trainingGroup", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Training> trainings;
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "trainingGroup", 
+             cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<Training> trainings;
 
-    private int numPlayedSessions;
+  private int numPlayedSessions;
 
 }

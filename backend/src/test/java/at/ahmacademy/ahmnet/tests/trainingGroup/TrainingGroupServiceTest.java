@@ -22,8 +22,8 @@ import at.ahmacademy.ahmnet.model.Training;
 import at.ahmacademy.ahmnet.model.TrainingGroup;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.repositories.TrainingGroupRepository;
-import at.ahmacademy.ahmnet.services.TrainingGroupService;
-import at.ahmacademy.ahmnet.services.UserService;
+import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
+import at.ahmacademy.ahmnet.services.user.UserService;
 
 @SpringBootTest
 @WebAppConfiguration

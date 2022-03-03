@@ -235,8 +235,8 @@ export default {
     },
 
     async updateTrainingGroupDetails() {
-      let oldClubId = this.$route.params.clubId;
-      await this.$ax.put('clubs/' + oldClubId + '/groups/' + this.group.id, this.group);
+      let pathClubId = this.$route.params.clubId;
+      await this.$ax.put('clubs/' + pathClubId + '/groups/' + this.group.id, this.group);
       this.$router.push({name: 'traininggroups'});
     },
 

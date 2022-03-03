@@ -13,11 +13,11 @@ import lombok.Setter;
 @Setter
 public class TrainingGroupDto {
 
-    private long id;
-    private UserDto trainer;
-    private Club club;
-    private Collection<UserDto> players;
-    private int numPlayedSessions;
-    private Map<String, Integer> attendance;
+  private long id;
+  private UserDto trainer;
+  private Club club;
+  private Collection<UserDto> players;
+  private int numPlayedSessions;
+  private Map<String, Integer> attendance;
 
 }

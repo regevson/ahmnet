@@ -26,80 +26,64 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import at.ahmacademy.ahmnet.filters.CustomAuthenticationFilter;
 import at.ahmacademy.ahmnet.filters.CustomAuthorizationFilter;
 
-
-
-/**
- * Spring configuration for web security.
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
- */
 @Configuration
 @EnableWebSecurity()
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+  @Autowired
+  DataSource dataSource;
 
-    @Autowired
-    DataSource dataSource;
+  @Bean
+  CorsConfigurationSource corsConfigurationSource() {
+    final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+    configuration.setAllowedOrigins(Collections.singletonList("*"));
+    configuration.addAllowedMethod(HttpMethod.TRACE);
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "OPTIONS", "PUT"));
 
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-        configuration.setAllowedOrigins(Collections.singletonList("*"));
-        configuration.addAllowedMethod(HttpMethod.TRACE);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "OPTIONS", "PUT"));
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
 
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+    http.cors().and().csrf().disable();
+    http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
+    http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    http.headers().frameOptions().disable(); // needed for H2 console
 
-	// set 'Access-Control-Allow-Origin' to '*' globally
-        //http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
+    http.logout()
+      .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+      .invalidateHttpSession(true)
+      .deleteCookies("JSESSIONID");
 
-	http.cors().and()
-        .csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+    http.authorizeRequests()
+      //Permit access to the H2 console
+      .antMatchers("/h2-console/**").permitAll()
+      .and().formLogin()
+      .loginProcessingUrl("/login");
+  }
 
+  @Autowired
+  public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    //Configure roles and passwords via datasource
+    auth.jdbcAuthentication().dataSource(dataSource)
+      .usersByUsernameQuery("select username, password, enabled from user where username=?")
+      .authoritiesByUsernameQuery("select user_username, roles from user_user_role where user_username=?");
+  }
 
-        http.headers().frameOptions().disable(); // needed for H2 console
+  @Bean
+  public static PasswordEncoder passwordEncoder() {
+    // :TODO: use proper passwordEncoder and do not store passwords in plain text
+    return NoOpPasswordEncoder.getInstance();
+  }
 
-        http.logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID");
-
-        http.authorizeRequests()
-                //Permit access to the H2 console
-                .antMatchers("/h2-console/**").permitAll()
-                .and().formLogin()
-                .loginProcessingUrl("/login");
-    }
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        //Configure roles and passwords via datasource
-        auth.jdbcAuthentication().dataSource(dataSource)
-                .usersByUsernameQuery("select username, password, enabled from user where username=?")
-                .authoritiesByUsernameQuery("select user_username, roles from user_user_role where user_username=?");
-    }
-
-    @Bean
-    public static PasswordEncoder passwordEncoder() {
-        // :TODO: use proper passwordEncoder and do not store passwords in plain text
-        return NoOpPasswordEncoder.getInstance();
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-	return super.authenticationManagerBean();
-    }
+  @Bean
+  @Override
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
 }

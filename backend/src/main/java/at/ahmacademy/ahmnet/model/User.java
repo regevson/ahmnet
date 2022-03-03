@@ -29,90 +29,87 @@ import lombok.Setter;
 @Entity
 public class User implements Persistable<String>, Serializable, Comparable<User> {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(length = 100, name="username")
-    private String username;
+  @Id
+  @Column(length = 100, name="username")
+  private String username;
 
-    @JsonBackReference
-    @ManyToOne(optional = false)
-    private User createUser;
+  @JsonBackReference
+  @ManyToOne(optional = false)
+  private User createUser;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createDate;
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date createDate;
 
-    @JsonBackReference
-    @ManyToOne(optional = true)
-    private User updateUser;
+  @JsonBackReference
+  @ManyToOne(optional = true)
+  private User updateUser;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateDate;
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date updateDate;
 
-    private String password;
+  private String password;
 
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phone;
+  private String firstName;
+  private String lastName;
+  private String email;
+  private String phone;
 
-    boolean enabled;
+  boolean enabled;
 
-    @ManyToOne
-    private Club club;
+  @ManyToOne
+  private Club club;
 
-    @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "User_UserRole")
-    @Enumerated(EnumType.STRING)
-    private Set<UserRole> roles;
+  @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
+  @CollectionTable(name = "User_UserRole")
+  @Enumerated(EnumType.STRING)
+  private Set<UserRole> roles;
 
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 59 * hash + Objects.hashCode(this.username);
-        return hash;
-    }
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash = 59 * hash + Objects.hashCode(this.username);
+    return hash;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof User)) {
-            return false;
-        }
-        final User other = (User) obj;
-        if (!Objects.equals(this.username, other.username)) {
-            return false;
-        }
-        return true;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if(obj == null)
+      return false;
+    if(!(obj instanceof User))
+      return false;
+    final User other = (User) obj;
+    if(!Objects.equals(this.username, other.username))
+      return false;
+    return true;
+  }
 
-    @Override
-    public String toString() {
-        return "at.qe.skeleton.model.User[ id=" + username + " ]";
-    }
+  @Override
+  public String toString() {
+    return "at.qe.skeleton.model.User[ id=" + username + " ]";
+  }
 
-    @Override
-    public String getId() {
-        return getUsername();
-    }
+  @Override
+  public String getId() {
+    return getUsername();
+  }
 
-    public void setId(String id) {
-        setUsername(id);
-    }
+  public void setId(String id) {
+    setUsername(id);
+  }
 
-    @Override
-    public boolean isNew() {
-        return (null == createDate);
-    }
+  @Override
+  public boolean isNew() {
+    return (null == createDate);
+  }
 
-    @Override
-    public int compareTo(User o) {
-            return this.username.compareTo(o.getUsername());
-    }
+  @Override
+  public int compareTo(User o) {
+    return this.username.compareTo(o.getUsername());
+  }
 
 }
 

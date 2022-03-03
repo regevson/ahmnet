@@ -15,20 +15,20 @@ import lombok.Setter;
 @Setter
 public class TrainingDto {
 
-    private Long id;
-    private TrainingGroupSnippetDto group;
-    private Club club;
-    private LocalDate date;
-    private LocalDate lastDate;
-    private String timeslot;
-    private int court;
-    private LocalTime startTime;
-    private int durationMinutes;
-    private UserDto trainer;
-    private Collection<UserDto> players;
-    private Collection<String> attendees;
-    private String bulletPoints;
-    private String comments;
-    private boolean isFree;
+  private Long id;
+  private TrainingGroupSnippetDto group;
+  private Club club;
+  private LocalDate date;
+  private LocalDate lastDate;
+  private String timeslot;
+  private int court;
+  private LocalTime startTime;
+  private int durationMinutes;
+  private UserDto trainer;
+  private Collection<UserDto> players;
+  private Collection<String> attendees;
+  private String bulletPoints;
+  private String comments;
+  private boolean isFree;
 
 }

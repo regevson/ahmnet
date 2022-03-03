@@ -12,17 +12,17 @@ import lombok.Setter;
 @Setter
 public class TrainingSnippetDto {
 
-    private long id;
-    private long groupId;
-    private Club club;
-    private String groupClubId;
-    private String date;
-    private String timeslot;
-    private LocalTime startTime;
-    private int durationMinutes;
-    private int court;
-    private boolean isFree;
-    private String trainerId;
-    private String prevTrainerId;
+  private long id;
+  private long groupId;
+  private Club club;
+  private String groupClubId;
+  private String date;
+  private String timeslot;
+  private LocalTime startTime;
+  private int durationMinutes;
+  private int court;
+  private boolean isFree;
+  private String trainerId;
+  private String prevTrainerId;
 
 }

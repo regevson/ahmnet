@@ -20,6 +20,7 @@ public class TrainingRepositoryTest {
     TrainingRepository trainingRepo;
     
 
+/*
     @Test
     public void testFindByTrainer_UsernameOrderByDateTimeAsc() {
 	List<Training> trainings = trainingRepo.findByTrainer_UsernameOrderByDateTimeAsc("johndoe");
@@ -57,4 +58,5 @@ public class TrainingRepositoryTest {
 	}
     }
 
+*/
 }

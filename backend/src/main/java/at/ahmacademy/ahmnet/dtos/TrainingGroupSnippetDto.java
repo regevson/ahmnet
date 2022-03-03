@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 public class TrainingGroupSnippetDto {
 
-    private long id;
-    private UserDto trainer;
-    private Club club;
-    private Collection<UserDto> players;
+  private long id;
+  private UserDto trainer;
+  private Club club;
+  private Collection<UserDto> players;
 
 }

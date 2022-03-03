@@ -12,18 +12,18 @@ import at.ahmacademy.ahmnet.model.SmsRequest;
 @Component
 public class TwilioSmsSender implements SmsSender {
 
-/*
-    @Autowired
-    private TwilioConfig twilioConfig;
-    */
+  /*
+  @Autowired
+  private TwilioConfig twilioConfig;
+  */
 
-    @Override
-    public void sendWAMessage(SmsRequest sms) {
-	PhoneNumber to = new PhoneNumber("whatsapp:" + sms.getPhoneNumber());
-	PhoneNumber from = new PhoneNumber("whatsapp:" + TwilioInitializer.number);
-	String msg = sms.getMessage();
-	MessageCreator creator = Message.creator(to, from, msg);
-	creator.create();
-    }
+  @Override
+  public void sendWAMessage(SmsRequest sms) {
+    PhoneNumber to = new PhoneNumber("whatsapp:" + sms.getPhoneNumber());
+    PhoneNumber from = new PhoneNumber("whatsapp:" + TwilioInitializer.number);
+    String msg = sms.getMessage();
+    MessageCreator creator = Message.creator(to, from, msg);
+    creator.create();
+  }
 
 }
