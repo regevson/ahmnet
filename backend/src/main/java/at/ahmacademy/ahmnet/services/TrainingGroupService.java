@@ -11,11 +11,11 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import at.ahmacademy.ahmnet.model.Club;
-import at.ahmacademy.ahmnet.model.SmsRequest;
 import at.ahmacademy.ahmnet.model.Training;
 import at.ahmacademy.ahmnet.model.TrainingGroup;
 import at.ahmacademy.ahmnet.model.User;
@@ -30,6 +30,8 @@ public class TrainingGroupService {
     TrainingGroupRepository trainingGroupRepository;
     @Autowired
     ClubRepository clubRepository;
+    @Autowired
+    UserService userService;
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
     public List<Club> loadAllClubs() {
@@ -47,13 +49,10 @@ public class TrainingGroupService {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public Set<TrainingGroup> loadTrainingGroupByTrainer(User trainer) {
-	return this.trainingGroupRepository.findByTrainer_Username(trainer.getUsername());
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public TrainingGroup loadTrainingGroupById(long id) {
-	return this.trainingGroupRepository.findById(id).orElse(null);
+    public TrainingGroup loadTrainingGroupById(String clubId, long groupId) {
+	TrainingGroup group = this.trainingGroupRepository.findById(groupId).orElse(null);
+	authorizeGroup(clubId, group);
+	return group;
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #group.trainer.getId")
@@ -89,6 +88,14 @@ public class TrainingGroupService {
 	for(Club club : clubs)
 	    map.put(club.getName(), this.loadTrainingGroupsByClub(club.getName()).size());
 	return map;
+    }
+    
+    private void authorizeGroup(String pathClubId, TrainingGroup group) {
+	String clubId = group.getClub().getName();
+	if(!pathClubId.equals(clubId))
+	    throw new IllegalArgumentException("Club in path is not club of this group!");
+	if(!userService.hasTrainerRights())
+	    throw new AccessDeniedException("No rights to view group!");
     }
 
 }

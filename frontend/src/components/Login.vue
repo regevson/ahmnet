@@ -71,14 +71,13 @@ export default {
 
   methods: {
     async handleSubmit() {
-      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
       const params = new URLSearchParams()
       params.append('username', this.username)
       params.append('password', this.password)
 
       let response;
       try {
-        response = await axios.post('http://10.0.0.242:8080/login', params, config);
+        response = await axios.post('http://10.0.0.242:8080/login', params);
       } catch(err) { 
           this.wrongCredentials = true;
           return null; 

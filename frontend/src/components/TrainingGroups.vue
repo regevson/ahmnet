@@ -23,7 +23,7 @@
           role="tabpanel"
         >
           <b-card-body>
-            <TrainingGroupSnippet :club="club[0]" />
+            <TrainingGroupSnippet :clubId="club[0]" />
           </b-card-body>
         </b-collapse>
       </b-card>
@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import { axiosReq } from '../axios'
 import TrainingGroupSnippet from "./TrainingGroupSnippet";
 
 export default {
@@ -49,13 +48,13 @@ export default {
   },
 
   async created() {
-    const response = await axiosReq('allClubsWithGroupNum');
+    const response = await this.$ax.get('clubs/actions/count-groups');
     this.clubs = Object.entries(response.data);
   },
 
   methods: {
     createGroup() {
-      this.$router.push({name: 'traininggroupdetails', params: {groupId: -1}});
+      this.$router.push({name: 'traininggroupdetails', params: {clubId: this.user.clubName, groupId: -1}});
     },
 
   }

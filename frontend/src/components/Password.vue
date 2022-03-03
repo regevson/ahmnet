@@ -38,9 +38,7 @@
 </template>
 
 <script>
-import { axiosReq } from '../axios'
 import { required } from 'vuelidate/lib/validators'
-import qs from 'qs'
 
 export default {
   name: 'Password',
@@ -62,10 +60,7 @@ export default {
     async changePassword() {
       if(!this.validate())
         return;
-
-      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      let params = qs.stringify({'password': this.password});
-      await axiosReq('changePassword', params, config);
+      await this.$ax.post('users/' + sessionStorage.username + '/actions/change-password', {"password": this.password});
       this.$router.push({name: 'login'});
     },
 

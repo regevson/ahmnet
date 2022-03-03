@@ -6,7 +6,6 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,12 +13,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Example;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import at.ahmacademy.ahmnet.model.SmsRequest;
 import at.ahmacademy.ahmnet.model.Training;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.repositories.TrainingRepository;
+import at.ahmacademy.ahmnet.repositories.TrainingSpecification;
 
 @Service
 @Scope("application")
@@ -41,32 +43,40 @@ public class TrainingService {
     @Autowired
     private SmsService smsService;
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
-    public Training loadTrainingById(long id) {
-	return trainingRepo.findById(id).orElse(null);
+
+    private Training loadTrainingById(Long trainingId) {
+	return trainingRepo.findById(trainingId).orElse(null);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
-    public List<Training> loadTrainingsByTrainer(User trainer) {
-	return trainingRepo.findByTrainer_UsernameOrderByDateTimeAsc(trainer.getId());
+    public Training loadTrainingById(String trainerId, Long trainingId) {
+	Training training = loadTrainingById(trainingId);
+	authorizeTrainingOwner(trainerId, training);
+	return training;
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','TRAINER')")
-    public List<Training> loadTrainingsByTrainerAndWeek(String trainerUsername, int weekNum) {
-	return trainingRepo.findByTrainerIdAndWeek(trainerUsername, weekNum);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.trainer.getId")
-    public Training saveTraining(Training training) {
+    private Training saveTraining(Training training) {
         return trainingRepo.save(training);
     }
 
-    @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.trainer.getId")
-    public void deleteTraining(Training training) {
+    public void updateTraining(String trainerId, Long trainingId, Training training) {
+	authorizeTraining(trainingId, training);
+	saveTraining(training);
+    }
+
+    private void deleteTraining(Training training) {
 	training.getAttendees().removeAll(training.getAttendees());
 	training.getTrainingGroup().getTrainings().remove(training);
         trainingRepo.delete(training);
+    }
+
+    @Transactional
+    public void deleteTrainings(String trainerId, Long[] trainingIds) {
+	authorizeTrainingOwner(trainerId, trainingIds);
+
+	for(int i = 0; i < trainingIds.length; i++) {
+	    Training t = loadTrainingById(trainingIds[i]);
+	    deleteTraining(t);
+	}
     }
 
     public List<List<Training>> groupByDay(List<Training> trainings) {
@@ -91,27 +101,13 @@ public class TrainingService {
         	.collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public List<List<Training>> loadFreeTrainingsByWeek(int weekNum) {
-	List<Training> trainings = trainingRepo.findFreeTrainingsByWeek(weekNum);
-	return groupByDay(trainings);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainer.getId")
-    public List<List<Training>> loadFreeTrainingsByExcludingTrainer(User trainer, int weekNum) {
-	List<Training> trs = trainingRepo.findFreeTrainingsByWeekAndExcludingTrainer(trainer.getId(), weekNum);
-	return groupByDay(trs);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.trainer.getId")
-    public void freeTraining(Training training) {
+    private void freeTraining(Training training) {
 	training.setIsFree(true);
 	training.setTrainer(training.getPrevTrainer());
 	saveTraining(training);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or #training.getIsFree()")
-    public void grabTraining(Training training) {
+    private void grabTraining(Training training) {
 	training.setIsFree(false);
 	User user = userService.getAuthenticatedUser();
 	User prevTrainer = training.getTrainer();
@@ -120,63 +116,74 @@ public class TrainingService {
 	saveTraining(training);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainerId")
-    public List<List<Training>> getTrainingsByWeek(String trainerId, int weekNum) {
-        List<Training> trainings = loadTrainingsByTrainerAndWeek(trainerId, weekNum);
-	return groupByDay(trainings);
+    @PreAuthorize("#trainerId eq #training.getTrainer.getId() && (hasAuthority('ADMIN') or authentication.getName() eq #trainerId)")
+    public void saveNewTraining(String trainerId, Training training) {
+
+	if(training.getLastDate() == null)
+            saveTraining(training);
+	else
+	    saveRecurringTraining(trainerId, training);
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #training.getTrainer.getId()")
-    public List<Training> saveRecurringTrainings(Training training) {
-	List<Training> recurringTrainings = new ArrayList<>();
+    private List<Training> saveRecurringTraining(String trainerId, Training training) {
+        LocalDate startDate = training.getDateTime().toLocalDate();
+        LocalTime startTime = training.getDateTime().toLocalTime();
 	LocalDate lastDate = training.getLastDate();
-	if(lastDate == null) {
-            saveTraining(training);
-            recurringTrainings.add(training);
-	}
 
-	else {
-            LocalDate startDate = training.getDateTime().toLocalDate();
-            LocalTime startTime = training.getDateTime().toLocalTime();
-            while(startDate.isBefore(lastDate) || startDate.isEqual(lastDate)) {
-                Training tmp = new Training(training);
-                tmp.setDateTime(startDate.atTime(startTime));
-                saveTraining(tmp);
-                recurringTrainings.add(tmp);
-                startDate = startDate.plusWeeks(1);
-            }
-	}
+	List<Training> recurringTrainings = new ArrayList<>();
+        while(startDate.isBefore(lastDate) || startDate.isEqual(lastDate)) {
+            Training tmp = new Training(training);
+            tmp.setDateTime(startDate.atTime(startTime));
+            saveTraining(tmp);
+            recurringTrainings.add(tmp);
+            startDate = startDate.plusWeeks(1);
+        }
 
 	return recurringTrainings;
     }
 
-    @Transactional
-    public void deleteTrainings(Long[] trainingIds) {
-	authorizeTrainingOwner(trainingIds);
 
-	for(int i = 0; i < trainingIds.length; i++) {
-	    Training t = loadTrainingById(trainingIds[i]);
-	    deleteTraining(t);
-	}
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+    public List<List<Training>> loadFreeTrainings(Integer weekNum, Optional<String> exclId) {
+	Specification<Training> spec = Specification.where(TrainingSpecification.hasWeekNum(weekNum))
+		.and(TrainingSpecification.hasStatus(true))
+		.and(exclId.isPresent() ? TrainingSpecification.exclId(exclId.get()) : null);
+	List<Training> trainings = this.trainingRepo.findAll(spec);
+	return groupByDay(trainings);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainerId")
+    public List<List<Training>> loadTrainingsByTrainer(String trainerId, 
+	    					       Integer weekNum, 
+	    					       Optional<Boolean> isFree) {
+
+	Specification<Training> spec = Specification.where(TrainingSpecification.hasWeekNum(weekNum))
+		.and(TrainingSpecification.hasTrainer(trainerId))
+		.and(isFree.isPresent() ? TrainingSpecification.hasStatus(isFree.get()) : null);
+	List<Training> trainings = this.trainingRepo.findAll(spec);
+	return groupByDay(trainings);
+    }
+
+
     @Transactional
-    public void freeTrainings(Long[] trainingIds) {
-	authorizeTrainingOwner(trainingIds);
+    public void freeTrainings(String trainerId, Long[] trainingIds, boolean notify) {
+	authorizeTrainingOwner(trainerId, trainingIds);
 
 	List<Training> trainingList = new ArrayList<>();
 	for(int i = 0; i < trainingIds.length; i++) {
 	    Training t = loadTrainingById(trainingIds[i]);
 	    freeTraining(t);
 
-	    trainingList.add(t);
+	    if(notify)
+                trainingList.add(t);
 	}
-	//informOfFreeing(trainingList);
+	if(notify && false)
+            informOfFreeing(trainingList);
     }
 
     @Transactional
-    public void grabTrainings(Long[] trainingIds) {
+    public void grabTrainings(Long[] trainingIds, boolean notify) {
 	authorizeGrabTraining(trainingIds);
 
 	Map<User, List<Training>> prevTrainer_trainings = new HashMap<>();
@@ -184,11 +191,14 @@ public class TrainingService {
 	    Training t = loadTrainingById(trainingIds[i]);
 	    grabTraining(t);
 
-	    List<Training> trainingList = prevTrainer_trainings.getOrDefault(t.getPrevTrainer(), new ArrayList<>());
-	    trainingList.add(t);
-	    prevTrainer_trainings.put(t.getPrevTrainer(), trainingList);
+	    if(notify) {
+                List<Training> trainingList = prevTrainer_trainings.getOrDefault(t.getPrevTrainer(), new ArrayList<>());
+                trainingList.add(t);
+                prevTrainer_trainings.put(t.getPrevTrainer(), trainingList);
+	    }
 	}
-	//informOfGrabbing(prevTrainer_trainings);
+	if(notify && false)
+	    informOfGrabbing(prevTrainer_trainings);
     }
 
     private void informOfFreeing(List<Training> trainings) {
@@ -264,15 +274,30 @@ public class TrainingService {
 
 // Authorization
 
-    private void authorizeTrainingOwner(Training training) {
-	User currentUser = userService.getAuthenticatedUser();
-	if(!userService.isAdmin() && currentUser.compareTo(training.getTrainer()) != 0)
-	    throw new AccessDeniedException("Logged in user is not trainer of this training!");
+    private void authorizeTrainingOwner(String pathTrainerId, Long pathTrainingId, Training training) {
+	String trainerId = training.getTrainer().getId();
+	if(!pathTrainerId.equals(trainerId))
+	    throw new IllegalArgumentException("Trainer in path is not trainer of this training!");
+	if(!pathTrainingId.equals(training.getId()))
+	    throw new IllegalArgumentException("Training in path is not this training!");
+	if(!userService.isAdmin() && !userService.isAuthUser(trainerId) && !training.getIsFree())
+	    throw new AccessDeniedException("Given trainer is not trainer of this training!");
+    }
+    private void authorizeTrainingOwner(String pathTrainerId, Training training) {
+        authorizeTrainingOwner(pathTrainerId, training.getId(), training);
+    }
+    private void authorizeTrainingOwner(String pathTrainerId, Long[] trainingIds) {
+	for(int i = 0; i < trainingIds.length; i++)
+            authorizeTrainingOwner(pathTrainerId, loadTrainingById(trainingIds[i]));
     }
 
-    private void authorizeTrainingOwner(Long[] trainingIds) {
-	for(int i = 0; i < trainingIds.length; i++)
-            authorizeTrainingOwner(loadTrainingById(trainingIds[i]));
+    private void authorizeTraining(Long pathTrainingId, Training training) {
+	Long trainingId = training.getId();
+	String trainerId = training.getTrainer().getId();
+	if(!pathTrainingId.equals(trainingId))
+	    throw new IllegalArgumentException("Training in path is not this training!");
+	if(!userService.isAdmin() && !userService.isAuthUser(trainerId))
+	    throw new AccessDeniedException("Given trainer is not trainer of this training!");
     }
 
     private void authorizeGrabTraining(Training training) {
@@ -284,6 +309,5 @@ public class TrainingService {
 	for(int i = 0; i < trainingIds.length; i++)
             authorizeGrabTraining(loadTrainingById(trainingIds[i]));
     }
-
 
 }

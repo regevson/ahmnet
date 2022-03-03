@@ -1,7 +1,7 @@
 <template>
   <div>
     <form style="text-align: left" v-if="group" @submit.prevent="">
-      <div align="center" v-if="group.id != -1">
+      <div align="center" v-if="!isNewGroup()">
         <p class="entry" style="background: #1b2730; border-radius: 5px">
           Gruppe {{group.id}}
           <i
@@ -11,6 +11,9 @@
           ></i>
         </p>
       </div>
+      <p v-if="isNewGroup()" class="entry" style="background: #1b2730; border-radius: 5px; text-align: center;">
+        Neue Gruppe
+      </p>
       <br />
 
       <p class="entry">Club:</p>
@@ -80,7 +83,7 @@
       </div>
       <br />
 
-      <div align="center" v-if="group.id == -1">
+      <div align="center" v-if="isNewGroup()">
         <input
           class="changeBtn fourth"
           type="submit"
@@ -90,7 +93,7 @@
         />
       </div>
 
-      <div align="center" v-if="group.id != -1">
+      <div align="center" v-if="!isNewGroup()">
         <input
           v-if="permChangeGroup()"
           class="changeBtn fourth"
@@ -113,7 +116,7 @@
 
     <b-modal
       centered
-      @ok="updateTrainingGroupDetails"
+      @ok="createNewTrainingGroup"
       id="createDialog"
       title="Bestätigung"
       >{{dialogTxt}}</b-modal
@@ -140,9 +143,7 @@
 </template>
 
 <script>
-import { axiosReq } from '../axios'
 import Multiselect from 'vue-multiselect'
-import qs from 'qs'
 
 export default {
   name: 'TrainingGroupDetails',
@@ -184,17 +185,17 @@ export default {
     },
 
     async getAllClubs() {
-      const res = await axiosReq('allClubs');
+      const res = await this.$ax.get('clubs');
       this.allClubs = res.data;
     },
 
     async getAllPlayers() {
-      const res = await axiosReq('allPlayers');
+      const res = await this.$ax.get('users?role=PLAYER');
       this.allPlayers = res.data.map(this.combinePlayerInfo);
     },
 
     async getAllTrainers() {
-      const res = await axiosReq('allTrainers');
+      const res = await this.$ax.get('users?role=TRAINER');
       this.allTrainers = res.data;
     },
 
@@ -206,34 +207,41 @@ export default {
     },
 
     async setupNewGroup() {
-      const res = await axiosReq('newGroup');
-      this.group = res.data;
-      this.prepopulate();
+      let group = {}
+      this.group = this.prepopulate(group);
     },
 
-    prepopulate() {
-      this.group.club = this.allClubs[0];
-      this.group.players = [this.allPlayers[0]];
-      this.group.trainer = this.user;
+    prepopulate(group) {
+      group.id = null;
+      group.trainer = this.user;
+      group.club = this.allClubs[0];
+      group.players = [this.allPlayers[0]];
+      group.numPlayedSessions = 0;
+      group.attendance = null;
+      return group;
     },
 
     async setupGroup() {
-      const res = await axiosReq('group?id=' + this.$route.params.groupId);
+      let clubId = this.$route.params.clubId;
+      let groupId = this.$route.params.groupId;
+      const res = await this.$ax.get('clubs/' + clubId + '/groups/' + groupId);
       this.group = res.data;
       this.group.players.map(this.combinePlayerInfo);
     },
 
+    async createNewTrainingGroup() {
+      await this.$ax.post('clubs/' + this.group.club.name + '/groups', this.group);
+      this.$router.push({name: 'traininggroups'});
+    },
+
     async updateTrainingGroupDetails() {
-      const config = {headers: {'Content-Type': 'application/json'}}
-      let params = JSON.stringify(this.group);
-      await axiosReq('updateTrainingGroupDetails', params, config);
+      let oldClubId = this.$route.params.clubId;
+      await this.$ax.put('clubs/' + oldClubId + '/groups/' + this.group.id, this.group);
       this.$router.push({name: 'traininggroups'});
     },
 
     async deleteGroup() {
-      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      let params = qs.stringify({'id': this.group.id});
-      await axiosReq('deleteGroup', params, config);
+      await this.$ax.delete('clubs/' + this.group.club.name + '/groups/' + this.group.id);
       this.$router.push({name: 'traininggroups'});
     },
 
@@ -246,6 +254,10 @@ export default {
 
     permChangeGroup() {
       return this.isAdmin || this.user.id === this.group.trainer.id;
+    },
+
+    isNewGroup() {
+      return this.group.id == null;
     },
 
     setDialogTxt(cmd) {

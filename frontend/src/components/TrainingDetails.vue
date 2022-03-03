@@ -125,7 +125,7 @@
       />
       <br />
 
-      <div v-if="training.id != -1">
+      <div v-if="!isNewTraining()">
         <p class="entry">Anwesenheit SpielerInnen:</p>
         <div style="margin-top: 10px" class="form-check">
           <div v-for="player in training.players" :key="player.id">
@@ -206,7 +206,7 @@
 
 
 
-      <div align="center" v-if="training.id == -1">
+      <div align="center" v-if="isNewTraining()">
         <input
           class="changeBtn fourth"
           type="submit"
@@ -216,7 +216,7 @@
         />
       </div>
 
-      <div align="center" v-if="training.id != -1">
+      <div align="center" v-if="!isNewTraining()">
         <input
           v-if="!isFree()"
           class="changeBtn fourth"
@@ -254,7 +254,7 @@
 
     <b-modal
       centered
-      @ok="updateTrainingDetails"
+      @ok="createNewTraining"
       id="createDialog"
       title="Bestätigung"
       >{{dialogTxt}}</b-modal
@@ -297,10 +297,8 @@
 </template>
 
 <script>
-import { axiosReq } from '../axios'
 import Multiselect from 'vue-multiselect'
 import { required, requiredIf, minValue } from 'vuelidate/lib/validators'
-import qs from 'qs'
 
 export default {
   name: 'TrainingDetails',
@@ -367,36 +365,43 @@ export default {
     },
 
     async getAllClubs() {
-      const res = await axiosReq('allClubs');
+      const res = await this.$ax.get('clubs');
       this.allClubs = res.data;
     },
 
     async getAllGroups() {
-      const res = await axiosReq('allGroups');
+      const res = await this.$ax.get('batch/groups');
       this.allGroups = res.data;
       this.allGroups.map(this.combineGroupInfo);
     },
 
     async getAllTrainer() {
-      const res = await axiosReq('allTrainers');
+      const res = await this.$ax.get('users?role=TRAINER');
       this.allTrainers = res.data;
     },
 
     async setupNewTraining() {
-      const res = await axiosReq('newTraining');
-      this.training = res.data;
-      this.prepopulate();
+      let training = {};
+      this.training = this.prepopulate(training);
     },
 
-    prepopulate() {
-      this.training.startTime = "10:30";
-      this.training.durationMinutes = 60;
-      this.training.free = false;
-      const currDate = this.getCurrentDate();
-      this.training.date = currDate;
-      this.training.club = this.allClubs[0];
-      this.training.group = this.allGroups[0];
-      this.training.trainer = this.user;
+    prepopulate(training) {
+      training.id = null;
+      training.group = this.allGroups[0];
+      training.club = this.allClubs[0];
+      training.date = this.getCurrentDate();
+      training.lastDate = null;
+      training.timeslot = '';
+      training.court = 1;
+      training.startTime = "10:30";
+      training.durationMinutes = 60;
+      training.trainer = this.user;
+      training.players = [];
+      training.attendees = [];
+      training.bulletPoints = '';
+      training.comments = '';
+      training.free = false;
+      return training;
     },
 
     getCurrentDate() {
@@ -406,7 +411,9 @@ export default {
     },
 
     async setupTraining() {
-      const res = await axiosReq('training?id=' + this.$route.params.trainingId);
+      const trainerId = this.$route.params.trainerId;
+      const trainingId = this.$route.params.trainingId;
+      const res = await this.$ax.get('trainers/' + trainerId + '/trainings/' + trainingId);
       this.training = res.data;
       this.combineGroupInfo(this.training.group);
       this.setValidationFields();
@@ -424,16 +431,20 @@ export default {
       this.court = this.training.court;
     },
 
+    async createNewTraining() {
+      if(!this.validate())
+        return;
+      this.getValidationFields();
+      await this.$ax.post('trainers/' + this.training.trainer.id + '/trainings', this.training);
+      this.$router.push({name: 'timetable'});
+    },
+
     async updateTrainingDetails() {
       if(!this.validate())
         return;
-
       this.getValidationFields();
-
-      const config = {headers: {'Content-Type': 'application/json'}}
-      let params = JSON.stringify(this.training);
-      await axiosReq('updateTrainingDetails', params, config);
-
+      let oldTrainerId = this.$route.params.trainerId;
+      await this.$ax.put('trainers/' + oldTrainerId + '/trainings/' + this.training.id, this.training);
       this.$router.push({name: 'timetable'});
     },
 
@@ -455,23 +466,17 @@ export default {
     },
 
     async deleteTraining() {
-      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      let params = qs.stringify({'id': this.training.id});
-      await axiosReq('deleteTraining', params, config);
+      await this.$ax.delete('trainers/' + this.training.trainer.id + '/trainings/' + this.training.id);
       this.$router.push({name: 'timetable'});
     },
 
     async freeTraining() {
-      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      let params = qs.stringify({'id': this.training.id});
-      await axiosReq('freeTraining', params, config);
+      await this.$ax.post('trainers/' + this.user.id + '/trainings/' + this.training.id + '/actions/free');
       this.$router.push({name: 'timetable'});
     },
 
     async grabTraining() {
-      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      let params = qs.stringify({'id': this.training.id});
-      await axiosReq('grabTraining', params, config);
+      await this.$ax.post('batch/trainings/' + this.training.id + '/actions/grab');
       this.$router.push({name: 'vacationtable'});
     },
 
@@ -480,7 +485,7 @@ export default {
     },
 
     isNewTraining() {
-      return this.training.id == -1;
+      return this.training.id == null;
     },
 
     setDialogTxt(cmd) {

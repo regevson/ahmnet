@@ -2,10 +2,10 @@ package at.ahmacademy.ahmnet.services;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,17 +32,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Collection<User> getAllTrainer() {
-        return userRepository.findByRole(UserRole.TRAINER);
-    }
-
-    public Collection<User> getAllPlayer() {
-        return userRepository.findByRole(UserRole.PLAYER);
-    }
-
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public Set<User> loadUsersById(String[] users) {
-        return userRepository.getUsersById(users);
+    public Collection<User> getUsersByRole(UserRole role) {
+        return userRepository.findByRole(role);
     }
 
     /**
@@ -95,10 +87,15 @@ public class UserService {
         return user;
     }
 
-    public void changePassword(String password) {
-	User loggedInUser = this.getAuthenticatedUser();
-	loggedInUser.setPassword(password);
-	this.saveUser(loggedInUser);
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #userId")
+    public void changePassword(String userId, String password) {
+	User user = loadUser(userId);
+	user.setPassword(password);
+	this.saveUser(user);
+    }
+
+    public boolean isAuthUser(String someUserId) {
+	return getAuthenticatedUser().getId().equals(someUserId);
     }
 
     public boolean isAdmin() {
@@ -113,5 +110,4 @@ public class UserService {
 	return isAdmin() || isTrainer();
     }
     
-
 }

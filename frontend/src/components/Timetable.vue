@@ -88,7 +88,6 @@
 import DateBar from "./DateBar";
 import Table from "./Table";
 import Multiselect from 'vue-multiselect'
-import { axiosReq } from '../axios'
 
 export default {
   name: 'Timetable',
@@ -117,18 +116,16 @@ export default {
 
   methods: {
     createTraining() {
-      this.$router.push({name: 'trainingdetails', params: {trainingId: -1}});
+      this.$router.push({name: 'trainingdetails', params: {trainerId: this.user.id, trainingId: -1}});
     },
 
     async getAllTrainers() {
-      const response = await axiosReq('allTrainers');
+      const response = await this.$ax.get('users?role=TRAINER');
       this.allTrainers = response.data;
     },
 
     async getTrainings(weekNum) {
-      let response;
-      response = await axiosReq('trainingsByWeek?trainer='
-                            + this.selectedTrainer.id + '&weekNum=' + weekNum);
+      const response = await this.$ax.get('trainers/' + this.selectedTrainer.id + '/trainings?weekNum=' + weekNum + '&free=false');
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
     },
@@ -158,16 +155,12 @@ export default {
     },
 
     async deleteTrainings() {
-      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      let params = "trainingIds=" + this.checkedSlots.toString();
-      await axiosReq('deleteTrainings', params, config);
+      await this.$ax.delete('trainers/' + this.selectedTrainer.id + '/trainings/' + this.checkedSlots.toString());
       this.getTrainings(this.weekNum);
     },
 
     async freeTrainings() {
-      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      let params = "trainingIds=" + this.checkedSlots.toString();
-      await axiosReq('freeTrainings', params, config);
+      await this.$ax.post('trainers/' + this.selectedTrainer.id + '/trainings/' + this.checkedSlots.toString() + '/actions/free/notify');
       this.getTrainings(this.weekNum);
     },
 

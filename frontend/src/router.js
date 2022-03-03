@@ -21,8 +21,8 @@ export default new Router ({
         { path: '/timetable', name: 'timetable', component: Timetable },
         { path: '/vacationtable', name: 'vacationtable', component: Vacationtable },
         { path: '/traininggroups', name: 'traininggroups', component: TrainingGroups },
-        { path: '/traininggroupdetails/group:groupId', name: 'traininggroupdetails', components: {default: TrainingGroupDetails} },
-        { path: '/trainingdetails/training:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}},
+        { path: '/traininggroupdetails/:clubId/group_:groupId', name: 'traininggroupdetails', components: {default: TrainingGroupDetails} },
+        { path: '/trainingdetails/:trainerId/training_:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}},
         { path: '/password', name: 'password', components: {default: Password}},
       ]
     }

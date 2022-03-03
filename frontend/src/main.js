@@ -5,6 +5,7 @@ import bootstrap from 'bootstrap-vue'
 import vuelidate from 'vuelidate'
 import {store} from './store'
 import {funcs} from './funcs.js'
+import {ax} from './axios.js'
 import './axios'
 
 import 'bootstrap/dist/css/bootstrap.css'
@@ -18,12 +19,14 @@ Vue.use(bootstrap)
 Vue.use(vuelidate)
 
 Vue.prototype.$funcs = funcs
+Vue.prototype.$ax = ax
 
 
 
 new Vue({
   store,
   funcs,
+  ax,
   router,
   render: h => h(App),
 }).$mount('#app')

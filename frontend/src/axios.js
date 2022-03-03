@@ -23,3 +23,46 @@ export async function axiosReq(req, params, config) {
 
     return res;
 }
+
+
+export const ax = {
+
+  error(err) {
+    alert(err.response.data); 
+    router.replace({name: 'timetable'}); 
+    router.go(); 
+  },
+
+  async get(req) {
+    try {
+      return await axios.get('api/' + req);
+    } catch(err) {
+      this.error(err);
+    }
+  },
+
+  async delete(req) {
+    try {
+      return await axios.delete('api/' + req);
+    } catch(err) {
+      this.error(err);
+    }
+  },
+
+  async post(req, params) {
+    try {
+      return await axios.post('api/' + req, params);
+    } catch(err) {
+      this.error(err);
+    }
+  },
+
+  async put(req, params) {
+    try {
+      return await axios.put('api/' + req, params);
+    } catch(err) {
+      this.error(err);
+    }
+  },
+
+}

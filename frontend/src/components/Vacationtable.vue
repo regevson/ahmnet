@@ -65,7 +65,6 @@
 <script>
 import DateBar from "./DateBar";
 import Table from "./Table";
-import { axiosReq } from '../axios'
 
 export default {
   name: 'VacationTable',
@@ -89,16 +88,13 @@ export default {
 
   methods: {
     async getAvailableTrainings(weekNum) {
-      let response;
-      response = await axiosReq('availableTrainings?weekNum=' + weekNum);
+      const response = await this.$ax.get('batch/trainings/' + '?weekNum=' + weekNum);
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
     },
 
     async getAvailableTrainingsByTrainer(trainer, weekNum) {
-      let response;
-      response = await axiosReq('availableTrainingsByExcluding?trainerId=' + trainer.id 
-                                                + '&weekNum=' + weekNum);
+      const response = await this.$ax.get('batch/trainings/' + '?weekNum=' + weekNum + '&exclTrainerId=' + trainer.id);
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
     },
@@ -135,9 +131,7 @@ export default {
     },
 
     async grabTrainings() {
-      const config = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-      let params = "trainingIds=" + this.checkedSlots.toString();
-      await axiosReq('grabTrainings', params, config);
+      await this.$ax.post('batch/trainings/' + this.checkedSlots.toString() + '/actions/grab/notify');
       this.rerenderTrainings(this.weekNum);
     },
 

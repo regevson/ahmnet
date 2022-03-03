@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,80 +29,82 @@ import at.ahmacademy.ahmnet.services.TrainingGroupService;
 public class TrainingGroupController {
 
     @Autowired
-    TrainingGroupService trainingGroupService;
+    TrainingGroupService groupService;
     @Autowired
-    TrainingGroupMapper trainingGroupMapper;
+    TrainingGroupMapper mapper;
 
-    @GetMapping("/newGroup")
-    public ResponseEntity<?> getNewGroup() {
-	TrainingGroupDto dto = new TrainingGroupDto();
-	dto.setId(-1L);
-        return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(dto);
-    }
 
-    @GetMapping("/allClubs")
+    @GetMapping("/clubs")
     public ResponseEntity<?> getAllClubs() {
-	Collection<Club> clubs = this.trainingGroupService.loadAllClubs();
+	Collection<Club> clubs = groupService.loadAllClubs();
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .body(clubs);
     }
 
-    @GetMapping("/allClubsWithGroupNum")
-    public ResponseEntity<?> getAllClubsWithGroupNum() {
-	Collection<Club> clubs = this.trainingGroupService.loadAllClubs();
-	Map<String, Integer> club_groupNum = this.trainingGroupService.getNumOfGroups(clubs);
+    @GetMapping("/clubs/actions/count-groups")
+    public ResponseEntity<?> getAllClubsWithGroupCount() {
+	Collection<Club> clubs = groupService.loadAllClubs();
+	Map<String, Integer> club_groupNum = groupService.getNumOfGroups(clubs);
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .body(club_groupNum);
     }
 
-    @GetMapping("/allGroups")
+    @GetMapping("/batch/groups")
     public ResponseEntity<?> getAllGroups() {
-	Collection<TrainingGroupSnippetDto> dtos = this.trainingGroupMapper.mapToTrainingGroupSnippetDto(trainingGroupService.loadAllGroups());
+	Collection<TrainingGroupSnippetDto> dtos = 
+				mapper.mapToTrainingGroupSnippetDto(groupService.loadAllGroups());
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .body(dtos);
     }
 
-    @PostMapping("/deleteGroup")
-    public ResponseEntity<?> deleteGroup(Long id) {
-	this.trainingGroupService.deleteGroup(this.trainingGroupService.loadTrainingGroupById(id));
+    @DeleteMapping("/clubs/{clubId}/groups/{groupId}")
+    public ResponseEntity<?> deleteGroup(@PathVariable String clubId, @PathVariable Long groupId) {
+	groupService.deleteGroup(groupService.loadTrainingGroupById(clubId, groupId));
         return ResponseEntity
                     .status(HttpStatus.OK)
                     .build();
     }
 
-    @GetMapping("/groupsByClub")
-    public ResponseEntity<?> getGroupsByClub(String clubName) {
-        Collection<TrainingGroupSnippetDto> dtos = this.trainingGroupMapper.mapToTrainingGroupSnippetDto(trainingGroupService.loadTrainingGroupsByClub(clubName));
+    @GetMapping("/clubs/{clubId}/groups")
+    public ResponseEntity<?> getGroupsByClub(@PathVariable String clubId) {
+        Collection<TrainingGroupSnippetDto> dtos = 
+        	mapper.mapToTrainingGroupSnippetDto(groupService.loadTrainingGroupsByClub(clubId));
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .body(dtos);
     }
 
-    @GetMapping("/group")
-    public ResponseEntity<?> getGroupById(Long id) {
-	TrainingGroup group = trainingGroupService.loadTrainingGroupById(id);
-	int numPlayedTr = this.trainingGroupService.calcNumPlayedSessions(group);
-	Map<String, Integer> attendance = this.trainingGroupService.calcAttendance(group);
-	TrainingGroupDto dto = this.trainingGroupMapper.mapToTrainingGroupDto(group, numPlayedTr, attendance);
+    @GetMapping("/clubs/{clubId}/groups/{groupId}")
+    public ResponseEntity<?> getGroupById(@PathVariable String clubId, @PathVariable Long groupId) {
+	TrainingGroup group = groupService.loadTrainingGroupById(clubId, groupId);
+	int numPlayedTr = groupService.calcNumPlayedSessions(group);
+	Map<String, Integer> attendance = groupService.calcAttendance(group);
+	TrainingGroupDto dto = mapper.mapToTrainingGroupDto(group, numPlayedTr, attendance);
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .body(dto);
     }
 
-    @PostMapping("/updateTrainingGroupDetails")
-    public ResponseEntity<?> updateTrainingGroupDetails(@RequestBody TrainingGroupDto groupDto) {
-        TrainingGroup group = null;
-        if(groupDto.getId() == -1) // group is brand-new
-            group = new TrainingGroup();
-        else
-            group = this.trainingGroupService.loadTrainingGroupById(groupDto.getId());
-        this.trainingGroupMapper.mapFromTrainingGroupDto(groupDto, group);
-        this.trainingGroupService.saveGroup(group);
+    @PostMapping("/clubs/{id}/groups")
+    public ResponseEntity<?> createNewGroup(@PathVariable String id, @RequestBody TrainingGroupDto groupDto) {
+        TrainingGroup group = new TrainingGroup();
+        mapper.mapFromTrainingGroupDto(groupDto, group);
+        groupService.saveGroup(group);
+        return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .build();
+    }
+
+    @PutMapping("/clubs/{clubId}/groups/{groupId}")
+    public ResponseEntity<?> updateTrainingGroupDetails(@PathVariable String clubId,
+	    						@PathVariable Long groupId,
+	    						@RequestBody TrainingGroupDto groupDto) {
+        TrainingGroup group = groupService.loadTrainingGroupById(clubId, groupDto.getId());
+        mapper.mapFromTrainingGroupDto(groupDto, group);
+        groupService.saveGroup(group);
         return ResponseEntity
                     .status(HttpStatus.OK)
                     .build();

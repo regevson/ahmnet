@@ -13,7 +13,7 @@
 
       <div align="center">
 
-        <router-link :to="{name: 'traininggroupdetails', params: {groupId: training.groupId}}">
+        <router-link :to="{name: 'traininggroupdetails', params: {clubId: training.groupClubId, groupId: training.groupId}}">
           <span style="margin-left: 18px" class="groupLink">Gruppe {{training.groupId}}</span>
         </router-link>
         <input
@@ -25,7 +25,7 @@
 
       </div>
 
-      <router-link :to="{name: 'trainingdetails', params: {trainingId: training.id}}">
+      <router-link :to="{name: 'trainingdetails', params: {trainerId: training.trainerId, trainingId: training.id}}">
         <div id="inner" class="trainingPreviewInner">
           <span>{{training.club.name}}</span>
           <br/>

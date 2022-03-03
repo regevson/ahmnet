@@ -2,7 +2,7 @@
   <div>
     <div v-for="(group, idx) in groups" :key="idx">
       <router-link
-        :to="{name: 'traininggroupdetails', params: {groupId: group.id}}"
+        :to="{name: 'traininggroupdetails', params: {clubId: clubId, groupId: group.id}}"
         class="link"
       >
         <div id="groupSnippet">
@@ -30,12 +30,11 @@
 </template>
 
 <script>
-import { axiosReq } from '../axios'
 
 export default {
   name: 'TrainingGroupSnippet',
   props: {
-    club: null,
+    clubId: null,
   },
   data() {
     return {
@@ -44,7 +43,7 @@ export default {
   },
 
   async created() {
-    const response = await axiosReq('groupsByClub?clubName=' + this.club);
+    const response = await this.$ax.get('clubs/' + this.clubId + '/groups');
     this.groups = response.data;
   },
 

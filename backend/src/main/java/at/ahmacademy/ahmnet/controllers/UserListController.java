@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +16,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +29,7 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import at.ahmacademy.ahmnet.dtos.UserDto;
 import at.ahmacademy.ahmnet.dtos.UserMapper;
@@ -42,40 +46,28 @@ public class UserListController {
     private UserService userService;
 
     @GetMapping("/users")
-    public ResponseEntity<?> getUsers() {
-        Collection<UserDto> dtos = UserMapper.mapToUserDto(userService.getAllUsers());
+    public ResponseEntity<?> getUsers(Optional<UserRole> role) {
+        Collection<UserDto> dtos = null;
+        if(role.isEmpty())
+            dtos = UserMapper.mapToUserDto(userService.getAllUsers());
+        else
+            dtos = UserMapper.mapToUserDto(userService.getUsersByRole(role.get()));
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .body(dtos);
     }
 
-    @GetMapping("/allTrainers")
-    public ResponseEntity<?> getAllTrainers() {
-        Collection<UserDto> dtos = UserMapper.mapToUserDto(userService.getAllTrainer());
-	return ResponseEntity
-	            .status(HttpStatus.OK)
-	            .body(dtos);
-    }
-
-    @GetMapping("/allPlayers")
-    public ResponseEntity<?> getAllPlayers() {
-        Collection<UserDto> dtos = UserMapper.mapToUserDto(userService.getAllPlayer());
-	return ResponseEntity
-	            .status(HttpStatus.OK)
-	            .body(dtos);
-    }
-
-    @GetMapping("/user")
-    public ResponseEntity<?> getUser(String username) {
-        UserDto dto = UserMapper.mapToUserDto(userService.loadUser(username));
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<?> getUser(@PathVariable String userId) {
+        UserDto dto = UserMapper.mapToUserDto(userService.loadUser(userId));
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .body(dto);
     }
 
-    @PostMapping("/changePassword")
-    public ResponseEntity<?> changePassword(String password) {
-        this.userService.changePassword(password);
+    @PostMapping("/users/{userId}/actions/change-password")
+    public ResponseEntity<?> changePassword(@PathVariable String userId, @RequestBody ObjectNode password) {
+        this.userService.changePassword(userId, password.get("password").asText());
 	return ResponseEntity
 	            .status(HttpStatus.OK)
 	            .build();

@@ -30,6 +30,7 @@ public class TrainingMapper {
 	dto.setId(tr.getId());
 	dto.setGroupId(tr.getTrainingGroup().getId());
 	dto.setClub(tr.getClub());
+	dto.setGroupClubId(tr.getTrainingGroup().getClub().getName());
 	dto.setDate(tr.getDateTime().toLocalDate().toString());
 	LocalTime startTime = tr.getDateTime().toLocalTime();
 	dto.setTimeslot(startTime.toString() + " - " + startTime.plusMinutes(tr.getDurationMinutes()).toString());
@@ -41,11 +42,17 @@ public class TrainingMapper {
 	dto.setTrainerId(tr.getTrainer().getId());
 	return dto;
     }
-    public List<TrainingSnippetDto> mapToTrainingSnippetDto(List<Training> trainings) {
+    public List<TrainingSnippetDto> mapToTrainingSnippetDto(Iterable<Training> trainings) {
 	List<TrainingSnippetDto> dtos = new ArrayList<>();
 	for(Training t : trainings)
 	    dtos.add(mapToTrainingSnippetDto(t));
 	return dtos;
+    }
+    public List<List<TrainingSnippetDto>> mapToTrainingSnippetDto(List<List<Training>> trainingsByDay) {
+	List<List<TrainingSnippetDto>> dtoList = new ArrayList<>();
+	for(List<Training> dayList : trainingsByDay)
+            dtoList.add(mapToTrainingSnippetDto(dayList));
+        return dtoList;
     }
 
     public TrainingDto mapToTrainingDto(Training tr) {
@@ -69,8 +76,9 @@ public class TrainingMapper {
 	return dto;
     }
     
-    public void mapFromTrainingDetailsDto(TrainingDto dto, Training tr) {
-        tr.setTrainingGroup(trainingGroupService.loadTrainingGroupById(dto.getGroup().getId()));
+    public void mapFromTrainingDto(TrainingDto dto, Training tr) {
+        tr.setTrainingGroup(trainingGroupService.loadTrainingGroupById(dto.getGroup().getClub().getName(), 
+        							       dto.getGroup().getId()));
         tr.setTrainer(userService.loadUser(dto.getTrainer().getId()));
         tr.setClub(dto.getClub());
 	tr.setCourt(dto.getCourt());

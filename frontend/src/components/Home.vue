@@ -13,7 +13,6 @@
 
 <script>
 import Nav from "./Nav"
-import axios from 'axios'
 
 export default {
   name: 'Home',
@@ -27,7 +26,7 @@ export default {
 
   async created() {
     const username = sessionStorage.getItem('username');
-    const response = await axios.get('api/user?username=' + username);
+    const response = await this.$ax.get('users/' + username);
 
     this.user = response.data;
     sessionStorage.setItem('user', JSON.stringify(this.user));
