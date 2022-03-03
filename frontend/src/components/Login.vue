@@ -17,6 +17,7 @@
               ></span>
             </div>
             <b-form-input
+              v-on:click="resetErrorLabel"
               type="text"
               v-model="username"
               placeholder="Username"
@@ -31,6 +32,7 @@
               ></span>
             </div>
             <b-form-input
+              v-on:click="resetErrorLabel"
               type="password"
               v-model="password"
               placeholder="Password"
@@ -38,12 +40,12 @@
           </div>
 
 
-      <div style="color: red; font-size: 15px; text-align: left;" class="errorText" v-if="wrongCredentials">Login fehlgeschlagen!</div>
+      <div style="color: red; font-size: 15px; text-align: left; position: absolute;" class="errorText" v-if="wrongCredentials">Login fehlgeschlagen!</div>
 
           <div align="center">
             <input type="submit" class="changeBtn" value="Log In" />
           </div>
-      <div style="color: white; font-size: 15px; text-align: left;" >Passwort vergessen?<br>Wenden Sie sich bitte an 069910983630.</div>
+      <div style="color: white; font-size: 15px; text-align: left;" >Passwort vergessen?<br>- wenden Sie sich bitte an 069910983630.</div>
         </form>
       </div>
     </div>
@@ -87,7 +89,12 @@ export default {
       sessionStorage.setItem('accessToken', response.data.access_token);
       sessionStorage.setItem('username', this.username);
       this.$router.push('/timetable');
+    },
+
+    resetErrorLabel() {
+      this.wrongCredentials = false;  
     }
+
   }
 }
 </script>
