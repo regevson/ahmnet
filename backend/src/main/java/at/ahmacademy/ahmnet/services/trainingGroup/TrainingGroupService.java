@@ -20,6 +20,7 @@ import at.ahmacademy.ahmnet.model.TrainingGroup;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.repositories.ClubRepository;
 import at.ahmacademy.ahmnet.repositories.TrainingGroupRepository;
+import at.ahmacademy.ahmnet.services.user.UserAuthService;
 
 @Service
 @Scope("application")
@@ -49,7 +50,7 @@ public class TrainingGroupService {
     return this.trainingGroupRepository.findByClub_NameContaining(clubName);
   }
 
-  @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #group.trainer.getId")
+  @PreAuthorize("hasAuthority('ADMIN') || @userAuthService.isAuthUsr(#group.trainer.id)")
   public TrainingGroup saveGroup(TrainingGroup group) {
     return trainingGroupRepository.save(group);
   }
@@ -60,7 +61,7 @@ public class TrainingGroupService {
     return group;
   }
 
-  @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #group.trainer.getId")
+  @PreAuthorize("hasAuthority('ADMIN') || @userAuthService.isAuthUsr(#group.trainer.id)")
   public void deleteGroup(TrainingGroup group) {
     group.getPlayers().removeAll(group.getPlayers());
     trainingGroupRepository.delete(group);

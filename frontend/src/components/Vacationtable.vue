@@ -91,12 +91,14 @@ export default {
       const response = await this.$ax.get('batch/trainings/' + '?weekNum=' + weekNum);
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
+      this.checkedSlots = [];
     },
 
     async getAvailableTrainingsByTrainer(trainer, weekNum) {
       const response = await this.$ax.get('batch/trainings/' + '?weekNum=' + weekNum + '&exclTrainerId=' + trainer.id);
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
+      this.checkedSlots = [];
     },
 
     updateDateBarProps(timetable) {

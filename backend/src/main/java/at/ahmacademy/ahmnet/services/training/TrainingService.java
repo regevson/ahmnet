@@ -50,14 +50,14 @@ public class TrainingService {
   @Autowired
   private SmsService smsService;
   @Autowired
-  UserAuthService usrAuth;
+  private UserAuthService usrAuth;
   @Autowired
-  TrainingAuthService trgAuth;
+  private TrainingAuthService trgAuth;
   private boolean enableNotify = false;
 
 
   @PostAuthorize("hasAuthority('ADMIN') || "
-               + "@trainingAuthService.hasTrainer(returnObject, authentication.getName()) || "
+               + "@trainingAuthService.hasTrainer(returnObject, authentication.name) || "
                + "(@trainingAuthService.isFree(returnObject) && hasAuthority('TRAINER'))")
   public Training loadTrainingById(Long trainingId) {
     Training training = trainingRepo.findById(trainingId).orElse(null);
@@ -69,13 +69,13 @@ public class TrainingService {
   }
 
   @PreAuthorize("hasAuthority('ADMIN') || "
-              + "@trainingAuthService.hasTrainer(#training, authentication.getName())")
+              + "@trainingAuthService.hasTrainer(#training, authentication.name)")
   public void updateTraining(Training training) {
     saveTraining(training);
   }
 
   @PreAuthorize("hasAuthority('ADMIN') || "
-              + "@trainingAuthService.hasTrainer(#training, authentication.getName())")
+              + "@trainingAuthService.hasTrainer(#training, authentication.name)")
   public void deleteTraining(Training training) {
     training.getAttendees().removeAll(training.getAttendees());
     training.getTrainingGroup().getTrainings().remove(training);

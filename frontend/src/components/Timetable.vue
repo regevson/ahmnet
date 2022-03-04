@@ -128,6 +128,7 @@ export default {
       const response = await this.$ax.get('trainers/' + this.selectedTrainer.id + '/trainings?weekNum=' + weekNum + '&free=false');
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
+      this.checkedSlots = [];
     },
 
     updateDateBarProps(timetable) {

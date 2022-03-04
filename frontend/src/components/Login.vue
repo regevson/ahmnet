@@ -17,7 +17,7 @@
               ></span>
             </div>
             <b-form-input
-              v-on:click="resetErrorLabel"
+              @keyup="resetErrorLabel"
               type="text"
               v-model="username"
               placeholder="Username"
@@ -32,7 +32,7 @@
               ></span>
             </div>
             <b-form-input
-              v-on:click="resetErrorLabel"
+              @keyup="resetErrorLabel"
               type="password"
               v-model="password"
               placeholder="Password"
@@ -91,8 +91,9 @@ export default {
       this.$router.push('/timetable');
     },
 
-    resetErrorLabel() {
-      this.wrongCredentials = false;  
+    resetErrorLabel(keyup) {
+      if(keyup.key !== 'Enter') // don't hide error-label when 'enter' is pressed
+        this.wrongCredentials = false;  
     }
 
   }
