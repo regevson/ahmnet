@@ -92,10 +92,6 @@ public class UserService {
     this.saveUser(user);
   }
 
-  public boolean isAuthUser(String someUserId) {
-    return getAuthUser().getId().equals(someUserId);
-  }
-
   public boolean isAdmin() {
     return getAuthUser().getRoles().contains(UserRole.ADMIN);
   }

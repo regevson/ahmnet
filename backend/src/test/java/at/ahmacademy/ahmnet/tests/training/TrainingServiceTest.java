@@ -56,6 +56,7 @@ public class TrainingServiceTest {
     }
     */
     
+    /*
     @Test
     public void testGroupByDay() {
 	Training t1 = new Training();
@@ -73,6 +74,7 @@ public class TrainingServiceTest {
         Assertions.assertTrue(groupedList.get(time2.getDayOfWeek().getValue()-1).contains(t2), "Second training was wrongly grouped");
         Assertions.assertTrue(groupedList.get(time3.getDayOfWeek().getValue()-1).contains(t3), "Third training was wrongly grouped");
     }
+    */
 
     @Test
     public void testGetDatesInWeek() {
