@@ -466,17 +466,22 @@ export default {
     },
 
     async deleteTraining() {
-      await this.$ax.delete('trainers/' + this.training.trainer.id + '/trainings/' + this.training.id);
+      let pathTrainerId = this.$route.params.trainerId;
+      let pathTrainingId = this.$route.params.trainingId;
+      await this.$ax.delete('trainers/' + pathTrainerId + '/trainings/' + pathTrainingId);
       this.$router.push({name: 'timetable'});
     },
 
     async freeTraining() {
-      await this.$ax.post('trainers/' + this.user.id + '/trainings/' + this.training.id + '/actions/free');
+      let pathTrainerId = this.$route.params.trainerId;
+      let pathTrainingId = this.$route.params.trainingId;
+      await this.$ax.post('trainers/' + pathTrainerId + '/trainings/' + pathTrainingId + '/actions/free');
       this.$router.push({name: 'timetable'});
     },
 
     async grabTraining() {
-      await this.$ax.post('batch/trainings/' + this.training.id + '/actions/grab');
+      let pathTrainingId = this.$route.params.trainingId;
+      await this.$ax.post('batch/trainings/' + pathTrainingId + '/actions/grab');
       this.$router.push({name: 'vacationtable'});
     },
 

@@ -1,8 +1,6 @@
 package at.ahmacademy.ahmnet.services.training;
 
-import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.exclId;
-import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasStatus;
-import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasTrainer;
+import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.*;
 import static at.ahmacademy.ahmnet.services.training.TrainingAuthService.*;
 
 import java.time.LocalDate;
@@ -60,8 +58,7 @@ public class TrainingService {
                + "@trainingAuthService.hasTrainer(returnObject, authentication.name) || "
                + "(@trainingAuthService.isFree(returnObject) && hasAuthority('TRAINER'))")
   public Training loadTrainingById(Long trainingId) {
-    Training training = trainingRepo.findById(trainingId).orElse(null);
-    return training;
+    return trainingRepo.findById(trainingId).orElse(null);
   }
 
   private Training saveTraining(Training training) {
@@ -103,17 +100,17 @@ public class TrainingService {
                                                            .collect(Collectors.toList());
   }
 
-  @PreAuthorize("@trainingAuthService.hasTrainer(#training, #trainerId) && "
-              + "(hasAuthority('ADMIN') || @userAuthService.isAuthUsr(#trainerId))")
-  public void saveNewTraining(String trainerId, Training training) {
+  @PreAuthorize("hasAuthority('ADMIN') || "
+              + "(hasAuthority('TRAINER') && @userAuthService.isAuthUsr(#training.trainer.id))")
+  public List<Training> saveNewTraining(Training training) {
     if(training.getLastDate() == null)
-      saveTraining(training);
+      return List.of(saveTraining(training));
     else
-      saveRecurringTraining(trainerId, training);
+      return saveRecurringTraining(training);
   }
 
   @Transactional
-  private List<Training> saveRecurringTraining(String trainerId, Training training) {
+  private List<Training> saveRecurringTraining(Training training) {
     LocalDate startDate = training.getDateTime().toLocalDate();
     LocalTime startTime = training.getDateTime().toLocalTime();
     LocalDate lastDate = training.getLastDate();
@@ -132,8 +129,8 @@ public class TrainingService {
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
   public List<List<Training>> loadFreeTrainings(Integer weekNum, Optional<String> exclId) {
-    Specification<Training> spec = Specification.where(TrainingSpecification.hasWeekNum(weekNum))
-                                            .and(hasStatus(true))
+    Specification<Training> spec = Specification.where(hasWeekNum(weekNum))
+                                            .and(hasFreeStatus(true))
                                             .and(exclId.isPresent() ? exclId(exclId.get()) : null);
     List<Training> trainings = trainingRepo.findAll(spec);
     return groupByDay(trainings);
@@ -143,26 +140,11 @@ public class TrainingService {
               + "(hasAuthority('TRAINER') && @userAuthService.isAuthUsr(#trainerId))")
   public List<List<Training>> loadTrainingsByTrainer(String trainerId, Integer weekNum,
                                                                        Optional<Boolean> isFree) {
-    Specification<Training> spec = Specification.where(TrainingSpecification.hasWeekNum(weekNum))
+    Specification<Training> spec = Specification.where(hasWeekNum(weekNum))
                                           .and(hasTrainer(trainerId))
-                                          .and(isFree.isPresent() ? hasStatus(isFree.get()) : null);
+                                          .and(isFree.isPresent() ? hasFreeStatus(isFree.get()) : null);
     List<Training> trainings = trainingRepo.findAll(spec);
     return groupByDay(trainings);
-  }
-
-  private void freeTraining(Training training) {
-    training.setIsFree(true);
-    training.setTrainer(training.getPrevTrainer());
-    saveTraining(training);
-  }
-
-  private void grabTraining(Training training) {
-    training.setIsFree(false);
-    User user = userService.getAuthUser();
-    User prevTrainer = training.getTrainer();
-    training.setTrainer(user);
-    training.setPrevTrainer(prevTrainer);
-    saveTraining(training);
   }
 
   @Transactional
@@ -174,6 +156,12 @@ public class TrainingService {
       freeTraining(t);
     if(notify && this.enableNotify)
       informOfFreeing(trainings);
+  }
+
+  private void freeTraining(Training training) {
+    training.setIsFree(true);
+    training.setTrainer(training.getPrevTrainer());
+    saveTraining(training);
   }
 
   @Transactional
@@ -194,6 +182,15 @@ public class TrainingService {
     }
     if(notify && this.enableNotify)
       informOfGrabbing(prevTrainer_trainings);
+  }
+
+  private void grabTraining(Training training) {
+    training.setIsFree(false);
+    User user = userService.getAuthUser();
+    User prevTrainer = training.getTrainer();
+    training.setTrainer(user);
+    training.setPrevTrainer(prevTrainer);
+    saveTraining(training);
   }
 
   private void informOfFreeing(List<Training> trainings) {

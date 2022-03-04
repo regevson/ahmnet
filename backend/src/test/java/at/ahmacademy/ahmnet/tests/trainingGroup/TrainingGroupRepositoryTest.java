@@ -16,30 +16,29 @@ import at.ahmacademy.ahmnet.repositories.TrainingGroupRepository;
 @WebAppConfiguration
 public class TrainingGroupRepositoryTest {
 
-    @Autowired
-    TrainingGroupRepository trainingGroupRepo;
-    
+  @Autowired
+  TrainingGroupRepository trainingGroupRepo;
 
-    @Test
-    public void testFindByTrainer_Username() {
-	Set<TrainingGroup> groups = this.trainingGroupRepo.findByTrainer_Username("johndoe");
-        Assertions.assertTrue(groups.size() > 0, "Too few groups");
-        for(TrainingGroup g : groups)
-            Assertions.assertEquals("johndoe", g.getTrainer().getId(), "Wrong trainer in group");
-    }
-    
-    @Test
-    public void testFindByClub_NameContaining() {
-	Set<TrainingGroup> groups = this.trainingGroupRepo.findByClub_NameContaining("TC Wiesing");
-        Assertions.assertTrue(groups.size() > 0, "Too few groups");
-        for(TrainingGroup g : groups)
-            Assertions.assertEquals("TC Wiesing", g.getClub().getName(), "Wrong club in group");
-    }
-    
-    @Test
-    public void testCountPlayedTrainingsByGroupId() {
-	int numGroups = trainingGroupRepo.countPlayedTrainingsByGroupId(0L, LocalDateTime.now());
-        Assertions.assertEquals(2, numGroups, "Wrong number of played trainings of group");
-    }
+  @Test
+  public void testFindByTrainer_Username() {
+    Set<TrainingGroup> groups = this.trainingGroupRepo.findByTrainer_Username("johndoe");
+    Assertions.assertTrue(groups.size() > 0, "Too few groups");
+    for(TrainingGroup g: groups)
+      Assertions.assertEquals("johndoe", g.getTrainer().getId(), "Wrong trainer in group");
+  }
+
+  @Test
+  public void testFindByClub_NameContaining() {
+    Set<TrainingGroup> groups = this.trainingGroupRepo.findByClub_NameContaining("TC Wiesing");
+    Assertions.assertTrue(groups.size() > 0, "Too few groups");
+    for(TrainingGroup g: groups)
+      Assertions.assertEquals("TC Wiesing", g.getClub().getName(), "Wrong club in group");
+  }
+
+  @Test
+  public void testCountPlayedTrainingsByGroupId() {
+    int numGroups = trainingGroupRepo.countPlayedTrainingsByGroupId(0L, LocalDateTime.now());
+    Assertions.assertEquals(2, numGroups, "Wrong number of played trainings of group");
+  }
 
 }

@@ -10,7 +10,7 @@ public class TrainingSpecification {
     return (root, query, builder) -> builder.like(root.get("trainer").get("username"), trainerId);
   }
 
-  public static Specification<Training> hasStatus(Boolean isFree) {
+  public static Specification<Training> hasFreeStatus(Boolean isFree) {
     return (root, query, builder) -> builder.equal(root.get("isFree"), isFree);
   }
 

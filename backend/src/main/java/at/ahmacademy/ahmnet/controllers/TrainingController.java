@@ -105,7 +105,7 @@ public class TrainingController {
     // TODO: userPathValidator.validatePath(id);
     Training training = new Training();
     mapper.mapFromTrainingDto(trainingDto, training);
-    trService.saveNewTraining(id, training);
+    trService.saveNewTraining(training);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
