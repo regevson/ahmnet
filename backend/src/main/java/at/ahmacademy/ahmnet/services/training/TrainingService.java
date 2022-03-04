@@ -1,5 +1,9 @@
 package at.ahmacademy.ahmnet.services.training;
 
+import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.exclId;
+import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasStatus;
+import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasTrainer;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Year;
@@ -20,6 +24,7 @@ import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,51 +47,33 @@ public class TrainingService {
   private TrainingRepository trainingRepo;
   @Autowired
   private SmsService smsService;
-  @Autowired
-  private TrainingAuthService auth;
   private boolean enableNotify = false;
 
 
+  @PostAuthorize("hasAuthority('ADMIN') || "
+               + "returnObject.getTrainer().getId() == authentication.getName() || "
+               + "(returnObject.getIsFree() && hasAuthority('TRAINER'))")
   public Training loadTrainingById(Long trainingId) {
     Training training = trainingRepo.findById(trainingId).orElse(null);
-    auth.whenUserIsTheTrainer(userService.getAuthenticatedUser(), training);
     return training;
-  }
-
-  private Training loadTrainingById_noAuth(Long trainingId) {
-    return trainingRepo.findById(trainingId).orElse(null);
-  }
-
-  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-  public List<Training> batchLoadTrainingsById(Long[] trainingIds) {
-    List<Training> trainings = new ArrayList<>();
-    for(Long id: trainingIds)
-      trainings.add(loadTrainingById_noAuth(id));
-    return trainings;
   }
 
   private Training saveTraining(Training training) {
     return trainingRepo.save(training);
   }
 
+  @PreAuthorize("hasAuthority('ADMIN') || "
+              + "#training.getTrainer().getId() == authentication.getName()")
   public void updateTraining(Training training) {
-    auth.whenUserIsTheTrainer(userService.getAuthenticatedUser(), training);
-
     saveTraining(training);
   }
 
-  private void deleteTraining(Training training) {
+  @PreAuthorize("hasAuthority('ADMIN') || "
+              + "#training.getTrainer().getId() == authentication.getName()")
+  public void deleteTraining(Training training) {
     training.getAttendees().removeAll(training.getAttendees());
     training.getTrainingGroup().getTrainings().remove(training);
     trainingRepo.delete(training);
-  }
-
-  @Transactional
-  public void deleteTrainings(List<Training> trainings) {
-    auth.whenUserIsTheTrainer(userService.getAuthenticatedUser(), trainings);
-
-    for(Training training: trainings)
-      deleteTraining(training);
   }
 
   private List<List<Training>> groupByDay(List<Training> trainings) {
@@ -110,24 +97,9 @@ public class TrainingService {
                                                            .collect(Collectors.toList());
   }
 
-  private void freeTraining(Training training) {
-    training.setIsFree(true);
-    training.setTrainer(training.getPrevTrainer());
-    saveTraining(training);
-  }
-
-  private void grabTraining(Training training) {
-    training.setIsFree(false);
-    User user = userService.getAuthenticatedUser();
-    User prevTrainer = training.getTrainer();
-    training.setTrainer(user);
-    training.setPrevTrainer(prevTrainer);
-    saveTraining(training);
-  }
-
-  @PreAuthorize("#trainerId eq #training.getTrainer.getId() &&(hasAuthority('ADMIN') or authentication.getName() eq #trainerId)")
+  @PreAuthorize("#trainerId == #training.getTrainer.getId() && "
+              + "(hasAuthority('ADMIN') || authentication.getName() == #trainerId)")
   public void saveNewTraining(String trainerId, Training training) {
-
     if(training.getLastDate() == null)
       saveTraining(training);
     else
@@ -155,39 +127,50 @@ public class TrainingService {
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
   public List<List<Training>> loadFreeTrainings(Integer weekNum, Optional<String> exclId) {
     Specification<Training> spec = Specification.where(TrainingSpecification.hasWeekNum(weekNum))
-      .and(TrainingSpecification.hasStatus(true))
-      .and(exclId.isPresent() ? TrainingSpecification.exclId(exclId.get()) : null);
-    List<Training> trainings = this.trainingRepo.findAll(spec);
+                                            .and(hasStatus(true))
+                                            .and(exclId.isPresent() ? exclId(exclId.get()) : null);
+    List<Training> trainings = trainingRepo.findAll(spec);
     return groupByDay(trainings);
   }
 
-  @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #trainerId")
-  public List<List<Training>> loadTrainingsByTrainer(String trainerId,
-    Integer weekNum,
-    Optional<Boolean> isFree) {
-
+  @PreAuthorize("hasAuthority('ADMIN') || "
+              + "(hasAuthority('TRAINER') && authentication.getName() == #trainerId)")
+  public List<List<Training>> loadTrainingsByTrainer(String trainerId, Integer weekNum,
+                                                                       Optional<Boolean> isFree) {
     Specification<Training> spec = Specification.where(TrainingSpecification.hasWeekNum(weekNum))
-      .and(TrainingSpecification.hasTrainer(trainerId))
-      .and(isFree.isPresent() ? TrainingSpecification.hasStatus(isFree.get()) : null);
-    List<Training> trainings = this.trainingRepo.findAll(spec);
+                                          .and(hasTrainer(trainerId))
+                                          .and(isFree.isPresent() ? hasStatus(isFree.get()) : null);
+    List<Training> trainings = trainingRepo.findAll(spec);
     return groupByDay(trainings);
   }
 
+  private void freeTraining(Training training) {
+    training.setIsFree(true);
+    training.setTrainer(training.getPrevTrainer());
+    saveTraining(training);
+  }
+
+  private void grabTraining(Training training) {
+    training.setIsFree(false);
+    User user = userService.getAuthUser();
+    User prevTrainer = training.getTrainer();
+    training.setTrainer(user);
+    training.setPrevTrainer(prevTrainer);
+    saveTraining(training);
+  }
+
+  @PreAuthorize("hasPermission(#trainings, 'free')")
   @Transactional
   public void freeTrainings(List<Training> trainings, boolean notify) {
-    auth.whenUserIsTheTrainer(userService.getAuthenticatedUser(), trainings);
-
     for(Training t: trainings)
       freeTraining(t);
     if(notify && this.enableNotify)
       informOfFreeing(trainings);
   }
 
-  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+  @PreAuthorize("hasPermission(#trainings, 'grab')")
   @Transactional
   public void grabTrainings(List<Training> trainings, boolean notify) {
-    auth.whenTrainingIsFree(trainings);
-
     Map<User, List<Training>> prevTrainer_trainings = new HashMap<>();
     for(Training training: trainings) {
       grabTraining(training);
@@ -219,7 +202,7 @@ public class TrainingService {
   }
 
   private String createFreeingMsg(List<Training> trainings) {
-    User trainer = userService.getAuthenticatedUser();
+    User trainer = userService.getAuthUser();
     String msg = trainer.getFirstName() + " " + trainer.getLastName() + " braucht Hilfe " +
       "bei folgenden Trainings:\n\n";
 
@@ -232,7 +215,7 @@ public class TrainingService {
   }
 
   private String createGrabbingMsg(List<Training> trainings) {
-    User currUser = userService.getAuthenticatedUser();
+    User currUser = userService.getAuthUser();
     String msg = currUser.getFirstName() + " " + currUser.getLastName() + " hat folgende Trainings " 
                  + "von dir übernommen:\n\n";
 

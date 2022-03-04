@@ -2,11 +2,14 @@ package at.ahmacademy.ahmnet.controllers;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +34,7 @@ import at.ahmacademy.ahmnet.services.user.UserService;
 public class TrainingController {
 
   @Autowired
-  TrainingService trainingService;
+  TrainingService trService;
   @Autowired
   UserService userService;
   @Autowired
@@ -44,16 +47,17 @@ public class TrainingController {
   public ResponseEntity<?> getTrainingById(@PathVariable String trainerId, 
                                            @PathVariable Long trainingId) {
     pathValidator.validatePath(trainerId, trainingId);
-    Training training = trainingService.loadTrainingById(trainingId);
+    Training training = trService.loadTrainingById(trainingId);
     TrainingDto dto = mapper.mapToTrainingDto(training);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
+  @Transactional
   @DeleteMapping("/trainers/{trainerId}/trainings/{trainingIds}")
   public ResponseEntity<?> deleteTrainings(@PathVariable String trainerId, 
                                            @PathVariable Long[] trainingIds) {
     List<Training> trainings = pathValidator.validatePath(trainerId, trainingIds);
-    trainingService.deleteTrainings(trainings);
+    trainings.stream().forEach(trService::deleteTraining);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
@@ -63,7 +67,7 @@ public class TrainingController {
                                          @PathVariable Long[] trainingIds,
                                          @PathVariable Optional<String> notify) {
     List<Training> trainings = pathValidator.validatePath(trainerId, trainingIds);
-    trainingService.freeTrainings(trainings, notify.orElse("").equals("notify"));
+    trService.freeTrainings(trainings, notify.orElse("").equals("notify"));
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
@@ -71,16 +75,16 @@ public class TrainingController {
                         "/batch/trainings/{ids}/actions/grab/{notify}"})
   public ResponseEntity<?> grabTrainings(@PathVariable Long[] ids, 
                                          @PathVariable Optional<String> notify) {
-    List<Training> trainings = trainingService.batchLoadTrainingsById(ids);
-    trainingService.grabTrainings(trainings, notify.orElse("").equals("notify"));
+    List<Training> trainings = pathValidator.validatePath(ids);
+    trService.grabTrainings(trainings, notify.orElse("").equals("notify"));
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @GetMapping(value = "/batch/trainings", params = {"weekNum"})
-  public ResponseEntity<?> getTrainingsBatch(Integer weekNum, Optional<String> exclTrainerId) {
-    List<List<Training>> trainingsByDay = trainingService.loadFreeTrainings(weekNum, exclTrainerId);
+  public ResponseEntity<?> getAllFreeTrainings(Integer weekNum, Optional<String> exclTrainerId) {
+    List<List<Training>> trainingsByDay = trService.loadFreeTrainings(weekNum, exclTrainerId);
     List<List<TrainingSnippetDto>> dtoList = mapper.mapToTrainingSnippetDto(trainingsByDay);
-    TimetableDto dto = mapper.mapToTimetableDto(trainingService.getDatesInWeek(weekNum), dtoList);
+    TimetableDto dto = mapper.mapToTimetableDto(trService.getDatesInWeek(weekNum), dtoList);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
@@ -88,18 +92,20 @@ public class TrainingController {
   public ResponseEntity<?> getTrainingsByTrainer(@PathVariable String id, 
                                                  Integer weekNum, 
                                                  Optional<Boolean> free) {
-    List<List<Training>> trainingsByDay = trainingService.loadTrainingsByTrainer(id, weekNum, free);
+    // TODO: userPathValidator.validatePath(id);
+    List<List<Training>> trainingsByDay = trService.loadTrainingsByTrainer(id, weekNum, free);
     List<List<TrainingSnippetDto>> dtoList = mapper.mapToTrainingSnippetDto(trainingsByDay);
-    TimetableDto dto = mapper.mapToTimetableDto(trainingService.getDatesInWeek(weekNum), dtoList);
+    TimetableDto dto = mapper.mapToTimetableDto(trService.getDatesInWeek(weekNum), dtoList);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
   @PostMapping("trainers/{id}/trainings")
   public ResponseEntity<?> createNewTraining(@PathVariable String id, 
                                              @RequestBody TrainingDto trainingDto) {
+    // TODO: userPathValidator.validatePath(id);
     Training training = new Training();
     mapper.mapFromTrainingDto(trainingDto, training);
-    trainingService.saveNewTraining(id, training);
+    trService.saveNewTraining(id, training);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
@@ -109,7 +115,7 @@ public class TrainingController {
                                                @RequestBody TrainingDto trainingDto) {
     Training training = pathValidator.validatePath(trainerId, trainingId);
     mapper.mapFromTrainingDto(trainingDto, training);
-    trainingService.updateTraining(training);
+    trService.updateTraining(training);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 

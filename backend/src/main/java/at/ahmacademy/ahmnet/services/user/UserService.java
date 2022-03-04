@@ -60,11 +60,11 @@ public class UserService {
   public User saveUser(User user) {
     if(user.isNew()) {
       user.setCreateDate(new Date());
-      user.setCreateUser(getAuthenticatedUser());
+      user.setCreateUser(getAuthUser());
     } 
     else {
       user.setUpdateDate(new Date());
-      user.setUpdateUser(getAuthenticatedUser());
+      user.setUpdateUser(getAuthUser());
     }
     return userRepository.save(user);
   }
@@ -79,7 +79,7 @@ public class UserService {
     userRepository.delete(user);
   }
 
-  public User getAuthenticatedUser() {
+  public User getAuthUser() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     User user = userRepository.findFirstByUsername(auth.getName());
     return user;
@@ -93,11 +93,11 @@ public class UserService {
   }
 
   public boolean isAuthUser(String someUserId) {
-    return getAuthenticatedUser().getId().equals(someUserId);
+    return getAuthUser().getId().equals(someUserId);
   }
 
   public boolean isAdmin() {
-    return getAuthenticatedUser().getRoles().contains(UserRole.ADMIN);
+    return getAuthUser().getRoles().contains(UserRole.ADMIN);
   }
 
   public boolean isAdmin(User user) {
@@ -105,7 +105,7 @@ public class UserService {
   }
 
   public boolean isTrainer() {
-    return getAuthenticatedUser().getRoles().contains(UserRole.TRAINER);
+    return getAuthUser().getRoles().contains(UserRole.TRAINER);
   }
 
   public boolean hasTrainerRights() {

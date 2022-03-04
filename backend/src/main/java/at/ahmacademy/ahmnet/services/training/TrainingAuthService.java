@@ -1,45 +1,72 @@
 package at.ahmacademy.ahmnet.services.training;
 
-import java.util.List;
+import static at.ahmacademy.ahmnet.model.UserRole.ADMIN;
+import static at.ahmacademy.ahmnet.model.UserRole.TRAINER;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import at.ahmacademy.ahmnet.model.Training;
-import at.ahmacademy.ahmnet.model.User;
-import at.ahmacademy.ahmnet.services.user.UserService;
+import at.ahmacademy.ahmnet.model.UserRole;
 
 @Service
 @Scope("application")
-public class TrainingAuthService {
+public class TrainingAuthService implements PermissionEvaluator {
 
-  @Autowired
-  UserService userService;
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean hasPermission(Authentication auth, Object obj, Object perm) {
+    if((auth == null) || (obj == null) || !(obj instanceof List) || !(perm instanceof String))
+      return false;
 
-
-  public void whenUserIsTheTrainer(User user, Training training) {
-    String userId = user.getId();
-    String trainerId = training.getTrainer().getId();
-    if(!userService.isAdmin(user) && !userId.equals(trainerId))
-      throw new IllegalArgumentException("Trainer in path is not trainer of this training!");
+    String userId = auth.getName();
+    List<Training> trainings = (List<Training>) obj;
+    Set<UserRole> roles = auth.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                                                        .map(UserRole::valueOf)
+                                                        .collect(Collectors.toSet());
+    Predicate<Training> pred = null;
+    if(perm.toString().equals("free"))
+      pred = isAdmin(roles).or(isTrainerOfTraining(userId));
+    else if(perm.toString().equals("grab"))
+      pred = isAdmin(roles).or( isTrainer(roles).and(isFree()) );
+    
+    return trainings.stream().allMatch(pred::test);
   }
 
-  public void whenUserIsTheTrainer(User user, List<Training> trainings) {
-    for(Training training: trainings)
-      whenUserIsTheTrainer(user, training);
+  public Predicate<Training> isTrainerOfTraining(String userId) {
+    return (training) -> userId.equals(training.getTrainer().getId());
   }
 
-  public void whenTrainingIsFree(Training training) {
-    User authUser = userService.getAuthenticatedUser();
-    boolean isFree = training.getIsFree();
-    if(!userService.isAdmin(authUser) && !isFree)
-      throw new IllegalArgumentException("Training is not free!");
+  public Predicate<Training> isFree() {
+    return (training) -> training.getIsFree();
   }
 
-  public void whenTrainingIsFree(List<Training> trainings) {
-    for(Training training: trainings)
-      whenTrainingIsFree(training);
+  public Predicate<Training> isAdmin(Set<UserRole> roles) {
+    return (training) -> roles.contains(ADMIN);
+  }
+
+  public Predicate<Training> isTrainer(Set<UserRole> roles) {
+    return (training) -> roles.contains(TRAINER);
+  }
+
+
+
+
+
+
+
+  @Override
+  public boolean hasPermission(Authentication auth, Serializable obj, String type, Object perm) {
+    return false;
   }
 
 }

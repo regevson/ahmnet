@@ -19,7 +19,7 @@ public class TrainingPathValidationService {
 
 
   public Training validatePath(String trainerId, Long trainingId) {
-    Training training = trainingRepo.findById(trainingId).orElseThrow();
+    Training training = validatePath(trainingId);
     if(!training.getTrainer().getId().equals(trainerId))
         throw new IllegalArgumentException("Training specified in request doesn't belong "
             + "to trainer specified in request!");
@@ -30,6 +30,18 @@ public class TrainingPathValidationService {
     List<Training> trainings = new ArrayList<>();
     for(Long id : trainingIds)
       trainings.add(validatePath(trainerId, id));
+    return trainings;
+  }
+
+  public Training validatePath(Long trainingId) {
+    return trainingRepo.findById(trainingId).orElseThrow(() 
+          -> new IllegalArgumentException("Training specified in request doesn't exist!"));
+  }
+
+  public List<Training> validatePath(Long[] trainingIds) {
+    List<Training> trainings = new ArrayList<>();
+    for(Long id : trainingIds)
+      trainings.add(validatePath(id));
     return trainings;
   }
 
