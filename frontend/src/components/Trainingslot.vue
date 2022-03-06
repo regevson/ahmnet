@@ -20,7 +20,7 @@
           :disabled="getSlotType(tr_idx) === 'pastslot' && !userIsAdmin"
           class="checkedSlotBox form-check-input"
           type="checkbox"
-          v-on:change="$emit('checkedSlot', training.id)"
+          v-on:change="$emit('checkedSlot', training)"
         />
 
       </div>

@@ -2,8 +2,6 @@ package at.ahmacademy.ahmnet.controllers;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -46,7 +44,7 @@ public class TrainingController {
   @GetMapping("/trainers/{trainerId}/trainings/{trainingId}")
   public ResponseEntity<?> getTrainingById(@PathVariable String trainerId, 
                                            @PathVariable Long trainingId) {
-    pathValidator.validatePath(trainerId, trainingId);
+    pathValidator.trainingBelongsToTrainer(trainerId, trainingId);
     Training training = trService.loadTrainingById(trainingId);
     TrainingDto dto = mapper.mapToTrainingDto(training);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
@@ -56,7 +54,7 @@ public class TrainingController {
   @DeleteMapping("/trainers/{trainerId}/trainings/{trainingIds}")
   public ResponseEntity<?> deleteTrainings(@PathVariable String trainerId, 
                                            @PathVariable Long[] trainingIds) {
-    List<Training> trainings = pathValidator.validatePath(trainerId, trainingIds);
+    List<Training> trainings = pathValidator.trainingBelongsToTrainer(trainerId, trainingIds);
     trainings.stream().forEach(trService::deleteTraining);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
@@ -66,16 +64,17 @@ public class TrainingController {
   public ResponseEntity<?> freeTrainings(@PathVariable String trainerId,
                                          @PathVariable Long[] trainingIds,
                                          @PathVariable Optional<String> notify) {
-    List<Training> trainings = pathValidator.validatePath(trainerId, trainingIds);
+    List<Training> trainings = pathValidator.trainingBelongsToTrainer(trainerId, trainingIds);
     trService.freeTrainings(trainings, notify.orElse("").equals("notify"));
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @PostMapping(value = {"/batch/trainings/{ids}/actions/grab",
-                        "/batch/trainings/{ids}/actions/grab/{notify}"})
-  public ResponseEntity<?> grabTrainings(@PathVariable Long[] ids, 
+  @PostMapping(value = {"/trainers/{trainerIds}/trainings/{trainingIds}/actions/grab",
+                        "/trainers/{trainerIds}/trainings/{trainingIds}/actions/grab/{notify}"})
+  public ResponseEntity<?> grabTrainings(@PathVariable String[] trainerIds,
+                                         @PathVariable Long[] trainingIds, 
                                          @PathVariable Optional<String> notify) {
-    List<Training> trainings = pathValidator.validatePath(ids);
+    List<Training> trainings = pathValidator.trainingBelongsToTrainer(trainerIds, trainingIds);
     trService.grabTrainings(trainings, notify.orElse("").equals("notify"));
     return ResponseEntity.status(HttpStatus.OK).build();
   }
@@ -113,7 +112,7 @@ public class TrainingController {
   public ResponseEntity<?> setTrainingsDetails(@PathVariable String trainerId,
                                                @PathVariable Long trainingId,
                                                @RequestBody TrainingDto trainingDto) {
-    Training training = pathValidator.validatePath(trainerId, trainingId);
+    Training training = pathValidator.trainingBelongsToTrainer(trainerId, trainingId);
     mapper.mapFromTrainingDto(trainingDto, training);
     trService.updateTraining(training);
     return ResponseEntity.status(HttpStatus.OK).build();

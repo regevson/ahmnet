@@ -156,12 +156,14 @@ export default {
     },
 
     async deleteTrainings() {
-      await this.$ax.delete('trainers/' + this.selectedTrainer.id + '/trainings/' + this.checkedSlots.toString());
+      let trainingIds = this.checkedSlots.map(t => t.id);
+      await this.$ax.delete('trainers/' + this.selectedTrainer.id + '/trainings/' + trainingIds.toString());
       this.getTrainings(this.weekNum);
     },
 
     async freeTrainings() {
-      await this.$ax.post('trainers/' + this.selectedTrainer.id + '/trainings/' + this.checkedSlots.toString() + '/actions/free/notify');
+      let trainingIds = this.checkedSlots.map(t => t.id);
+      await this.$ax.post('trainers/' + this.selectedTrainer.id + '/trainings/' + trainingIds.toString() + '/actions/free/notify');
       this.getTrainings(this.weekNum);
     },
 

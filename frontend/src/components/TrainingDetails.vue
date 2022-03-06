@@ -480,8 +480,9 @@ export default {
     },
 
     async grabTraining() {
+      let pathTrainerId = this.$route.params.trainerId;
       let pathTrainingId = this.$route.params.trainingId;
-      await this.$ax.post('batch/trainings/' + pathTrainingId + '/actions/grab');
+      await this.$ax.post('trainers/' + pathTrainerId + '/trainings/' + pathTrainingId + '/actions/grab');
       this.$router.push({name: 'vacationtable'});
     },
 

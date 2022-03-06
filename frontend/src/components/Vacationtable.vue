@@ -133,7 +133,9 @@ export default {
     },
 
     async grabTrainings() {
-      await this.$ax.post('batch/trainings/' + this.checkedSlots.toString() + '/actions/grab/notify');
+      let trainerIds = this.checkedSlots.map(t => t.trainerId);
+      let trainingIds = this.checkedSlots.map(t => t.id);
+      await this.$ax.post('trainers/' + trainerIds.toString() + '/trainings/' + trainingIds.toString() + '/actions/grab/notify');
       this.rerenderTrainings(this.weekNum);
     },
 
