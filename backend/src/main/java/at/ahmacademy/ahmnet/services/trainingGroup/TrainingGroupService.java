@@ -28,26 +28,14 @@ public class TrainingGroupService {
 
   @Autowired
   private TrainingGroupRepository trainingGroupRepository;
-  @Autowired
-  private ClubRepository clubRepository;
   /*
   @Autowired
   private TrainingGroupAuthService auth;
   */
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-  public List<Club> loadAllClubs() {
-    return clubRepository.findAll();
-  }
-
-  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
   public List<TrainingGroup> loadAllGroups() {
     return trainingGroupRepository.findAll();
-  }
-
-  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-  public Set<TrainingGroup> loadTrainingGroupsByClub(String clubName) {
-    return this.trainingGroupRepository.findByClub_NameContaining(clubName);
   }
 
   @PreAuthorize("hasAuthority('ADMIN') || @userAuthService.isAuthUsr(#group.trainer.id)")
@@ -59,6 +47,11 @@ public class TrainingGroupService {
   public TrainingGroup loadTrainingGroupById(long groupId) {
     TrainingGroup group = this.trainingGroupRepository.findById(groupId).orElse(null);
     return group;
+  }
+
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+  public Set<TrainingGroup> loadTrainingGroupsByClub(String clubName) {
+    return this.trainingGroupRepository.findByClub_NameContaining(clubName);
   }
 
   @PreAuthorize("hasAuthority('ADMIN') || @userAuthService.isAuthUsr(#group.trainer.id)")
@@ -84,12 +77,5 @@ public class TrainingGroupService {
     return this.trainingGroupRepository.countPlayedTrainingsByGroupId(trg.getId(), LocalDateTime.now());
   }
 
-  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-  public Map<String, Integer> getNumOfGroups(Collection<Club> clubs) {
-    Map<String, Integer> map = new HashMap<>();
-    for(Club club: clubs)
-      map.put(club.getName(), this.loadTrainingGroupsByClub(club.getName()).size());
-    return map;
-  }
 
 }

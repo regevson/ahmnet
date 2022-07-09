@@ -50,7 +50,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 #groupSnippet {
   float: left;
   background: #273a48;

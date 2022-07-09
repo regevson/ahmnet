@@ -36,19 +36,6 @@ public class TrainingGroupController {
   @Autowired
   TrainingGroupPathValidationService pathValidator;
 
-  @GetMapping("/clubs")
-  public ResponseEntity<?> getAllClubs() {
-    Collection<Club> clubs = groupService.loadAllClubs();
-    return ResponseEntity.status(HttpStatus.OK).body(clubs);
-  }
-
-  @GetMapping("/clubs/actions/count-groups")
-  public ResponseEntity<?> getAllClubsWithGroupCount() {
-    Collection<Club> clubs = groupService.loadAllClubs();
-    Map<String, Integer> club_groupNum = groupService.getNumOfGroups(clubs);
-    return ResponseEntity.status(HttpStatus.OK).body(club_groupNum);
-  }
-
   @GetMapping("/batch/groups")
   public ResponseEntity<?> getAllGroups() {
     Collection<TrainingGroupSnippetDto> dtos =

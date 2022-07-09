@@ -6,6 +6,7 @@ import Timetable from './components/Timetable.vue'
 import Vacationtable from './components/Vacationtable.vue'
 import TrainingDetails from './components/TrainingDetails.vue'
 import TrainingGroups from './components/TrainingGroups.vue'
+import Players from './components/Players.vue'
 import TrainingGroupDetails from './components/TrainingGroupDetails.vue'
 import Password from './components/Password.vue'
 
@@ -21,6 +22,7 @@ export default new Router ({
         { path: '/timetable', name: 'timetable', component: Timetable },
         { path: '/vacationtable', name: 'vacationtable', component: Vacationtable },
         { path: '/traininggroups', name: 'traininggroups', component: TrainingGroups },
+        { path: '/players', name: 'players', component: Players },
         { path: '/traininggroupdetails/:clubId/group_:groupId', name: 'traininggroupdetails', components: {default: TrainingGroupDetails} },
         { path: '/trainingdetails/:trainerId/training_:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}},
         { path: '/password', name: 'password', components: {default: Password}},

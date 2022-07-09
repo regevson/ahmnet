@@ -37,6 +37,13 @@
           </b-nav-item>
           <b-nav-item
             v-if="isLoggedIn && hasRole('TRAINER')"
+            :to="{name: 'players'}"
+            class="nav-link"
+          >
+            SPIELER
+          </b-nav-item>
+          <b-nav-item
+            v-if="isLoggedIn && hasRole('TRAINER')"
             :to="{name: 'vacationtable'}"
             class="nav-link"
           >

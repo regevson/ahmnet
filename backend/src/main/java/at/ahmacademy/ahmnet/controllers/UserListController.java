@@ -33,8 +33,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import at.ahmacademy.ahmnet.dtos.UserDto;
 import at.ahmacademy.ahmnet.dtos.UserMapper;
+import at.ahmacademy.ahmnet.dtos.UserSnippetDto;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.model.UserRole;
+import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
 import at.ahmacademy.ahmnet.services.user.UserService;
 
 @RequestMapping("/api")
@@ -44,23 +46,40 @@ public class UserListController {
 
   @Autowired
   private UserService userService;
+  @Autowired
+  TrainingGroupService groupService;
+  @Autowired
+  UserMapper mapper;
 
   @GetMapping("/users")
   public ResponseEntity<?> getUsers(Optional<UserRole> role) {
     Collection<UserDto> dtos = null;
     if(role.isEmpty())
-      dtos = UserMapper.mapToUserDto(userService.getAllUsers());
+      dtos = mapper.mapToUserDto(userService.getAllUsers());
     else
-      dtos = UserMapper.mapToUserDto(userService.getUsersByRole(role.get()));
+      dtos = mapper.mapToUserDto(userService.getUsersByRole(role.get()));
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
   @GetMapping("/users/{userId}")
   public ResponseEntity<?> getUser(@PathVariable String userId) {
-    UserDto dto = UserMapper.mapToUserDto(userService.loadUser(userId));
+    UserDto dto = mapper.mapToUserDto(userService.loadUser(userId));
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
+  @GetMapping("/clubs/{clubId}/players")
+  public ResponseEntity<?> getPlayersByClub(@PathVariable String clubId) {
+    //pathValidator.validatePath(clubId);
+    Collection<UserSnippetDto> dtos = mapper.mapToUserSnippetDto(userService.loadPlayersByClub(clubId));
+    return ResponseEntity.status(HttpStatus.OK).body(dtos);
+  }
+  
+  
+  
+  
+  
+  
+  
   @PostMapping("/users/{userId}/actions/change-password")
   public ResponseEntity<?> changePassword(@PathVariable String userId, 
                                            @RequestBody ObjectNode password) {

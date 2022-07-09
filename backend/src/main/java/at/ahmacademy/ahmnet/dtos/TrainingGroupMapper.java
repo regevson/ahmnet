@@ -21,15 +21,19 @@ public class TrainingGroupMapper {
   UserService userService;
   @Autowired
   TrainingGroupService trainingGroupService;
+  @Autowired
+  ClubMapper clubMapper;
+  @Autowired
+  UserMapper userMapper;
 
   public TrainingGroupDto mapToTrainingGroupDto(TrainingGroup trg, 
                                                 int numPlayedSessions, 
                                                 Map<String, Integer> attendance) {
     TrainingGroupDto dto = new TrainingGroupDto();
     dto.setId(trg.getId());
-    dto.setTrainer(UserMapper.mapToUserDto(trg.getTrainer()));
-    dto.setClub(trg.getClub());
-    dto.setPlayers(UserMapper.mapToUserDto(trg.getPlayers()));
+    dto.setTrainer(userMapper.mapToUserDto(trg.getTrainer()));
+    dto.setClub(clubMapper.mapToClubDto(trg.getClub()));
+    dto.setPlayers(userMapper.mapToUserDto(trg.getPlayers()));
     dto.setNumPlayedSessions(numPlayedSessions);
     dto.setAttendance(attendance);
     return dto;
@@ -37,7 +41,7 @@ public class TrainingGroupMapper {
 
   public void mapFromTrainingGroupDto(TrainingGroupDto dto, TrainingGroup trg) {
     trg.setTrainer(this.userService.loadUser(dto.getTrainer().getId()));
-    trg.setClub(dto.getClub());
+    trg.setClub(clubMapper.mapFromClubDto(dto.getClub()));
     Set<User> players = dto.getPlayers().stream().map(p -> userService.loadUser(p.getId()))
                                                  .collect(Collectors.toSet());
     trg.setPlayers(players);
@@ -47,9 +51,9 @@ public class TrainingGroupMapper {
   public TrainingGroupSnippetDto mapToTrainingGroupSnippetDto(TrainingGroup trg) {
     TrainingGroupSnippetDto dto = new TrainingGroupSnippetDto();
     dto.setId(trg.getId());
-    dto.setTrainer(UserMapper.mapToUserDto(trg.getTrainer()));
-    dto.setClub(trg.getClub());
-    dto.setPlayers(UserMapper.mapToUserDto(trg.getPlayers()));
+    dto.setTrainer(userMapper.mapToUserDto(trg.getTrainer()));
+    dto.setClub(clubMapper.mapToClubDto(trg.getClub()));
+    dto.setPlayers(userMapper.mapToUserDto(trg.getPlayers()));
     return dto;
   }
 

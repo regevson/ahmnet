@@ -2,6 +2,8 @@ package at.ahmacademy.ahmnet.services.user;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -106,6 +108,13 @@ public class UserService {
 
   public boolean hasTrainerRights() {
     return isAdmin() || isTrainer();
+  }
+
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+  public Set<User> loadPlayersByClub(String clubName) {
+    Set<User> members = this.userRepository.findByClub_NameContaining(clubName);
+    members = members.stream().filter(m -> m.getRoles().contains(UserRole.PLAYER)).collect(Collectors.toSet());
+    return members;
   }
 
 }

@@ -15,7 +15,7 @@ public class TrainingGroupDto {
 
   private long id;
   private UserDto trainer;
-  private Club club;
+  private ClubDto club;
   private Collection<UserDto> players;
   private int numPlayedSessions;
   private Map<String, Integer> attendance;

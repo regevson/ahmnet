@@ -4,7 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,5 +15,13 @@ public class Club {
   @Id
   @Column(length = 100, name="name")
   private String name;
+  
+  /*
+  @OneToMany(mappedBy="club")
+  private Set<User> members;
+
+  @OneToMany(mappedBy="club")
+  private Set<TrainingGroup> trainingGroups;
+  */
 
 }
