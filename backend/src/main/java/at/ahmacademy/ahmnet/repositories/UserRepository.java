@@ -24,6 +24,6 @@ public interface UserRepository extends AbstractRepository<User, String> {
   @Query("SELECT u FROM User u WHERE u.id in :ids")
   Set<User> getUsersById(@Param("ids") String ids[]);
 
-  Set<User> findByClub_NameContaining(String clubName);
+  Set<User> findByClub_IdContaining(String clubName);
 
 }

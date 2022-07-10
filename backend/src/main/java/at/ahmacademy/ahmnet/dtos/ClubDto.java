@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 public class ClubDto {
 
-  private String name;
+  private String id;
 
 }

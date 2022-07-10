@@ -23,8 +23,8 @@
         v-model="group.club"
         :options="allClubs"
         placeholder="Auswählen/Suchen"
-        label="name"
-        track-by="name"
+        label="id"
+        track-by="id"
         deselectLabel=""
         selectLabel=""
       />
@@ -230,7 +230,7 @@ export default {
     },
 
     async createNewTrainingGroup() {
-      await this.$ax.post('clubs/' + this.group.club.name + '/groups', this.group);
+      await this.$ax.post('clubs/' + this.group.club.id + '/groups', this.group);
       this.$router.push({name: 'traininggroups'});
     },
 
@@ -241,7 +241,7 @@ export default {
     },
 
     async deleteGroup() {
-      await this.$ax.delete('clubs/' + this.group.club.name + '/groups/' + this.group.id);
+      await this.$ax.delete('clubs/' + this.group.club.id + '/groups/' + this.group.id);
       this.$router.push({name: 'traininggroups'});
     },
 

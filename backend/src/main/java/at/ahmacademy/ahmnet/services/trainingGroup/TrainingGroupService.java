@@ -51,7 +51,7 @@ public class TrainingGroupService {
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
   public Set<TrainingGroup> loadTrainingGroupsByClub(String clubName) {
-    return this.trainingGroupRepository.findByClub_NameContaining(clubName);
+    return this.trainingGroupRepository.findByClub_IdContaining(clubName);
   }
 
   @PreAuthorize("hasAuthority('ADMIN') || @userAuthService.isAuthUsr(#group.trainer.id)")

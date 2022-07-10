@@ -1,0 +1,44 @@
+Input:
+ 
+requests:
+  - GET:
+      - clubs
+      - batch/groups
+      - users?role=TRAINER
+      - trainers/{trainerId}/trainings/{trainingId}
+
+  - POST:
+      - trainers/{trainerId}/trainings/{trainingId}
+      - trainers/{trainerId}/trainings/{trainingId}/actions/free
+      - trainers/{trainerId}/trainings/{trainingId}/actions/grab
+
+DTOs:
+  - ClubDto
+      - id
+  - TrainingGroupSnippetDto
+      - id
+      - club.id
+      - players.fullName
+  - UserDto
+      - fullName
+  - TrainingDto
+      - id
+      - lastDate
+      - clubId
+      - group
+          - id
+          - club.id
+          - players.fullName
+      - date
+      - startTime
+      - trainer
+          - fullName
+      - players
+          - id
+      - attendees
+      - durationMinutes
+      - bulletpoints
+      - comments
+      - free
+
+

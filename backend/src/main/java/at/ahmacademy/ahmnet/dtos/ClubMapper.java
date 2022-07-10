@@ -17,7 +17,7 @@ public class ClubMapper {
 
   public ClubDto mapToClubDto(Club club) {
     ClubDto dto = new ClubDto();
-    dto.setName(club.getName());
+    dto.setId(club.getId());
     return dto;
   }
 
@@ -29,8 +29,8 @@ public class ClubMapper {
   }
 
   public Club mapFromClubDto(ClubDto dto) {
-    Club club = this.clubService.loadClub(dto.getName());
-    club.setName(dto.getName());
+    Club club = this.clubService.loadClub(dto.getId());
+    club.setId(dto.getId());
     return club;
   }
 

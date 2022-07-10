@@ -30,7 +30,7 @@ public class TrainingGroupPathValidationService {
 
   public TrainingGroup validatePath(String clubId, Long groupId) {
     TrainingGroup group = groupRepo.findById(groupId).orElseThrow();
-    if(!group.getClub().getName().equals(clubId))
+    if(!group.getClub().getId().equals(clubId))
       throw new IllegalArgumentException("Group specified in request doesn't belong "
           + "to club specified in request!");
     return group;

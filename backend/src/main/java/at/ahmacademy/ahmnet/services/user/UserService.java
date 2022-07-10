@@ -112,7 +112,7 @@ public class UserService {
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
   public Set<User> loadPlayersByClub(String clubName) {
-    Set<User> members = this.userRepository.findByClub_NameContaining(clubName);
+    Set<User> members = this.userRepository.findByClub_IdContaining(clubName);
     members = members.stream().filter(m -> m.getRoles().contains(UserRole.PLAYER)).collect(Collectors.toSet());
     return members;
   }

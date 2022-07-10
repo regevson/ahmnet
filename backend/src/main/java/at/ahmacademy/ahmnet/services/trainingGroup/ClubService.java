@@ -26,7 +26,7 @@ public class ClubService {
   private UserService userService;
 
   public Club loadClub(String name) {
-    return clubRepository.findFirstByName(name);
+    return clubRepository.findFirstById(name);
   }
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
@@ -39,7 +39,7 @@ public class ClubService {
   public Map<String, Integer> getNumOfPlayers(Collection<Club> clubs) {
     Map<String, Integer> map = new HashMap<>();
     for(Club club: clubs)
-      map.put(club.getName(), userService.loadPlayersByClub(club.getName()).size());
+      map.put(club.getId(), userService.loadPlayersByClub(club.getId()).size());
     return map;
   }
 
@@ -47,7 +47,7 @@ public class ClubService {
   public Map<String, Integer> getNumOfGroups(Collection<Club> clubs) {
     Map<String, Integer> map = new HashMap<>();
     for(Club club: clubs)
-      map.put(club.getName(), groupService.loadTrainingGroupsByClub(club.getName()).size());
+      map.put(club.getId(), groupService.loadTrainingGroupsByClub(club.getId()).size());
     return map;
   }
 

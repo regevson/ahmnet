@@ -14,7 +14,7 @@ public interface TrainingGroupRepository extends AbstractRepository<TrainingGrou
 
   Set<TrainingGroup> findByTrainer_Username(String username);
 
-  Set<TrainingGroup> findByClub_NameContaining(String name);
+  Set<TrainingGroup> findByClub_IdContaining(String name);
 
   @Query("select count(t) "
     + "from Training t join t.trainingGroup "

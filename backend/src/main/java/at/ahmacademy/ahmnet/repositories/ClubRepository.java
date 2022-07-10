@@ -1,9 +1,12 @@
 package at.ahmacademy.ahmnet.repositories;
 
+import org.springframework.stereotype.Repository;
+
 import at.ahmacademy.ahmnet.model.Club;
 
-public interface ClubRepository  extends AbstractRepository<Club, String> {
+@Repository
+public interface ClubRepository extends AbstractRepository<Club, String> {
 
-  Club findFirstByName(String clubName);
+  Club findFirstById(String clubName);
 
 }

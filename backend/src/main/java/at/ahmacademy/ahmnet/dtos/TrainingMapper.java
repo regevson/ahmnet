@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import at.ahmacademy.ahmnet.model.Training;
 import at.ahmacademy.ahmnet.services.training.TrainingService;
+import at.ahmacademy.ahmnet.services.trainingGroup.ClubService;
 import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
 import at.ahmacademy.ahmnet.services.user.UserService;
 
@@ -27,19 +28,20 @@ public class TrainingMapper {
   @Autowired
   TrainingGroupService trainingGroupService;
   @Autowired
+  ClubService clubService;
+  @Autowired
   UserMapper userMapper;
 
   public TrainingSnippetDto mapToTrainingSnippetDto(Training tr) {
     TrainingSnippetDto dto = new TrainingSnippetDto();
     dto.setId(tr.getId());
     dto.setGroupId(tr.getTrainingGroup().getId());
-    dto.setClub(clubMapper.mapToClubDto(tr.getClub()));
-    dto.setGroupClubId(tr.getTrainingGroup().getClub().getName());
+    dto.setClubId(tr.getClub().getId());
+    dto.setGroupClubId(tr.getTrainingGroup().getClub().getId());
     dto.setDate(tr.getDateTime().toLocalDate().toString());
     LocalTime startTime = tr.getDateTime().toLocalTime();
     dto.setTimeslot(startTime.toString() + " - " + startTime.plusMinutes(tr.getDurationMinutes()).toString());
     dto.setStartTime(startTime);
-    dto.setDurationMinutes(tr.getDurationMinutes());
     dto.setCourt(tr.getCourt());
     dto.setFree(tr.getIsFree());
     dto.setPrevTrainerId(tr.getPrevTrainer().getId());
@@ -65,7 +67,7 @@ public class TrainingMapper {
     TrainingDto dto = new TrainingDto();
     dto.setId(tr.getId());
     dto.setGroup(groupMapper.mapToTrainingGroupSnippetDto(tr.getTrainingGroup()));
-    dto.setClub(clubMapper.mapToClubDto(tr.getClub()));
+    dto.setClubId(tr.getClub().getId());
     dto.setCourt(tr.getCourt());
     dto.setDate(tr.getDateTime().toLocalDate());
     dto.setLastDate(tr.getLastDate());
@@ -85,7 +87,7 @@ public class TrainingMapper {
   public void mapFromTrainingDto(TrainingDto dto, Training tr) {
     tr.setTrainingGroup(trainingGroupService.loadTrainingGroupById(dto.getGroup().getId()));
     tr.setTrainer(userService.loadUser(dto.getTrainer().getId()));
-    tr.setClub(clubMapper.mapFromClubDto(dto.getClub()));
+    tr.setClub(clubService.loadClub(dto.getClubId()));
     tr.setCourt(dto.getCourt());
     tr.setDateTime(dto.getDate().atTime(dto.getStartTime()));
     tr.setLastDate(dto.getLastDate());

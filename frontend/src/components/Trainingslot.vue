@@ -27,7 +27,7 @@
 
       <router-link :to="{name: 'trainingdetails', params: {trainerId: training.trainerId, trainingId: training.id}}">
         <div id="inner" class="trainingPreviewInner">
-          <span>{{training.club.name}}</span>
+          <span>{{training.clubId}}</span>
           <br/>
           <hr/>
           <span>{{training.timeslot}}</span>

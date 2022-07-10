@@ -17,7 +17,7 @@ public class TrainingDto {
 
   private Long id;
   private TrainingGroupSnippetDto group;
-  private ClubDto club;
+  private String clubId;
   private LocalDate date;
   private LocalDate lastDate;
   private String timeslot;
@@ -30,5 +30,31 @@ public class TrainingDto {
   private String bulletPoints;
   private String comments;
   private boolean isFree;
-
+  
 }
+
+/*
+
+  private long id;
+  private LocalDate date;
+  private LocalDate lastDate;
+  private String timeslot;
+  private int weekNum;
+  private int durationMinutes;
+  private int court;
+  private String bulletPoints;
+  private String comment;
+  private boolean isFree;
+  private Collection<String> attendeeIds;
+  private long trainingGroupId;
+  private String trainerId;
+  private String prevTrainer;
+  private String clubId;
+  
+  private String attendees_url;
+  private String group_url;
+  private String trainer_url;
+  private String prevTrainer_url;
+  private String club_url;
+
+*/

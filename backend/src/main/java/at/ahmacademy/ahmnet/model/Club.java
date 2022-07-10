@@ -14,7 +14,7 @@ public class Club {
 
   @Id
   @Column(length = 100, name="name")
-  private String name;
+  private String id;
   
   /*
   @OneToMany(mappedBy="club")

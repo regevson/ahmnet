@@ -22,7 +22,7 @@ public class UserMapper {
     dto.setFirstName(user.getFirstName());
     dto.setLastName(user.getLastName());
     dto.setFullName(user.getFirstName() + " " + user.getLastName());
-    dto.setClubName(user.getClub().getName());
+    dto.setClubName(user.getClub().getId());
     dto.setRoles(user.getRoles());
     return dto;
   }

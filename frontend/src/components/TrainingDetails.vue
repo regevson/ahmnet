@@ -29,11 +29,9 @@
       <multiselect
         :disabled="isFree()"
         :allowEmpty="false"
-        v-model="training.club"
+        v-model="training.clubId"
         :options="allClubs"
         placeholder="Club suchen"
-        label="name"
-        track-by="name"
         deselectLabel=""
         selectLabel=""
       />
@@ -366,7 +364,7 @@ export default {
 
     async getAllClubs() {
       const res = await this.$ax.get('clubs');
-      this.allClubs = res.data;
+      this.allClubs = res.data.map(c => c.id);
     },
 
     async getAllGroups() {
@@ -388,7 +386,7 @@ export default {
     prepopulate(training) {
       training.id = null;
       training.group = this.allGroups[0];
-      training.club = this.allClubs[0];
+      training.clubId = this.allClubs[0].id;
       training.date = this.getCurrentDate();
       training.lastDate = null;
       training.timeslot = '';
@@ -417,13 +415,14 @@ export default {
       this.training = res.data;
       this.combineGroupInfo(this.training.group);
       this.setValidationFields();
+      console.log(this.training);
     },
 
     // group should also display info about participants in multiselect-row
     combineGroupInfo(group) {
       let fullNames = [];
       group.players.forEach((player) => { fullNames.push(player.fullName); });
-      group.combinedInfo = 'Gruppe' + group.id + ': (' + group.club.name + ') [' + fullNames + ']';
+      group.combinedInfo = 'Gruppe' + group.id + ': (' + group.club.id + ') [' + fullNames + ']';
     },
 
     setValidationFields() {

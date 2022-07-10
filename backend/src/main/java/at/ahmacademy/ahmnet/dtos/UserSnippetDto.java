@@ -13,7 +13,7 @@ public class UserSnippetDto {
 
   private String id;
   private String fullName;
-  private Collection<TrainingGroupSnippetDto> groups;
+  private Collection<TrainingGroupSnippetDto> groups; //TODO: split this into necessary fields
   private ClubDto club;
 
 }
