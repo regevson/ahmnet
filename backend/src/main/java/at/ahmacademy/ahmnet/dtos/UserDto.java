@@ -1,6 +1,6 @@
 package at.ahmacademy.ahmnet.dtos;
 
-import java.util.Set;
+import java.util.Collection;
 
 import at.ahmacademy.ahmnet.model.UserRole;
 import lombok.Getter;
@@ -16,7 +16,13 @@ public class UserDto {
   private String firstName;
   private String lastName;
   private String fullName;
-  private String clubName;
-  private Set<UserRole> roles;
+  private String clubId;
+  private Collection<Long> trainingGroupIds;
+  private Collection<UserRole> roles;
+
+  private String groups_url;
 
 }
+
+/*
+*/

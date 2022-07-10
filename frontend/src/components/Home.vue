@@ -27,6 +27,7 @@ export default {
   async created() {
     const username = sessionStorage.getItem('username');
     const response = await this.$ax.get('users/' + username);
+    console.log(response);
 
     this.user = response.data;
     sessionStorage.setItem('user', JSON.stringify(this.user));

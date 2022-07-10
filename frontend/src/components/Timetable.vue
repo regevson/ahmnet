@@ -120,12 +120,12 @@ export default {
     },
 
     async getAllTrainers() {
-      const response = await this.$ax.get('users?role=TRAINER');
+      const response = await this.$ax.get('batch/users?role=TRAINER');
       this.allTrainers = response.data;
     },
 
     async getTrainings(weekNum) {
-      const response = await this.$ax.get('trainers/' + this.selectedTrainer.id + '/trainings?weekNum=' + weekNum + '&free=false');
+      const response = await this.$ax.get('batch/trainers/' + this.selectedTrainer.id + '/trainings?weekNum=' + weekNum + '&free=false');
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
       this.checkedSlots = [];
@@ -157,13 +157,15 @@ export default {
 
     async deleteTrainings() {
       let trainingIds = this.checkedSlots.map(t => t.id);
-      await this.$ax.delete('trainers/' + this.selectedTrainer.id + '/trainings/' + trainingIds.toString());
+      let groupIds = this.checkedSlots.map(t => t.groupId);
+      await this.$ax.delete('trainers/' + this.selectedTrainer.id + '/groups/' + groupIds + '/trainings/' + trainingIds);
       this.getTrainings(this.weekNum);
     },
 
     async freeTrainings() {
       let trainingIds = this.checkedSlots.map(t => t.id);
-      await this.$ax.post('trainers/' + this.selectedTrainer.id + '/trainings/' + trainingIds.toString() + '/actions/free/notify');
+      let groupIds = this.checkedSlots.map(t => t.groupId);
+      await this.$ax.post('trainers/' + this.selectedTrainer.id + '/groups/' + groupIds + '/trainings/' + trainingIds.toString() + '/actions/free/notify');
       this.getTrainings(this.weekNum);
     },
 

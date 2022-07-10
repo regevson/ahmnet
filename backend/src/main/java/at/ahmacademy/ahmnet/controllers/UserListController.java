@@ -1,6 +1,7 @@
 package at.ahmacademy.ahmnet.controllers;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class UserListController {
   @Autowired
   UserMapper mapper;
 
-  @GetMapping("/users")
+  @GetMapping("/batch/users")
   public ResponseEntity<?> getUsers(Optional<UserRole> role) {
     Collection<UserDto> dtos = null;
     if(role.isEmpty())
@@ -66,11 +67,26 @@ public class UserListController {
     UserDto dto = mapper.mapToUserDto(userService.loadUser(userId));
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
+  
+  @GetMapping("/clubs/{clubIds}/players/{playerIds}")
+  public ResponseEntity<?> getPlayersById(@PathVariable String[] clubIds,
+                                         @PathVariable String[] playerIds) { 
+    Collection<User> players = Arrays.stream(playerIds).map(userService::loadUser).collect(Collectors.toSet());
+    return ResponseEntity.status(HttpStatus.OK).body(players);
+  }
+
+  @GetMapping("/trainer/{trainerIds}")
+  public ResponseEntity<?> getPlayersById(@PathVariable String[] trainerIds) {
+    Collection<User> trainers = Arrays.stream(trainerIds).map(userService::loadUser).collect(Collectors.toSet());
+    Collection<UserDto> dtos = mapper.mapToUserDto(trainers);
+    return ResponseEntity.status(HttpStatus.OK).body(dtos);
+  }
+  
 
   @GetMapping("/clubs/{clubId}/players")
   public ResponseEntity<?> getPlayersByClub(@PathVariable String clubId) {
     //pathValidator.validatePath(clubId);
-    Collection<UserSnippetDto> dtos = mapper.mapToUserSnippetDto(userService.loadPlayersByClub(clubId));
+    Collection<UserDto> dtos = mapper.mapToUserDto(userService.loadPlayersByClub(clubId));
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
   

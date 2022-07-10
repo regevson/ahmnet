@@ -2,6 +2,7 @@ package at.ahmacademy.ahmnet.dtos;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,8 +23,14 @@ public class UserMapper {
     dto.setFirstName(user.getFirstName());
     dto.setLastName(user.getLastName());
     dto.setFullName(user.getFirstName() + " " + user.getLastName());
-    dto.setClubName(user.getClub().getId());
+    dto.setClubId(user.getClub().getId());
+    dto.setTrainingGroupIds(user.getTrainingGroups().stream().map(g -> g.getId()).collect(Collectors.toSet()));
     dto.setRoles(user.getRoles());
+
+    String groupClubIds = user.getTrainingGroups().stream().map(a -> a.getClub().getId()).collect(Collectors.joining(","));
+    String groupIds = user.getTrainingGroups().stream().map(a -> Long.toString(a.getId())).collect(Collectors.joining(","));
+    dto.setGroups_url("clubs/" + groupClubIds + "/groups/" + groupIds);
+
     return dto;
   }
   public Collection<UserDto> mapToUserDto(Collection<User> users) {

@@ -60,12 +60,24 @@ public class TrainingGroupController {
 
   @GetMapping("/clubs/{clubId}/groups/{groupId}")
   public ResponseEntity<?> getGroupById(@PathVariable String clubId, @PathVariable Long groupId) {
-    TrainingGroup group = pathValidator.validatePath(clubId, groupId);
-    int numPlayedTr = groupService.calcNumPlayedSessions(group);
-    Map<String, Integer> attendance = groupService.calcAttendance(group);
-    TrainingGroupDto dto = mapper.mapToTrainingGroupDto(group, numPlayedTr, attendance);
+  System.out.println("here");
+    //TrainingGroup group = pathValidator.validatePath(clubId, groupId);
+    //int numPlayedTr = groupService.calcNumPlayedSessions(group);
+    //Map<String, Integer> attendance = groupService.calcAttendance(group);
+    //TrainingGroupDto dto = mapper.mapToTrainingGroupDto(group, numPlayedTr, attendance);
+    TrainingGroup groups = groupService.loadTrainingGroupById(groupId);
+    TrainingGroupDto dto = mapper.mapToTrainingGroupDto(groups, 0, null);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
+
+/*
+  @GetMapping("/clubs/{clubId}/groups/{groupId}")
+  public ResponseEntity<?> getGroupById(@PathVariable String[] clubIds, @PathVariable Long[] groupIds) {
+    Collection<TrainingGroup> groups = Arrays.stream(groupIds).map(groupService::loadTrainingGroupById)
+                                                              .collect(Collectors.toSet());
+    return ResponseEntity.status(HttpStatus.OK).body(groups);
+  }
+  */
 
   @PostMapping("/clubs/{id}/groups")
   public ResponseEntity<?> createNewGroup(@PathVariable String id, @RequestBody TrainingGroupDto groupDto) {

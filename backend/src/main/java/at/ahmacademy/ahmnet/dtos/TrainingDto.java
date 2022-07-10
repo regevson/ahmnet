@@ -15,29 +15,10 @@ import lombok.Setter;
 @Setter
 public class TrainingDto {
 
-  private Long id;
-  private TrainingGroupSnippetDto group;
-  private String clubId;
-  private LocalDate date;
-  private LocalDate lastDate;
-  private String timeslot;
-  private int court;
-  private LocalTime startTime;
-  private int durationMinutes;
-  private UserDto trainer;
-  private Collection<UserDto> players;
-  private Collection<String> attendees;
-  private String bulletPoints;
-  private String comments;
-  private boolean isFree;
-  
-}
-
-/*
-
   private long id;
   private LocalDate date;
   private LocalDate lastDate;
+  private LocalTime startTime;
   private String timeslot;
   private int weekNum;
   private int durationMinutes;
@@ -45,16 +26,18 @@ public class TrainingDto {
   private String bulletPoints;
   private String comment;
   private boolean isFree;
+  private Collection<String> playerIds;
   private Collection<String> attendeeIds;
-  private long trainingGroupId;
+  private long groupId;
   private String trainerId;
-  private String prevTrainer;
+  private String prevTrainerId;
   private String clubId;
   
+  private String players_url;
   private String attendees_url;
   private String group_url;
   private String trainer_url;
   private String prevTrainer_url;
   private String club_url;
-
-*/
+  
+}

@@ -25,7 +25,7 @@
 
       </div>
 
-      <router-link :to="{name: 'trainingdetails', params: {trainerId: training.trainerId, trainingId: training.id}}">
+      <router-link :to="{name: 'trainingdetails', params: {trainerId: training.trainerId, groupId: training.groupId, trainingId: training.id}}">
         <div id="inner" class="trainingPreviewInner">
           <span>{{training.clubId}}</span>
           <br/>

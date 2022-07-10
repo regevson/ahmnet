@@ -42,3 +42,34 @@ DTOs:
       - free
 
 
+- training
+- group
+- club
+- trainer
+- player
+
+user
+club
+trainer -> group
+trainer -> group -> training
+
+trainer
+club
+club -> player
+trainer -> club -> group
+trainer -> club -> group -> training
+
+
+
+
+
+
+
+
+
+
+trainer
+club
+club -> player
+club -> group
+trainer -> training

@@ -24,7 +24,7 @@ export default new Router ({
         { path: '/traininggroups', name: 'traininggroups', component: TrainingGroups },
         { path: '/players', name: 'players', component: Players },
         { path: '/traininggroupdetails/:clubId/group_:groupId', name: 'traininggroupdetails', components: {default: TrainingGroupDetails} },
-        { path: '/trainingdetails/:trainerId/training_:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}},
+        { path: '/trainingdetails/:trainerId/gr:groupId/tr:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}},
         { path: '/password', name: 'password', components: {default: Password}},
       ]
     }

@@ -317,6 +317,10 @@ export default {
       dialogTxt: '',
       isRecurring: false,
       lastDate: '',
+
+      pathTrainerId: '',
+      pathGroupId: 0,
+      pathTrainingId: 0,
     }
   },
 
@@ -340,6 +344,9 @@ export default {
   },
 
   async created() {
+    this.pathTrainerId = this.$route.params.trainerId;
+    this.pathGroupId = this.$route.params.groupId;
+    this.pathTrainingId = this.$route.params.trainingId;
     this.getUserRole();
     this.getFormData();
   },
@@ -374,7 +381,7 @@ export default {
     },
 
     async getAllTrainer() {
-      const res = await this.$ax.get('users?role=TRAINER');
+      const res = await this.$ax.get('batch/users?role=TRAINER');
       this.allTrainers = res.data;
     },
 
@@ -409,13 +416,17 @@ export default {
     },
 
     async setupTraining() {
-      const pathTrainerId = this.$route.params.trainerId;
-      const pathTrainingId = this.$route.params.trainingId;
-      const res = await this.$ax.get('trainers/' + pathTrainerId + '/trainings/' + pathTrainingId);
-      this.training = res.data;
+      const training_res = await this.$ax.get('trainers/' + this.pathTrainerId + '/groups/' + this.pathGroupId + '/trainings/' + this.pathTrainingId);
+      this.training = training_res.data;
+
+      const group_res = await this.$ax.get(this.training.group_url);
+      this.training.group = group_res.data;
       this.combineGroupInfo(this.training.group);
+
+      const trainer_res = await this.$ax.get(this.training.trainer_url);
+      this.training.trainer = trainer_res.data;
+
       this.setValidationFields();
-      console.log(this.training);
     },
 
     // group should also display info about participants in multiselect-row
@@ -434,7 +445,9 @@ export default {
       if(!this.validate())
         return;
       this.getValidationFields();
-      await this.$ax.post('trainers/' + this.training.trainer.id + '/trainings', this.training);
+      this.prepareTraining();
+      console.log(this.training);
+      await this.$ax.post('trainers/' + this.training.trainer.id + '/groups/' + this.training.group.id + '/trainings', this.training);
       this.$router.push({name: 'timetable'});
     },
 
@@ -442,8 +455,8 @@ export default {
       if(!this.validate())
         return;
       this.getValidationFields();
-      let pathTrainerId = this.$route.params.trainerId;
-      await this.$ax.put('trainers/' + pathTrainerId + '/trainings/' + this.training.id, this.training);
+      //let this.pathTrainerId = this.$route.params.trainerId;
+      await this.$ax.put('trainers/' + this.pathTrainerId + '/trainings/' + this.training.id, this.training);
       this.$router.push({name: 'timetable'});
     },
 
@@ -464,24 +477,25 @@ export default {
       this.training.lastDate = this.lastDate;
     },
 
+    prepareTraining() {
+      this.training.groupId = this.training.group.id;
+      this.training.playerIds = this.training.players.map(p => p.id);
+      this.training.attendeeIds = this.training.attendees.map(a => a.id);
+      this.training.trainerId = this.training.trainer.id;
+    },
+
     async deleteTraining() {
-      let pathTrainerId = this.$route.params.trainerId;
-      let pathTrainingId = this.$route.params.trainingId;
-      await this.$ax.delete('trainers/' + pathTrainerId + '/trainings/' + pathTrainingId);
+      await this.$ax.delete('trainers/' + this.pathTrainerId + '/groups/' + this.pathGroupId + '/trainings/' + this.pathTrainingId);
       this.$router.push({name: 'timetable'});
     },
 
     async freeTraining() {
-      let pathTrainerId = this.$route.params.trainerId;
-      let pathTrainingId = this.$route.params.trainingId;
-      await this.$ax.post('trainers/' + pathTrainerId + '/trainings/' + pathTrainingId + '/actions/free');
+      await this.$ax.post('trainers/' + this.pathTrainerId + '/groups/' + this.pathGroupId + '/trainings/' + this.pathTrainingId + '/actions/free');
       this.$router.push({name: 'timetable'});
     },
 
     async grabTraining() {
-      let pathTrainerId = this.$route.params.trainerId;
-      let pathTrainingId = this.$route.params.trainingId;
-      await this.$ax.post('trainers/' + pathTrainerId + '/trainings/' + pathTrainingId + '/actions/grab');
+      await this.$ax.post('trainers/' + this.pathTrainerId + '/trainings/' + this.pathTrainingId + '/actions/grab');
       this.$router.push({name: 'vacationtable'});
     },
 
