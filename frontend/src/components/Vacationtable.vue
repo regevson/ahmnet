@@ -88,14 +88,14 @@ export default {
 
   methods: {
     async getAvailableTrainings(weekNum) {
-      const response = await this.$ax.get('batch/trainings/' + '?weekNum=' + weekNum);
+      const response = await this.$ax.get('trainings/' + '?weekNum=' + weekNum);
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
       this.checkedSlots = [];
     },
 
     async getAvailableTrainingsByTrainer(trainer, weekNum) {
-      const response = await this.$ax.get('batch/trainings/' + '?weekNum=' + weekNum + '&exclTrainerId=' + trainer.id);
+      const response = await this.$ax.get('trainings/' + '?weekNum=' + weekNum + '&exclTrainerId=' + trainer.id);
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
       this.checkedSlots = [];
@@ -133,9 +133,8 @@ export default {
     },
 
     async grabTrainings() {
-      let trainerIds = this.checkedSlots.map(t => t.trainerId);
       let trainingIds = this.checkedSlots.map(t => t.id);
-      await this.$ax.post('trainers/' + trainerIds.toString() + '/trainings/' + trainingIds.toString() + '/actions/grab/notify');
+      await this.$ax.post('trainings/' + trainingIds.toString() + '/actions/grab/notify');
       this.rerenderTrainings(this.weekNum);
     },
 

@@ -1,8 +1,9 @@
 <template>
   <div>
+    <div v-if="groups">
     <div v-for="(group, idx) in groups" :key="idx">
       <router-link
-        :to="{name: 'traininggroupdetails', params: {clubId: clubId, groupId: group.id}}"
+        :to="{name: 'traininggroupdetails', params: {groupId: group.id}}"
         class="link"
       >
         <div id="groupSnippet">
@@ -10,7 +11,7 @@
           <div class="bot">
             <b>Trainer: </b>
             <span class="player trainer"
-              >{{group.trainer.firstName}} {{group.trainer.lastName}}</span
+              >{{group.trainer.fullName}}</span
             ><br />
             <hr style="margin: 5px 0px 5px 0px" />
             <b>SpielerInnen:</b><br />
@@ -19,13 +20,14 @@
               v-for="player in group.players"
               :key="player.id"
             >
-              {{player.firstName}} {{player.lastName}}
+              {{player.fullName}}
             </span>
           </div>
         </div>
       </router-link>
     </div>
     <div style="clear: both"></div>
+  </div>
   </div>
 </template>
 
@@ -43,8 +45,18 @@ export default {
   },
 
   async created() {
-    const response = await this.$ax.get('clubs/' + this.clubId + '/groups');
-    this.groups = response.data;
+    let response = await this.$ax.get('clubs/' + this.clubId + '/groups');
+    let groups = response.data;
+    
+    for(let group of groups) {
+      console.log('reading group' + group.id);
+      response = await this.$ax.get(group.trainer_url);
+      group.trainer = response.data;
+      response = await this.$ax.get(group.players_url);
+      group.players = response.data;
+    }
+
+    this.groups = groups;
   },
 
 }

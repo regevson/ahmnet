@@ -72,13 +72,15 @@ public class UserListController {
   public ResponseEntity<?> getPlayersById(@PathVariable String[] clubIds,
                                          @PathVariable String[] playerIds) { 
     Collection<User> players = Arrays.stream(playerIds).map(userService::loadUser).collect(Collectors.toSet());
-    return ResponseEntity.status(HttpStatus.OK).body(players);
+    Collection<UserDto> dtos = mapper.mapToUserDto(players);
+    return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
   @GetMapping("/trainer/{trainerIds}")
   public ResponseEntity<?> getPlayersById(@PathVariable String[] trainerIds) {
     Collection<User> trainers = Arrays.stream(trainerIds).map(userService::loadUser).collect(Collectors.toSet());
     Collection<UserDto> dtos = mapper.mapToUserDto(trainers);
+    if(dtos.size() == 1) return ResponseEntity.status(HttpStatus.OK).body(dtos.iterator().next());
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
   
@@ -87,7 +89,9 @@ public class UserListController {
   public ResponseEntity<?> getPlayersByClub(@PathVariable String clubId) {
     //pathValidator.validatePath(clubId);
     Collection<UserDto> dtos = mapper.mapToUserDto(userService.loadPlayersByClub(clubId));
-    return ResponseEntity.status(HttpStatus.OK).body(dtos);
+    System.out.println(dtos.size());
+    return null;
+    //return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
   
   

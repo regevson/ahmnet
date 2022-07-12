@@ -12,6 +12,6 @@ import lombok.Setter;
 public class TimetableDto {
 
   private List<String> datesInWeek;
-  private List<List<TrainingDto>> trainings;
+  private List<List<TrainingResponse>> trainings;
 
 }

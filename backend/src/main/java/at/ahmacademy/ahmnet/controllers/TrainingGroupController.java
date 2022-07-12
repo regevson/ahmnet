@@ -1,7 +1,8 @@
 package at.ahmacademy.ahmnet.controllers;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.ahmacademy.ahmnet.dtos.TrainingGroupDto;
+import at.ahmacademy.ahmnet.dtos.GroupRequest;
+import at.ahmacademy.ahmnet.dtos.GroupResponse;
 import at.ahmacademy.ahmnet.dtos.TrainingGroupMapper;
-import at.ahmacademy.ahmnet.dtos.TrainingGroupSnippetDto;
-import at.ahmacademy.ahmnet.model.Club;
 import at.ahmacademy.ahmnet.model.TrainingGroup;
 import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupPathValidationService;
 import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
@@ -36,64 +36,47 @@ public class TrainingGroupController {
   @Autowired
   TrainingGroupPathValidationService pathValidator;
 
-  @GetMapping("/batch/groups")
+  @GetMapping("/groups")
   public ResponseEntity<?> getAllGroups() {
-    Collection<TrainingGroupSnippetDto> dtos =
-      mapper.mapToTrainingGroupSnippetDto(groupService.loadAllGroups());
+    Collection<GroupResponse> dtos = mapper.mapToDto(groupService.loadAllGroups());
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-  @DeleteMapping("/clubs/{clubId}/groups/{groupId}")
-  public ResponseEntity<?> deleteGroup(@PathVariable String clubId, @PathVariable Long groupId) {
-    TrainingGroup group = pathValidator.validatePath(clubId, groupId);
+  @DeleteMapping("/groups/{groupId}")
+  public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) {
+    TrainingGroup group = groupService.loadTrainingGroupById(groupId);
     groupService.deleteGroup(group);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @GetMapping("/clubs/{clubId}/groups")
   public ResponseEntity<?> getGroupsByClub(@PathVariable String clubId) {
-    pathValidator.validatePath(clubId);
-    Collection<TrainingGroupSnippetDto> dtos =
-      mapper.mapToTrainingGroupSnippetDto(groupService.loadTrainingGroupsByClub(clubId));
+    Collection<GroupResponse> dtos = mapper.mapToDto(groupService.loadTrainingGroupsByClub(clubId));
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-  @GetMapping("/clubs/{clubId}/groups/{groupId}")
-  public ResponseEntity<?> getGroupById(@PathVariable String clubId, @PathVariable Long groupId) {
-  System.out.println("here");
-    //TrainingGroup group = pathValidator.validatePath(clubId, groupId);
-    //int numPlayedTr = groupService.calcNumPlayedSessions(group);
-    //Map<String, Integer> attendance = groupService.calcAttendance(group);
-    //TrainingGroupDto dto = mapper.mapToTrainingGroupDto(group, numPlayedTr, attendance);
-    TrainingGroup groups = groupService.loadTrainingGroupById(groupId);
-    TrainingGroupDto dto = mapper.mapToTrainingGroupDto(groups, 0, null);
-    return ResponseEntity.status(HttpStatus.OK).body(dto);
+  @GetMapping("/groups/{groupId}")
+  public ResponseEntity<?> getGroupById(@PathVariable Long[] groupId) {
+    Collection<TrainingGroup> groups = Arrays.stream(groupId).map(id -> groupService.loadTrainingGroupById(id))
+                                                             .collect(Collectors.toSet());
+    groups.stream().forEach(g -> groupService.calcAttendance(g));
+    groups.stream().forEach(g -> groupService.calcNumPlayedSessions(g));
+    Collection<GroupResponse> dtos = mapper.mapToDto(groups);
+    if(dtos.size() == 1) return ResponseEntity.status(HttpStatus.OK).body(dtos.iterator().next());
+    return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-/*
-  @GetMapping("/clubs/{clubId}/groups/{groupId}")
-  public ResponseEntity<?> getGroupById(@PathVariable String[] clubIds, @PathVariable Long[] groupIds) {
-    Collection<TrainingGroup> groups = Arrays.stream(groupIds).map(groupService::loadTrainingGroupById)
-                                                              .collect(Collectors.toSet());
-    return ResponseEntity.status(HttpStatus.OK).body(groups);
-  }
-  */
-
-  @PostMapping("/clubs/{id}/groups")
-  public ResponseEntity<?> createNewGroup(@PathVariable String id, @RequestBody TrainingGroupDto groupDto) {
-    pathValidator.validatePath(id);
-    TrainingGroup group = new TrainingGroup();
-    mapper.mapFromTrainingGroupDto(groupDto, group);
+  @PostMapping("/groups")
+  public ResponseEntity<?> createNewGroup(@RequestBody GroupRequest groupDto) {
+    TrainingGroup group = mapper.mapToEntity(null, groupDto);
     groupService.saveGroup(group);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @PutMapping("/clubs/{clubId}/groups/{groupId}")
-  public ResponseEntity<?> updateTrainingGroupDetails(@PathVariable String clubId,
-                                                      @PathVariable Long groupId,
-                                                      @RequestBody TrainingGroupDto groupDto) {
-    TrainingGroup group = pathValidator.validatePath(clubId, groupDto.getId());
-    mapper.mapFromTrainingGroupDto(groupDto, group);
+  @PutMapping("/groups/{groupId}")
+  public ResponseEntity<?> updateTrainingGroupDetails(@PathVariable Long groupId,
+                                                      @RequestBody GroupRequest groupDto) {
+    TrainingGroup group = mapper.mapToEntity(groupId, groupDto);
     groupService.saveGroup(group);
     return ResponseEntity.status(HttpStatus.OK).build();
   }

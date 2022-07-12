@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class TrainingDto {
+public class TrainingResponse {
 
   private long id;
   private LocalDate date;
@@ -24,7 +24,7 @@ public class TrainingDto {
   private int durationMinutes;
   private int court;
   private String bulletPoints;
-  private String comment;
+  private String comments;
   private boolean isFree;
   private Collection<String> playerIds;
   private Collection<String> attendeeIds;

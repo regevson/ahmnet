@@ -3,7 +3,7 @@
     <form style="text-align: left" v-if="group" @submit.prevent="">
       <div align="center" v-if="!isNewGroup()">
         <p class="entry" style="background: #1b2730; border-radius: 5px">
-          Gruppe {{group.id}}
+          Gruppe {{groupId}}
           <i
             v-if="!permChangeGroup()"
             class="fa-solid fa-lock fa-sm"
@@ -20,11 +20,9 @@
       <multiselect
         :disabled="!permChangeGroup()"
         :allowEmpty="false"
-        v-model="group.club"
+        v-model="group.clubId"
         :options="allClubs"
         placeholder="Auswählen/Suchen"
-        label="id"
-        track-by="id"
         deselectLabel=""
         selectLabel=""
       />
@@ -34,7 +32,7 @@
       <multiselect
         :disabled="!permChangeGroup()"
         :allowEmpty="false"
-        v-model="group.players"
+        v-model="selectedPlayers"
         :options="allPlayers"
         :multiple="true"
         :close-on-select="false"
@@ -48,6 +46,7 @@
         selectLabel=""
         deselectLabel=""
         selectedLabel=""
+        @input="extractPlayerIds"
       />
       <br />
 
@@ -55,25 +54,26 @@
       <multiselect
         :disabled="!isAdmin"
         :allowEmpty="false"
-        v-model="group.trainer"
+        v-model="selectedTrainer"
         :options="allTrainers"
         placeholder="Select one"
         label="fullName"
         track-by="fullName"
         deselectLabel=""
         selectLabel=""
+        @input="extractTrainerId"
       />
       <br />
 
       <p class="entry">Gespielte Trainings:</p>
       <div class="detailsInput" style="padding: 5px 5px 5px 10px">
-        <span class="readonly readonlyDigit">{{group.numPlayedSessions}}</span>
+        <span class="readonly readonlyDigit">{{numPlayedSessions}}</span>
       </div>
       <br />
 
       <p class="entry">Anwesenheit:</p>
       <div class="detailsInput" style="padding: 5px 5px 5px 10px">
-        <div v-for="player in group.players" :key="player.id">
+        <div v-for="player in selectedPlayers" :key="player.id">
           <span class="readonly">{{player.fullName}}:</span>
           <span
             class="readonly readonlyDigit"
@@ -152,16 +152,22 @@ export default {
     return {
       user: null,
       isAdmin: false,
+      groupId: -1,
       group: null,
       allClubs: [],
       allPlayers: [],
+      selectedPlayers: [],
       allTrainers: [],
+      selectedTrainer: null,
+      attendance: null,
+      numPlayedSessions: 0,
 
       dialogTxt: '',
     }
   },
 
   async created() {
+    this.groupId = this.$route.params.groupId;
     this.getUserRole();
     this.getFormData();
   },
@@ -177,87 +183,103 @@ export default {
       await this.getAllPlayers();
       if(this.isAdmin)
         await this.getAllTrainers();
-
-      if(this.$route.params.groupId == -1) // is new group
-        this.setupNewGroup();
       else
-        this.setupGroup();
+        this.selectedTrainer = this.user;
+
+      if(this.groupId == -1) // is new group
+        this.setupRequest();
+      else {
+        let resp = await this.getGroup();
+        this.setupRequest(resp.trainerId, resp.clubId, resp.playerIds);
+      }
+
     },
 
     async getAllClubs() {
       const res = await this.$ax.get('clubs');
-      this.allClubs = res.data;
+      this.allClubs = res.data.map(c => c.id);
     },
 
     async getAllPlayers() {
       const res = await this.$ax.get('batch/users?role=PLAYER');
       this.allPlayers = res.data.map(this.combinePlayerInfo);
+      this.selectedPlayers = [this.allPlayers[0]];
     },
 
     async getAllTrainers() {
       const res = await this.$ax.get('batch/users?role=TRAINER');
       this.allTrainers = res.data;
+      this.selectedTrainer = this.user;
     },
 
-    // players should also display info about their club,id,... in multiselect-row
+    // players should also display info about their age... in multiselect-row
     combinePlayerInfo(player) {
-      player.combinedInfo = player.firstName + ' '
-          + player.lastName + ' (' + player.id + ') (' + player.clubName + ')';
+      let age = new Date().getFullYear() - player.birthYear;
+      player.combinedInfo = player.fullName + ' (' + age + 'J)';
       return player;
     },
 
-    async setupNewGroup() {
-      let group = {}
-      this.group = this.prepopulate(group);
+    async getGroup() {
+      let group_res = await this.$ax.get('groups/' + this.groupId);
+      group_res = group_res.data;
+
+      const players_res = await this.$ax.get(group_res.players_url);
+      this.selectedPlayers = players_res.data.map(this.combinePlayerInfo);
+
+      const trainer_res = await this.$ax.get(group_res.trainer_url);
+      this.selectedTrainer = trainer_res.data;
+
+      this.attendance = group_res.attendance;
+      this.numPlayedSessions = group_res.numPlayedSessions;
+      
+      return group_res;
     },
 
-    prepopulate(group) {
-      group.id = null;
-      group.trainer = this.user;
-      group.club = this.allClubs[0];
-      group.players = [this.allPlayers[0]];
-      group.numPlayedSessions = 0;
-      group.attendance = null;
-      return group;
-    },
+    setupRequest(trainerId=this.user.id, clubId=this.allClubs[0], playerIds=[]) {
+      let group = {};
+      group.trainerId = trainerId;
+      group.clubId = clubId;
+      group.playerIds = playerIds;
 
-    async setupGroup() {
-      let clubId = this.$route.params.clubId;
-      let groupId = this.$route.params.groupId;
-      const res = await this.$ax.get('clubs/' + clubId + '/groups/' + groupId);
-      this.group = res.data;
-      this.group.players.map(this.combinePlayerInfo);
+      this.group = group;
     },
 
     async createNewTrainingGroup() {
-      await this.$ax.post('clubs/' + this.group.club.id + '/groups', this.group);
+      await this.$ax.post('groups', this.group);
       this.$router.push({name: 'traininggroups'});
     },
 
     async updateTrainingGroupDetails() {
-      let pathClubId = this.$route.params.clubId;
-      await this.$ax.put('clubs/' + pathClubId + '/groups/' + this.group.id, this.group);
+      await this.$ax.put('groups/' + this.groupId, this.group);
       this.$router.push({name: 'traininggroups'});
     },
 
     async deleteGroup() {
-      await this.$ax.delete('clubs/' + this.group.club.id + '/groups/' + this.group.id);
-      this.$router.push({name: 'traininggroups'});
+      await this.$ax.delete('groups/' + this.groupId);
+      //this.$router.push({name: 'traininggroups'});
     },
 
     getAttendance(playerId) {
-      if(this.group.attendance != null && playerId in this.group.attendance)
-        return this.group.attendance[playerId];
+      if(this.attendance != null && playerId in this.attendance)
+        return this.attendance[playerId];
       else // if group is newly created
         return '?';
     },
 
+    extractTrainerId(trainer) {
+      this.group.trainerId = trainer.id;
+    },
+
+    extractPlayerIds(players) {
+      this.group.playerIds = players.map(p => p.id);
+    },
+
     permChangeGroup() {
-      return this.isAdmin || this.user.id === this.group.trainer.id;
+      return this.isAdmin || this.user.id === this.group.trainerId;
     },
 
     isNewGroup() {
-      return this.group.id == null;
+      return this.groupId == -1;
     },
 
     setDialogTxt(cmd) {

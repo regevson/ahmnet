@@ -30,7 +30,7 @@ import lombok.Setter;
 @Entity
 public class Training {
 
-  @Setter(AccessLevel.NONE)
+  //@Setter(AccessLevel.NONE)
   @Id
   // otherwise there is problem when saving with empty id
   @GeneratedValue(strategy = GenerationType.IDENTITY) 
@@ -47,7 +47,7 @@ public class Training {
   private int durationMinutes;
   private int court;
   private String bulletPoints;
-  private String comment;
+  private String comments;
 
   @Column(columnDefinition = "boolean default false", nullable = false)
   private Boolean isFree;
@@ -81,7 +81,7 @@ public class Training {
     this.setDurationMinutes(toClone.getDurationMinutes());
     this.setAttendees(toClone.getAttendees());
     this.setBulletPoints(toClone.getBulletPoints());
-    this.setComment(toClone.getComment());
+    this.setComments(toClone.getComments());
     this.setIsFree(toClone.getIsFree());
   }
 

@@ -23,6 +23,7 @@ public class UserMapper {
     dto.setFirstName(user.getFirstName());
     dto.setLastName(user.getLastName());
     dto.setFullName(user.getFirstName() + " " + user.getLastName());
+    dto.setBirthYear(user.getBirthYear());
     dto.setClubId(user.getClub().getId());
     dto.setTrainingGroupIds(user.getTrainingGroups().stream().map(g -> g.getId()).collect(Collectors.toSet()));
     dto.setRoles(user.getRoles());

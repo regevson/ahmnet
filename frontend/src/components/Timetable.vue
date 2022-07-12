@@ -125,7 +125,7 @@ export default {
     },
 
     async getTrainings(weekNum) {
-      const response = await this.$ax.get('batch/trainers/' + this.selectedTrainer.id + '/trainings?weekNum=' + weekNum + '&free=false');
+      const response = await this.$ax.get('trainers/' + this.selectedTrainer.id + '/trainings?weekNum=' + weekNum + '&free=false');
       this.updateDateBarProps(response.data);
       this.updateTableProps(response.data, 'trainings', this.selectedDate);
       this.checkedSlots = [];
@@ -157,15 +157,13 @@ export default {
 
     async deleteTrainings() {
       let trainingIds = this.checkedSlots.map(t => t.id);
-      let groupIds = this.checkedSlots.map(t => t.groupId);
-      await this.$ax.delete('trainers/' + this.selectedTrainer.id + '/groups/' + groupIds + '/trainings/' + trainingIds);
+      await this.$ax.delete('trainings/' + trainingIds);
       this.getTrainings(this.weekNum);
     },
 
     async freeTrainings() {
       let trainingIds = this.checkedSlots.map(t => t.id);
-      let groupIds = this.checkedSlots.map(t => t.groupId);
-      await this.$ax.post('trainers/' + this.selectedTrainer.id + '/groups/' + groupIds + '/trainings/' + trainingIds.toString() + '/actions/free/notify');
+      await this.$ax.post('trainings/' + trainingIds + '/actions/free/notify');
       this.getTrainings(this.weekNum);
     },
 

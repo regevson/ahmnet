@@ -48,28 +48,17 @@ DTOs:
 - trainer
 - player
 
-user
-club
-trainer -> group
-trainer -> group -> training
+clubs - groups
+clubs - groups - trainings  ----
+trainers - trainings
 
-trainer
-club
-club -> player
-trainer -> club -> group
-trainer -> club -> group -> training
+training
+
+trainer - trainings (GET)
 
 
 
-
-
-
-
-
-
-
-trainer
-club
-club -> player
-club -> group
-trainer -> training
+- group
+- club
+- trainer
+- player

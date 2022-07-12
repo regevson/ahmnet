@@ -16,6 +16,7 @@ import at.ahmacademy.ahmnet.repositories.TrainingGroupRepository;
 @WebAppConfiguration
 public class TrainingGroupRepositoryTest {
 
+/*
   @Autowired
   TrainingGroupRepository trainingGroupRepo;
 
@@ -40,5 +41,6 @@ public class TrainingGroupRepositoryTest {
     int numGroups = trainingGroupRepo.countPlayedTrainingsByGroupId(0L, LocalDateTime.now());
     Assertions.assertEquals(2, numGroups, "Wrong number of played trainings of group");
   }
+  */
 
 }

@@ -63,6 +63,7 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
 
   private String firstName;
   private String lastName;
+  private Integer birthYear;
   private String email;
   private String phone;
 

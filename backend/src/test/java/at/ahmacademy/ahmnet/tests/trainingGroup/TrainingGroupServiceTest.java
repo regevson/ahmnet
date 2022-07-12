@@ -28,6 +28,7 @@ import at.ahmacademy.ahmnet.services.user.UserService;
 @WebAppConfiguration
 public class TrainingGroupServiceTest {
 
+/*
   @Mock
   TrainingGroupRepository groupRepo;
 
@@ -80,7 +81,8 @@ public class TrainingGroupServiceTest {
     Map<String, Integer> numGroupsByClub = this.groupService.getNumOfGroups(List.of(c1, c2));
     Assertions.assertEquals(1, numGroupsByClub.get(c1.getName()), "Wrong group-num");
     Assertions.assertEquals(2, numGroupsByClub.get(c2.getName()), "Wrong group-num");
-    */
   }
+  
+    */
 
 }

@@ -16,6 +16,7 @@ public class UserDto {
   private String firstName;
   private String lastName;
   private String fullName;
+  private Integer birthYear;
   private String clubId;
   private Collection<Long> trainingGroupIds;
   private Collection<UserRole> roles;

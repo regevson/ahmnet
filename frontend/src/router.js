@@ -23,8 +23,8 @@ export default new Router ({
         { path: '/vacationtable', name: 'vacationtable', component: Vacationtable },
         { path: '/traininggroups', name: 'traininggroups', component: TrainingGroups },
         { path: '/players', name: 'players', component: Players },
-        { path: '/traininggroupdetails/:clubId/group_:groupId', name: 'traininggroupdetails', components: {default: TrainingGroupDetails} },
-        { path: '/trainingdetails/:trainerId/gr:groupId/tr:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}},
+        { path: '/traininggroupdetails/gruppe:groupId', name: 'traininggroupdetails', components: {default: TrainingGroupDetails} },
+        { path: '/trainingdetails/training:trainingId', name: 'trainingdetails', components: {default: TrainingDetails}},
         { path: '/password', name: 'password', components: {default: Password}},
       ]
     }

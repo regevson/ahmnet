@@ -13,7 +13,7 @@ import lombok.Setter;
 public class Club {
 
   @Id
-  @Column(length = 100, name="name")
+  @Column(length = 100)
   private String id;
   
   /*

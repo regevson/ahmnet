@@ -41,13 +41,14 @@
       <multiselect
         :disabled="isFree()"
         :allowEmpty="false"
-        v-model="training.group"
+        v-model="selectedGroup"
         :options="allGroups"
         placeholder="Gruppe suchen"
         label="combinedInfo"
         track-by="combinedInfo"
         deselectLabel=""
         selectLabel=""
+        @input="extractGroupId"
       />
       <br />
 
@@ -113,27 +114,28 @@
       <multiselect
         :disabled="!isAdmin || isFree()"
         :allowEmpty="false"
-        v-model="training.trainer"
+        v-model="selectedTrainer"
         :options="allTrainers"
         placeholder="TrainerIn suchen"
         label="fullName"
         track-by="fullName"
         deselectLabel=""
         selectLabel=""
+        @input="extractTrainerId"
       />
       <br />
 
       <div v-if="!isNewTraining()">
         <p class="entry">Anwesenheit SpielerInnen:</p>
         <div style="margin-top: 10px" class="form-check">
-          <div v-for="player in training.players" :key="player.id">
+          <div v-for="player in players" :key="player.id">
             <input
               class="form-check-input"
               :disabled="isFree()"
               type="checkbox"
               :value="player.id"
               :id="player.id"
-              v-model="training.attendees"
+              v-model="training.attendeeIds"
             />
             <label class="form-check-label" :for="player.id">
               <span> {{player.firstName}} {{player.lastName}} </span>
@@ -143,7 +145,7 @@
         <br />
       </div>
 
-      <p class="entry">Schwerpunkte:</p>
+      <p class="entry">Schwerpunkt(e):</p>
       <textarea
         :disabled="isFree()"
         v-model="training.bulletPoints"
@@ -303,12 +305,17 @@ export default {
   components: {Multiselect},
   data() {
     return {
+      pathTrainingId: -1,
       user: null,
       isAdmin: false,
       training: null,
-      allClubs: [],
       allGroups: [],
       allTrainers: [],
+      allClubs: [],
+
+      selectedGroup: null,
+      selectedTrainer: null,
+      players: [],
 
       // fields to validate
       durationMinutes: 60,
@@ -318,9 +325,6 @@ export default {
       isRecurring: false,
       lastDate: '',
 
-      pathTrainerId: '',
-      pathGroupId: 0,
-      pathTrainingId: 0,
     }
   },
 
@@ -344,8 +348,6 @@ export default {
   },
 
   async created() {
-    this.pathTrainerId = this.$route.params.trainerId;
-    this.pathGroupId = this.$route.params.groupId;
     this.pathTrainingId = this.$route.params.trainingId;
     this.getUserRole();
     this.getFormData();
@@ -364,9 +366,14 @@ export default {
         await this.getAllTrainer();
 
       if(this.$route.params.trainingId == -1) // is new training
-        await this.setupNewTraining();
-      else
-        await this.setupTraining();
+        this.setupRequest();
+      else {
+        let resp = await this.getTraining();
+        this.setupRequest(resp.id, resp.date, resp.lastDate, resp.startTime, resp.durationMinutes, resp.court,
+                          resp.bulletPoints, resp.comments, resp.playerIds, resp.attendeeIds, resp.groupId, resp.trainerId,
+                          resp.clubId, resp.isFree);
+      }
+      this.setValidationFields();
     },
 
     async getAllClubs() {
@@ -375,38 +382,39 @@ export default {
     },
 
     async getAllGroups() {
-      const res = await this.$ax.get('batch/groups');
+      const res = await this.$ax.get('groups');
       this.allGroups = res.data;
       this.allGroups.map(this.combineGroupInfo);
+      this.selectedGroup = this.allGroups[0];
     },
 
     async getAllTrainer() {
       const res = await this.$ax.get('batch/users?role=TRAINER');
       this.allTrainers = res.data;
+      this.selectedTrainer = this.user;
     },
 
-    async setupNewTraining() {
+    setupRequest(id=null, date=this.getCurrentDate(), lastDate=null, startTime="10:30", durationMinutes=60,
+                 court=1, bulletPoints = '', comments='', playerIds=[], attendeeIds=[], groupId=this.allGroups[0].id,
+                 trainerId=this.user.id, clubId=this.allClubs[0], isFree=false) {
+
       let training = {};
-      this.training = this.prepopulate(training);
-    },
+      training.id = id;
+      training.date = date;
+      training.lastDate = lastDate;
+      training.startTime = startTime;
+      training.durationMinutes = durationMinutes;
+      training.court = court;
+      training.bulletPoints = bulletPoints;
+      training.comments = comments;
+      training.playerIds = playerIds;
+      training.attendeeIds = attendeeIds;
+      training.groupId = groupId;
+      training.trainerId = trainerId;
+      training.clubId = clubId;
+      training.isFree = isFree;
 
-    prepopulate(training) {
-      training.id = null;
-      training.group = this.allGroups[0];
-      training.clubId = this.allClubs[0].id;
-      training.date = this.getCurrentDate();
-      training.lastDate = null;
-      training.timeslot = '';
-      training.court = 1;
-      training.startTime = "10:30";
-      training.durationMinutes = 60;
-      training.trainer = this.user;
-      training.players = [];
-      training.attendees = [];
-      training.bulletPoints = '';
-      training.comments = '';
-      training.free = false;
-      return training;
+      this.training = training;
     },
 
     getCurrentDate() {
@@ -415,25 +423,31 @@ export default {
       return curr;
     },
 
-    async setupTraining() {
-      const training_res = await this.$ax.get('trainers/' + this.pathTrainerId + '/groups/' + this.pathGroupId + '/trainings/' + this.pathTrainingId);
-      this.training = training_res.data;
+    async getTraining() {
+      let training_res = await this.$ax.get('trainings/' + this.pathTrainingId);
+      training_res = training_res.data;
 
-      const group_res = await this.$ax.get(this.training.group_url);
-      this.training.group = group_res.data;
-      this.combineGroupInfo(this.training.group);
+      const group_res = await this.$ax.get(training_res.group_url);
+      this.selectedGroup = group_res.data;
+      this.combineGroupInfo(this.selectedGroup);
 
-      const trainer_res = await this.$ax.get(this.training.trainer_url);
-      this.training.trainer = trainer_res.data;
+      const trainer_res = await this.$ax.get(training_res.trainer_url);
+      this.selectedTrainer = trainer_res.data;
 
-      this.setValidationFields();
+      const players_res = await this.$ax.get(training_res.players_url);
+      this.players = players_res.data;
+
+      return training_res;
     },
 
     // group should also display info about participants in multiselect-row
-    combineGroupInfo(group) {
+    async combineGroupInfo(group) {
+      const players_res = await this.$ax.get(group.players_url);
+      let players = players_res.data;
+
       let fullNames = [];
-      group.players.forEach((player) => { fullNames.push(player.fullName); });
-      group.combinedInfo = 'Gruppe' + group.id + ': (' + group.club.id + ') [' + fullNames + ']';
+      players.forEach((player) => { fullNames.push(player.fullName); });
+      group.combinedInfo = group.clubId + '\\GR' + group.id + ' - {' + fullNames + '}';
     },
 
     setValidationFields() {
@@ -442,21 +456,16 @@ export default {
     },
 
     async createNewTraining() {
-      if(!this.validate())
-        return;
-      this.getValidationFields();
-      this.prepareTraining();
-      console.log(this.training);
-      await this.$ax.post('trainers/' + this.training.trainer.id + '/groups/' + this.training.group.id + '/trainings', this.training);
+      if(!this.validate()) return;
+      this.copyValidationFields();
+      await this.$ax.post('trainings', this.training);
       this.$router.push({name: 'timetable'});
     },
 
     async updateTrainingDetails() {
-      if(!this.validate())
-        return;
-      this.getValidationFields();
-      //let this.pathTrainerId = this.$route.params.trainerId;
-      await this.$ax.put('trainers/' + this.pathTrainerId + '/trainings/' + this.training.id, this.training);
+      if(!this.validate()) return;
+      this.copyValidationFields();
+      await this.$ax.put('trainings/' + this.training.id, this.training);
       this.$router.push({name: 'timetable'});
     },
 
@@ -471,36 +480,37 @@ export default {
     },
 
     // copy validation-fields into dto to be sent
-    getValidationFields() {
+    copyValidationFields() {
       this.training.durationMinutes = this.durationMinutes;
       this.training.court = this.court;
       this.training.lastDate = this.lastDate;
     },
 
-    prepareTraining() {
-      this.training.groupId = this.training.group.id;
-      this.training.playerIds = this.training.players.map(p => p.id);
-      this.training.attendeeIds = this.training.attendees.map(a => a.id);
-      this.training.trainerId = this.training.trainer.id;
+    extractTrainerId(trainer) {
+      this.training.trainerId = trainer.id;
+    },
+
+    extractGroupId(group) {
+      this.training.groupId = group.id;
     },
 
     async deleteTraining() {
-      await this.$ax.delete('trainers/' + this.pathTrainerId + '/groups/' + this.pathGroupId + '/trainings/' + this.pathTrainingId);
+      await this.$ax.delete('trainings/' + this.pathTrainingId);
       this.$router.push({name: 'timetable'});
     },
 
     async freeTraining() {
-      await this.$ax.post('trainers/' + this.pathTrainerId + '/groups/' + this.pathGroupId + '/trainings/' + this.pathTrainingId + '/actions/free');
+      await this.$ax.post('trainings/' + this.pathTrainingId + '/actions/free');
       this.$router.push({name: 'timetable'});
     },
 
     async grabTraining() {
-      await this.$ax.post('trainers/' + this.pathTrainerId + '/trainings/' + this.pathTrainingId + '/actions/grab');
+      await this.$ax.post('trainings/' + this.pathTrainingId + '/actions/grab');
       this.$router.push({name: 'vacationtable'});
     },
 
     isFree() {
-      return this.training.free;
+      return this.training.isFree;
     },
 
     isNewTraining() {
@@ -520,7 +530,7 @@ export default {
         this.dialogTxt = "Training übernehmen?";
     },
 
-  }
+  },
 
 
 }
