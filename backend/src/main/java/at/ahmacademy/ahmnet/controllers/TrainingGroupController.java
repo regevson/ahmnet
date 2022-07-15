@@ -2,6 +2,7 @@ package at.ahmacademy.ahmnet.controllers;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,22 +43,23 @@ public class TrainingGroupController {
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-  @DeleteMapping("/groups/{groupId}")
-  public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) {
-    TrainingGroup group = groupService.loadTrainingGroupById(groupId);
-    groupService.deleteGroup(group);
+  @DeleteMapping("/groups/{groupIds}")
+  public ResponseEntity<?> deleteGroupsById(@PathVariable Long[] groupIds) {
+    Set<TrainingGroup> groups = Arrays.stream(groupIds).map(groupService::loadGroupById).collect(Collectors.toSet());
+    groups.stream().forEach(groupService::deleteGroup);
+  
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @GetMapping("/clubs/{clubId}/groups")
   public ResponseEntity<?> getGroupsByClub(@PathVariable String clubId) {
-    Collection<GroupResponse> dtos = mapper.mapToDto(groupService.loadTrainingGroupsByClub(clubId));
+    Collection<GroupResponse> dtos = mapper.mapToDto(groupService.loadGroupsByClub(clubId));
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
   @GetMapping("/groups/{groupId}")
-  public ResponseEntity<?> getGroupById(@PathVariable Long[] groupId) {
-    Collection<TrainingGroup> groups = Arrays.stream(groupId).map(id -> groupService.loadTrainingGroupById(id))
+  public ResponseEntity<?> getGroupsById(@PathVariable Long[] groupId) {
+    Collection<TrainingGroup> groups = Arrays.stream(groupId).map(id -> groupService.loadGroupById(id))
                                                              .collect(Collectors.toSet());
     groups.stream().forEach(g -> groupService.calcAttendance(g));
     groups.stream().forEach(g -> groupService.calcNumPlayedSessions(g));
@@ -74,8 +76,8 @@ public class TrainingGroupController {
   }
 
   @PutMapping("/groups/{groupId}")
-  public ResponseEntity<?> updateTrainingGroupDetails(@PathVariable Long groupId,
-                                                      @RequestBody GroupRequest groupDto) {
+  public ResponseEntity<?> updateExistingGroup(@PathVariable Long groupId,
+                                               @RequestBody GroupRequest groupDto) {
     TrainingGroup group = mapper.mapToEntity(groupId, groupDto);
     groupService.saveGroup(group);
     return ResponseEntity.status(HttpStatus.OK).build();

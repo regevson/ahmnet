@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.PreRemove;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -103,6 +104,10 @@ public class Training {
   
   public void setPrevTrainer(User prevTrainer) {
     this.prevTrainer = prevTrainer;
+  }
+  
+  @PreRemove
+  private void detachEntities() {
   }
 
 }

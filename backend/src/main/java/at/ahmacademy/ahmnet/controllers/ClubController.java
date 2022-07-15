@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import at.ahmacademy.ahmnet.dtos.ClubDto;
 import at.ahmacademy.ahmnet.dtos.ClubMapper;
 import at.ahmacademy.ahmnet.model.Club;
-import at.ahmacademy.ahmnet.services.trainingGroup.ClubService;
+import at.ahmacademy.ahmnet.services.club.ClubService;
 
 @RequestMapping("/api")
 @RestController

@@ -1,4 +1,4 @@
-package at.ahmacademy.ahmnet.services.trainingGroup;
+package at.ahmacademy.ahmnet.services.club;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import at.ahmacademy.ahmnet.model.Club;
 import at.ahmacademy.ahmnet.repositories.ClubRepository;
+import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
 import at.ahmacademy.ahmnet.services.user.UserService;
 
 @Service
@@ -47,10 +48,8 @@ public class ClubService {
   public Map<String, Integer> getNumOfGroups(Collection<Club> clubs) {
     Map<String, Integer> map = new HashMap<>();
     for(Club club: clubs)
-      map.put(club.getId(), groupService.loadTrainingGroupsByClub(club.getId()).size());
+      map.put(club.getId(), groupService.loadGroupsByClub(club.getId()).size());
     return map;
   }
-
-
 
 }

@@ -41,19 +41,4 @@ public class UserMapper {
     return dtos;
   }
 
-  public UserSnippetDto mapToUserSnippetDto(User user) {
-    UserSnippetDto dto = new UserSnippetDto();
-    dto.setId(user.getId());
-    dto.setFullName(user.getFirstName() + " " + user.getLastName());
-    dto.setClub(clubMapper.mapToClubDto(user.getClub()));
-    dto.setGroups(groupMapper.mapToTrainingGroupSnippetDto(user.getTrainingGroups()));
-    return dto;
-  }
-  public Collection<UserSnippetDto> mapToUserSnippetDto(Collection<User> users) {
-    Collection<UserSnippetDto> dtos = new ArrayList<>();
-    for(User u : users)
-      dtos.add(mapToUserSnippetDto(u));
-    return dtos;
-  }
-
 }

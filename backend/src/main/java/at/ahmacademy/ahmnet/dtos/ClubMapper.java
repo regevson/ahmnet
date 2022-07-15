@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import at.ahmacademy.ahmnet.model.Club;
-import at.ahmacademy.ahmnet.services.trainingGroup.ClubService;
+import at.ahmacademy.ahmnet.services.club.ClubService;
 
 @Component
 public class ClubMapper {

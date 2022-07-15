@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +44,6 @@ public class TrainingController {
   TrainingPathValidationService pathValidator;
 
 
-  // ok
   @GetMapping("/trainings/{trainingIds}")
   public ResponseEntity<?> getTrainingsById(@PathVariable Long[] trainingIds) {
     Collection<Training> trainings = Arrays.stream(trainingIds).map(trService::loadTrainingById).collect(Collectors.toSet());
@@ -54,8 +52,6 @@ public class TrainingController {
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-  // ok
-  @Transactional
   @DeleteMapping("/trainings/{trainingIds}")
   public ResponseEntity<?> deleteTrainingsById(@PathVariable Long[] trainingIds) {
     Set<Training> trainings = Arrays.stream(trainingIds).map(trService::loadTrainingById).collect(Collectors.toSet());
@@ -63,7 +59,6 @@ public class TrainingController {
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  // ok
   @PostMapping(value = {"/trainings/{trainingIds}/actions/free",
                         "/trainings/{trainingIds}/actions/free/{notify}"})
   public ResponseEntity<?> freeTrainingsById(@PathVariable Long[] trainingIds,
@@ -73,7 +68,6 @@ public class TrainingController {
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  // ok
   @PostMapping(value = {"/trainings/{trainingIds}/actions/grab",
                         "/trainings/{trainingIds}/actions/grab/{notify}"})
   public ResponseEntity<?> grabTrainingsById(@PathVariable Long[] trainingIds,
@@ -83,7 +77,6 @@ public class TrainingController {
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  // ok
   @GetMapping(value = "/trainings", params = {"weekNum"})
   public ResponseEntity<?> getAllFreeTrainingsByWeekNum(Integer weekNum, Optional<String> exclTrainerId) {
     List<List<Training>> trainingsByDay = trService.loadFreeTrainings(weekNum, exclTrainerId);
@@ -92,7 +85,6 @@ public class TrainingController {
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
-  // ok
   @GetMapping(value = "/trainers/{id}/trainings", params = {"weekNum"})
   public ResponseEntity<?> getTrainingsByTrainerAndWeekNum(@PathVariable String id, Integer weekNum, 
                                                            Optional<Boolean> free) {
@@ -102,19 +94,17 @@ public class TrainingController {
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
-  // ok
   @PostMapping("/trainings")
   public ResponseEntity<?> createNewTraining(@RequestBody TrainingRequest trainingDto) {
-    Training training = mapper.mapToEntity(trainingDto);
+    Training training = mapper.mapToEntity(null, trainingDto);
     trService.saveNewTraining(training);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  // ok
   @PutMapping("/trainings/{trainingId}")
   public ResponseEntity<?> updateExistingTraining(@PathVariable Long trainingId,
                                                   @RequestBody TrainingRequest trainingDto) {
-    Training training = mapper.mapToEntity(trainingDto);
+    Training training = mapper.mapToEntity(trainingId, trainingDto);
     trService.updateTraining(training);
     return ResponseEntity.status(HttpStatus.OK).build();
   }

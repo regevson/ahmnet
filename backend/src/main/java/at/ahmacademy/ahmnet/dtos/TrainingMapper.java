@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 import at.ahmacademy.ahmnet.model.Training;
 import at.ahmacademy.ahmnet.model.User;
+import at.ahmacademy.ahmnet.services.club.ClubService;
 import at.ahmacademy.ahmnet.services.training.TrainingService;
-import at.ahmacademy.ahmnet.services.trainingGroup.ClubService;
 import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
 import at.ahmacademy.ahmnet.services.user.UserService;
 
@@ -78,9 +78,10 @@ public class TrainingMapper {
     return dtoList;
   }
 
-  public Training mapToEntity(TrainingRequest dto) {
+  public Training mapToEntity(Long id, TrainingRequest dto) {
     Training tr = new Training();
-    tr.setId(dto.getId());
+    if(id != null)
+      tr = trainingService.loadTrainingById(id);
     tr.setDateTime(dto.getDate().atTime(dto.getStartTime()));
     tr.setLastDate(dto.getLastDate());
     tr.setDurationMinutes(dto.getDurationMinutes());
@@ -89,8 +90,8 @@ public class TrainingMapper {
     tr.setComments(dto.getComments());
     tr.setIsFree(dto.isFree());
     if(dto.getAttendeeIds() != null)
-      tr.setAttendees(dto.getAttendeeIds().stream().map(id -> userService.loadUser(id)).collect(Collectors.toSet()));
-    tr.setTrainingGroup(groupService.loadTrainingGroupById(dto.getGroupId()));
+      tr.setAttendees(dto.getAttendeeIds().stream().map(i -> userService.loadUser(i)).collect(Collectors.toSet()));
+    tr.setTrainingGroup(groupService.loadGroupById(dto.getGroupId()));
     tr.setTrainer(userService.loadUser(dto.getTrainerId()));
     tr.setClub(clubService.loadClub(dto.getClubId()));
 

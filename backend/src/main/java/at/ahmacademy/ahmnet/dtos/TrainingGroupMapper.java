@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import at.ahmacademy.ahmnet.model.Training;
 import at.ahmacademy.ahmnet.model.TrainingGroup;
 import at.ahmacademy.ahmnet.model.User;
-import at.ahmacademy.ahmnet.services.trainingGroup.ClubService;
+import at.ahmacademy.ahmnet.services.club.ClubService;
 import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
 import at.ahmacademy.ahmnet.services.user.UserService;
 
@@ -54,29 +54,12 @@ public class TrainingGroupMapper {
   public TrainingGroup mapToEntity(Long id, GroupRequest dto) {
     TrainingGroup group = new TrainingGroup();
     if(id != null)
-      group = groupService.loadTrainingGroupById(id);
+      group = groupService.loadGroupById(id);
     group.setTrainer(userService.loadUser(dto.getTrainerId()));
     group.setClub(clubService.loadClub(dto.getClubId()));
     Set<User> players = dto.getPlayerIds().stream().map(p -> userService.loadUser(p)).collect(Collectors.toSet());
     group.setPlayers(players);
     return group;
-  }
-
-  public TrainingGroupSnippetDto mapToTrainingGroupSnippetDto(TrainingGroup trg) {
-    TrainingGroupSnippetDto dto = new TrainingGroupSnippetDto();
-    dto.setId(trg.getId());
-    dto.setTrainer(userMapper.mapToUserDto(trg.getTrainer()));
-    dto.setClub(clubMapper.mapToClubDto(trg.getClub()));
-    dto.setPlayers(userMapper.mapToUserDto(trg.getPlayers()));
-    return dto;
-  }
-
-  public Collection<TrainingGroupSnippetDto> mapToTrainingGroupSnippetDto
-                                                       (Collection<TrainingGroup> groups) {
-    Collection<TrainingGroupSnippetDto> dtos = new ArrayList<>();
-    for(TrainingGroup tg: groups)
-      dtos.add(mapToTrainingGroupSnippetDto(tg));
-    return dtos;
   }
 
 }

@@ -4,7 +4,7 @@
 
       <div align="center" v-if="!isNewTraining()">
         <p class="entry" style="background: #1b2730; border-radius: 5px">
-          Training {{training.id}}
+          Training {{trainingId}}
           <i
             v-if="isFree()"
             class="fa-solid fa-lock fa-sm"
@@ -305,7 +305,7 @@ export default {
   components: {Multiselect},
   data() {
     return {
-      pathTrainingId: -1,
+      trainingId: -1,
       user: null,
       isAdmin: false,
       training: null,
@@ -348,7 +348,7 @@ export default {
   },
 
   async created() {
-    this.pathTrainingId = this.$route.params.trainingId;
+    this.trainingId = this.$route.params.trainingId;
     this.getUserRole();
     this.getFormData();
   },
@@ -369,7 +369,7 @@ export default {
         this.setupRequest();
       else {
         let resp = await this.getTraining();
-        this.setupRequest(resp.id, resp.date, resp.lastDate, resp.startTime, resp.durationMinutes, resp.court,
+        this.setupRequest(resp.date, resp.lastDate, resp.startTime, resp.durationMinutes, resp.court,
                           resp.bulletPoints, resp.comments, resp.playerIds, resp.attendeeIds, resp.groupId, resp.trainerId,
                           resp.clubId, resp.isFree);
       }
@@ -394,12 +394,11 @@ export default {
       this.selectedTrainer = this.user;
     },
 
-    setupRequest(id=null, date=this.getCurrentDate(), lastDate=null, startTime="10:30", durationMinutes=60,
+    setupRequest(date=this.getCurrentDate(), lastDate=null, startTime="10:30", durationMinutes=60,
                  court=1, bulletPoints = '', comments='', playerIds=[], attendeeIds=[], groupId=this.allGroups[0].id,
                  trainerId=this.user.id, clubId=this.allClubs[0], isFree=false) {
 
       let training = {};
-      training.id = id;
       training.date = date;
       training.lastDate = lastDate;
       training.startTime = startTime;
@@ -424,7 +423,7 @@ export default {
     },
 
     async getTraining() {
-      let training_res = await this.$ax.get('trainings/' + this.pathTrainingId);
+      let training_res = await this.$ax.get('trainings/' + this.trainingId);
       training_res = training_res.data;
 
       const group_res = await this.$ax.get(training_res.group_url);
@@ -465,7 +464,7 @@ export default {
     async updateTrainingDetails() {
       if(!this.validate()) return;
       this.copyValidationFields();
-      await this.$ax.put('trainings/' + this.training.id, this.training);
+      await this.$ax.put('trainings/' + this.trainingId, this.training);
       this.$router.push({name: 'timetable'});
     },
 
@@ -495,17 +494,17 @@ export default {
     },
 
     async deleteTraining() {
-      await this.$ax.delete('trainings/' + this.pathTrainingId);
+      await this.$ax.delete('trainings/' + this.trainingId);
       this.$router.push({name: 'timetable'});
     },
 
     async freeTraining() {
-      await this.$ax.post('trainings/' + this.pathTrainingId + '/actions/free');
+      await this.$ax.post('trainings/' + this.trainingId + '/actions/free');
       this.$router.push({name: 'timetable'});
     },
 
     async grabTraining() {
-      await this.$ax.post('trainings/' + this.pathTrainingId + '/actions/grab');
+      await this.$ax.post('trainings/' + this.trainingId + '/actions/grab');
       this.$router.push({name: 'vacationtable'});
     },
 
@@ -514,7 +513,7 @@ export default {
     },
 
     isNewTraining() {
-      return this.training.id == null;
+      return this.trainingId == -1;
     },
 
     setDialogTxt(cmd) {

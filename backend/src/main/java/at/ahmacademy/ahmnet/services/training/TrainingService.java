@@ -78,6 +78,7 @@ public class TrainingService {
   @PreAuthorize("hasAuthority('ADMIN') || "
               + "@trainingAuthService.hasTrainer(#training, authentication.name)")
   public void deleteTraining(Training training) {
+    training.getTrainingGroup().getTrainings().removeIf(t -> t.getId() == training.getId());
     trainingRepo.delete(training);
   }
 

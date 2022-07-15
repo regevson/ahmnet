@@ -44,13 +44,13 @@ public class TrainingGroupService {
   }
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-  public TrainingGroup loadTrainingGroupById(long groupId) {
+  public TrainingGroup loadGroupById(long groupId) {
     TrainingGroup group = this.trainingGroupRepository.findById(groupId).orElse(null);
     return group;
   }
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-  public Set<TrainingGroup> loadTrainingGroupsByClub(String clubName) {
+  public Set<TrainingGroup> loadGroupsByClub(String clubName) {
     return this.trainingGroupRepository.findByClub_IdContaining(clubName);
   }
 
@@ -76,6 +76,5 @@ public class TrainingGroupService {
     int num = this.trainingGroupRepository.countPlayedTrainingsByGroupId(group.getId(), LocalDateTime.now());
     group.setNumPlayedSessions(num);
   }
-
 
 }

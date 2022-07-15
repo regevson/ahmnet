@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import at.ahmacademy.ahmnet.dtos.UserDto;
 import at.ahmacademy.ahmnet.dtos.UserMapper;
-import at.ahmacademy.ahmnet.dtos.UserSnippetDto;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.model.UserRole;
 import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;

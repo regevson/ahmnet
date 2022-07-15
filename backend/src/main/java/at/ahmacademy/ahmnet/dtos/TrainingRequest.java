@@ -15,7 +15,6 @@ import lombok.Setter;
 @Setter
 public class TrainingRequest {
 
-  private long id;
   private LocalDate date;
   private LocalDate lastDate;
   private LocalTime startTime;

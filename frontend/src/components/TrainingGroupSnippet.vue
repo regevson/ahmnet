@@ -49,7 +49,6 @@ export default {
     let groups = response.data;
     
     for(let group of groups) {
-      console.log('reading group' + group.id);
       response = await this.$ax.get(group.trainer_url);
       group.trainer = response.data;
       response = await this.$ax.get(group.players_url);
