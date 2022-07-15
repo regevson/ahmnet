@@ -256,7 +256,7 @@ export default {
 
     async deleteGroup() {
       await this.$ax.delete('groups/' + this.groupId);
-      //this.$router.push({name: 'traininggroups'});
+      this.$router.push({name: 'traininggroups'});
     },
 
     getAttendance(playerId) {

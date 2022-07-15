@@ -39,7 +39,8 @@ public class TrainingGroup {
   @ManyToMany(fetch = FetchType.EAGER)
   private Set<User> players;
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "trainingGroup")
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "trainingGroup", 
+      cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Training> trainings;
 
   @Transient

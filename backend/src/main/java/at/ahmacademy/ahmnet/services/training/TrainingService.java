@@ -1,7 +1,10 @@
 package at.ahmacademy.ahmnet.services.training;
 
-import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.*;
-import static at.ahmacademy.ahmnet.services.training.TrainingAuthService.*;
+import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.exclId;
+import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasFreeStatus;
+import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasTrainer;
+import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasWeekNum;
+import static at.ahmacademy.ahmnet.services.AuthService.authWhen;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -30,10 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import at.ahmacademy.ahmnet.model.SmsRequest;
 import at.ahmacademy.ahmnet.model.Training;
+import at.ahmacademy.ahmnet.model.TrainingGroup;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.repositories.TrainingRepository;
-import at.ahmacademy.ahmnet.repositories.TrainingSpecification;
 import at.ahmacademy.ahmnet.services.sms.SmsService;
+import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
 import at.ahmacademy.ahmnet.services.user.UserAuthService;
 import at.ahmacademy.ahmnet.services.user.UserService;
 
@@ -74,8 +78,6 @@ public class TrainingService {
   @PreAuthorize("hasAuthority('ADMIN') || "
               + "@trainingAuthService.hasTrainer(#training, authentication.name)")
   public void deleteTraining(Training training) {
-    training.getAttendees().removeAll(training.getAttendees());
-    training.getTrainingGroup().getTrainings().remove(training);
     trainingRepo.delete(training);
   }
 

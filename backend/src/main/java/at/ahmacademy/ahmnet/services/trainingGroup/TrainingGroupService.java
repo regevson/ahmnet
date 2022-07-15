@@ -3,6 +3,7 @@ package at.ahmacademy.ahmnet.services.trainingGroup;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +28,6 @@ public class TrainingGroupService {
 
   @Autowired
   private TrainingGroupRepository trainingGroupRepository;
-  @Autowired
-  private TrainingService trainingService;
-  @Autowired
-  private UserService userService;
   /*
   @Autowired
   private TrainingGroupAuthService auth;
@@ -59,18 +56,7 @@ public class TrainingGroupService {
 
   @PreAuthorize("hasAuthority('ADMIN') || @userAuthService.isAuthUsr(#group.trainer.id)")
   public void deleteGroup(TrainingGroup group) {
-    group.getPlayers().stream().forEach(p -> p.getTrainingGroups().remove(group)); 
-    group.getPlayers().stream().forEach(p -> userService.saveUser(p));
-    group.setPlayers(Set.of());
-    group.getTrainings().stream().forEach(t -> t.setTrainingGroup(null));
-    group.getTrainings().stream().forEach(t -> t.setAttendees(Set.of()));
-    group.getTrainings().stream().forEach(t -> trainingService.updateTraining(t));
-    group.setTrainings(null);
-    this.saveGroup(group);
-    try {
-      trainingGroupRepository.delete(group);
-      System.out.println("after deleted");
-    }catch(Exception ex) {ex.printStackTrace();}
+    trainingGroupRepository.delete(group);
   }
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
