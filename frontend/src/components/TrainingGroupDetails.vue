@@ -221,7 +221,7 @@ export default {
 
     async getGroup() {
       let group_res = await this.$ax.get('groups/' + this.groupId);
-      group_res = group_res.data;
+      group_res = group_res.data[0];
 
       const players_res = await this.$ax.get(group_res.players_url);
       this.selectedPlayers = players_res.data.map(this.combinePlayerInfo);

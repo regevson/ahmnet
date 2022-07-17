@@ -64,7 +64,6 @@ public class TrainingGroupController {
     groups.stream().forEach(g -> groupService.calcAttendance(g));
     groups.stream().forEach(g -> groupService.calcNumPlayedSessions(g));
     Collection<GroupResponse> dtos = mapper.mapToDto(groups);
-    if(dtos.size() == 1) return ResponseEntity.status(HttpStatus.OK).body(dtos.iterator().next());
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 

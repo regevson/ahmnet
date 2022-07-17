@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -11,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import at.ahmacademy.ahmnet.model.Club;
+import at.ahmacademy.ahmnet.model.UserRole;
 import at.ahmacademy.ahmnet.repositories.ClubRepository;
 import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
 import at.ahmacademy.ahmnet.services.user.UserService;
@@ -40,7 +42,7 @@ public class ClubService {
   public Map<String, Integer> getNumOfPlayers(Collection<Club> clubs) {
     Map<String, Integer> map = new HashMap<>();
     for(Club club: clubs)
-      map.put(club.getId(), userService.loadPlayersByClub(club.getId()).size());
+      map.put(club.getId(), userService.loadUsersByClubAndRole(club.getId(), Optional.of(UserRole.PLAYER)).size());
     return map;
   }
 

@@ -48,7 +48,6 @@ public class TrainingController {
   public ResponseEntity<?> getTrainingsById(@PathVariable Long[] trainingIds) {
     Collection<Training> trainings = Arrays.stream(trainingIds).map(trService::loadTrainingById).collect(Collectors.toSet());
     List<TrainingResponse> dtos = mapper.mapToDto(trainings);
-    if(dtos.size() == 1) return ResponseEntity.status(HttpStatus.OK).body(dtos.get(0));
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 

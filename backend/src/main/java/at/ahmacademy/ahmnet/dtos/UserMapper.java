@@ -12,8 +12,8 @@ import at.ahmacademy.ahmnet.model.User;
 @Component
 public class UserMapper {
 
-  public UserDto mapToDto(User user) {
-    UserDto dto = new UserDto();
+  public UserResponse mapToDto(User user) {
+    UserResponse dto = new UserResponse();
     dto.setId(user.getId());
     dto.setFirstName(user.getFirstName());
     dto.setLastName(user.getLastName());
@@ -23,14 +23,13 @@ public class UserMapper {
     dto.setTrainingGroupIds(user.getTrainingGroups().stream().map(g -> g.getId()).collect(Collectors.toSet()));
     dto.setRoles(user.getRoles());
 
-    String groupClubIds = user.getTrainingGroups().stream().map(a -> a.getClub().getId()).collect(Collectors.joining(","));
     String groupIds = user.getTrainingGroups().stream().map(a -> Long.toString(a.getId())).collect(Collectors.joining(","));
-    dto.setGroups_url("clubs/" + groupClubIds + "/groups/" + groupIds);
+    dto.setGroups_url("groups/" + groupIds);
 
     return dto;
   }
-  public Collection<UserDto> mapToDto(Collection<User> users) {
-    Collection<UserDto> dtos = new ArrayList<>();
+  public Collection<UserResponse> mapToDto(Collection<User> users) {
+    Collection<UserResponse> dtos = new ArrayList<>();
     for(User u : users)
       dtos.add(mapToDto(u));
     return dtos;

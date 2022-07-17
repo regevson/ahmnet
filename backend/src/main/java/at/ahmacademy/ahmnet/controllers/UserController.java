@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import at.ahmacademy.ahmnet.dtos.UserDto;
+import at.ahmacademy.ahmnet.dtos.UserResponse;
 import at.ahmacademy.ahmnet.dtos.UserMapper;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.model.UserRole;
@@ -43,7 +43,7 @@ import at.ahmacademy.ahmnet.services.user.UserService;
 @RequestMapping("/api")
 @RestController
 @Scope("application")
-public class UserListController {
+public class UserController {
 
   @Autowired
   private UserService userService;
@@ -54,14 +54,14 @@ public class UserListController {
 
   @GetMapping("/users")
   public ResponseEntity<?> getAllUsers(Optional<UserRole> role) {
-    Collection<UserDto> dtos = mapper.mapToDto(userService.getUsersByRole(role));
+    Collection<UserResponse> dtos = mapper.mapToDto(userService.getUsersByRole(role));
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
   @GetMapping("/users/{userIds}")
   public ResponseEntity<?> getUsersById(@PathVariable String[] userIds) {
     Collection<User> users = Arrays.stream(userIds).map(userService::loadUser).collect(Collectors.toSet());
-    Collection<UserDto> dtos = mapper.mapToDto(users);
+    Collection<UserResponse> dtos = mapper.mapToDto(users);
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
   
@@ -86,7 +86,7 @@ public class UserListController {
 
   @GetMapping("/clubs/{clubId}/users")
   public ResponseEntity<?> getAllUsersByClub(@PathVariable String clubId, Optional<UserRole> role) {
-    Collection<UserDto> dtos = mapper.mapToDto(userService.loadUsersByClubAndRole(clubId, role));
+    Collection<UserResponse> dtos = mapper.mapToDto(userService.loadUsersByClubAndRole(clubId, role));
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
   

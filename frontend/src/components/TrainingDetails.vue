@@ -424,14 +424,14 @@ export default {
 
     async getTraining() {
       let training_res = await this.$ax.get('trainings/' + this.trainingId);
-      training_res = training_res.data;
+      training_res = training_res.data[0];
 
       const group_res = await this.$ax.get(training_res.group_url);
-      this.selectedGroup = group_res.data;
+      this.selectedGroup = group_res.data[0];
       this.combineGroupInfo(this.selectedGroup);
 
       const trainer_res = await this.$ax.get(training_res.trainer_url);
-      this.selectedTrainer = trainer_res.data;
+      this.selectedTrainer = trainer_res.data[0];
 
       const players_res = await this.$ax.get(training_res.players_url);
       this.players = players_res.data;
