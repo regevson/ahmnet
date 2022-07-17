@@ -50,7 +50,7 @@ export default {
     
     for(let group of groups) {
       response = await this.$ax.get(group.trainer_url);
-      group.trainer = response.data;
+      group.trainer = response.data[0];
       response = await this.$ax.get(group.players_url);
       group.players = response.data;
     }

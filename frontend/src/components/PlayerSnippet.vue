@@ -49,7 +49,7 @@ export default {
   },
 
   async created() {
-    const response = await this.$ax.get('clubs/' + this.clubId + '/players');
+    const response = await this.$ax.get('clubs/' + this.clubId + '/users?role=PLAYER');
     this.players = response.data;
     console.log(this.players);
   },

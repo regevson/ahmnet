@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -51,46 +52,42 @@ public class UserListController {
   @Autowired
   UserMapper mapper;
 
-  @GetMapping("/batch/users")
-  public ResponseEntity<?> getUsers(Optional<UserRole> role) {
-    Collection<UserDto> dtos = null;
-    if(role.isEmpty())
-      dtos = mapper.mapToUserDto(userService.getAllUsers());
-    else
-      dtos = mapper.mapToUserDto(userService.getUsersByRole(role.get()));
+  @GetMapping("/users")
+  public ResponseEntity<?> getAllUsers(Optional<UserRole> role) {
+    Collection<UserDto> dtos = mapper.mapToDto(userService.getUsersByRole(role));
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-  @GetMapping("/users/{userId}")
-  public ResponseEntity<?> getUser(@PathVariable String userId) {
-    UserDto dto = mapper.mapToUserDto(userService.loadUser(userId));
-    return ResponseEntity.status(HttpStatus.OK).body(dto);
+  @GetMapping("/users/{userIds}")
+  public ResponseEntity<?> getUsersById(@PathVariable String[] userIds) {
+    Collection<User> users = Arrays.stream(userIds).map(userService::loadUser).collect(Collectors.toSet());
+    Collection<UserDto> dtos = mapper.mapToDto(users);
+    return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
   
+  /*
   @GetMapping("/clubs/{clubIds}/players/{playerIds}")
   public ResponseEntity<?> getPlayersById(@PathVariable String[] clubIds,
                                          @PathVariable String[] playerIds) { 
     Collection<User> players = Arrays.stream(playerIds).map(userService::loadUser).collect(Collectors.toSet());
-    Collection<UserDto> dtos = mapper.mapToUserDto(players);
+    Collection<UserDto> dtos = mapper.mapToDto(players);
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
   @GetMapping("/trainer/{trainerIds}")
   public ResponseEntity<?> getPlayersById(@PathVariable String[] trainerIds) {
     Collection<User> trainers = Arrays.stream(trainerIds).map(userService::loadUser).collect(Collectors.toSet());
-    Collection<UserDto> dtos = mapper.mapToUserDto(trainers);
+    Collection<UserDto> dtos = mapper.mapToDto(trainers);
     if(dtos.size() == 1) return ResponseEntity.status(HttpStatus.OK).body(dtos.iterator().next());
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
+  */
   
 
-  @GetMapping("/clubs/{clubId}/players")
-  public ResponseEntity<?> getPlayersByClub(@PathVariable String clubId) {
-    //pathValidator.validatePath(clubId);
-    Collection<UserDto> dtos = mapper.mapToUserDto(userService.loadPlayersByClub(clubId));
-    System.out.println(dtos.size());
-    return null;
-    //return ResponseEntity.status(HttpStatus.OK).body(dtos);
+  @GetMapping("/clubs/{clubId}/users")
+  public ResponseEntity<?> getAllUsersByClub(@PathVariable String clubId, Optional<UserRole> role) {
+    Collection<UserDto> dtos = mapper.mapToDto(userService.loadUsersByClubAndRole(clubId, role));
+    return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
   
   

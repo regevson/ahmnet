@@ -12,12 +12,7 @@ import at.ahmacademy.ahmnet.model.User;
 @Component
 public class UserMapper {
 
-  @Autowired
-  private ClubMapper clubMapper;
-  @Autowired
-  private TrainingGroupMapper groupMapper;
-
-  public UserDto mapToUserDto(User user) {
+  public UserDto mapToDto(User user) {
     UserDto dto = new UserDto();
     dto.setId(user.getId());
     dto.setFirstName(user.getFirstName());
@@ -34,10 +29,10 @@ public class UserMapper {
 
     return dto;
   }
-  public Collection<UserDto> mapToUserDto(Collection<User> users) {
+  public Collection<UserDto> mapToDto(Collection<User> users) {
     Collection<UserDto> dtos = new ArrayList<>();
     for(User u : users)
-      dtos.add(mapToUserDto(u));
+      dtos.add(mapToDto(u));
     return dtos;
   }
 

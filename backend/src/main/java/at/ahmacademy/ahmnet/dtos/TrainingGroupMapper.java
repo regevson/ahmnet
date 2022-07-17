@@ -38,9 +38,8 @@ public class TrainingGroupMapper {
     dto.setAttendance(group.getAttendance());
     dto.setNumPlayedSessions(group.getNumPlayedSessions());
 
-    dto.setTrainer_url("trainer/" + dto.getTrainerId());
-    String playerClubIds = group.getPlayers().stream().map(a -> a.getClub().getId()).collect(Collectors.joining(","));
-    dto.setPlayers_url("clubs/" + playerClubIds + "/players/" + dto.getPlayerIds().stream().collect(Collectors.joining(",")));
+    dto.setTrainer_url("users/" + dto.getTrainerId());
+    dto.setPlayers_url("users/" + dto.getPlayerIds().stream().collect(Collectors.joining(",")));
     dto.setClub_url("clubs/" + dto.getClubId());
     return dto;
   }

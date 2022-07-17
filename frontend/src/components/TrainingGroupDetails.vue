@@ -201,13 +201,13 @@ export default {
     },
 
     async getAllPlayers() {
-      const res = await this.$ax.get('batch/users?role=PLAYER');
+      const res = await this.$ax.get('users?role=PLAYER');
       this.allPlayers = res.data.map(this.combinePlayerInfo);
       this.selectedPlayers = [this.allPlayers[0]];
     },
 
     async getAllTrainers() {
-      const res = await this.$ax.get('batch/users?role=TRAINER');
+      const res = await this.$ax.get('users?role=TRAINER');
       this.allTrainers = res.data;
       this.selectedTrainer = this.user;
     },

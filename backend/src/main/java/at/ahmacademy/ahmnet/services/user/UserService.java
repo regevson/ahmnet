@@ -2,6 +2,7 @@ package at.ahmacademy.ahmnet.services.user;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,8 +35,11 @@ public class UserService {
   }
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-  public Collection<User> getUsersByRole(UserRole role) {
-    return userRepository.findByRole(role);
+  public Collection<User> getUsersByRole(Optional<UserRole> role) {
+    if(role.isPresent())
+      return userRepository.findByRole(role.get());
+    else
+      return userRepository.findAll();
   }
 
   /**
@@ -111,9 +115,10 @@ public class UserService {
   }
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-  public Set<User> loadPlayersByClub(String clubName) {
+  public Set<User> loadUsersByClubAndRole(String clubName, Optional<UserRole> role) {
     Set<User> members = this.userRepository.findByClub_IdContaining(clubName);
-    members = members.stream().filter(m -> m.getRoles().contains(UserRole.PLAYER)).collect(Collectors.toSet());
+    if(role.isPresent())
+      members = members.stream().filter(m -> m.getRoles().contains(role.get())).collect(Collectors.toSet());
     return members;
   }
 

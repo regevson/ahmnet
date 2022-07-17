@@ -27,9 +27,8 @@ export default {
   async created() {
     const username = sessionStorage.getItem('username');
     const response = await this.$ax.get('users/' + username);
-    console.log(response);
 
-    this.user = response.data;
+    this.user = response.data[0];
     sessionStorage.setItem('user', JSON.stringify(this.user));
 
     // in case user navigates to '/home', he gets redirected to '/timetable'

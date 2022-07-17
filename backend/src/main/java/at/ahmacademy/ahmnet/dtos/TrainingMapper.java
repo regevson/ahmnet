@@ -54,13 +54,11 @@ public class TrainingMapper {
     dto.setPrevTrainerId(tr.getPrevTrainer().getId());
     dto.setClubId(tr.getClub().getId());
 
-    String playerClubIds = tr.getTrainingGroup().getPlayers().stream().map(a -> a.getClub().getId()).collect(Collectors.joining(","));
-    dto.setPlayers_url("clubs/" + playerClubIds + "/players/" + dto.getPlayerIds().stream().collect(Collectors.joining(",")));
-    String attendeeClubIds = tr.getAttendees().stream().map(a -> a.getClub().getId()).collect(Collectors.joining(","));
-    dto.setAttendees_url("clubs/" + attendeeClubIds + "/players/" + dto.getAttendeeIds());
+    dto.setPlayers_url("users/" + dto.getPlayerIds().stream().collect(Collectors.joining(",")));
+    dto.setAttendees_url("users/" + dto.getAttendeeIds());
     dto.setGroup_url("groups/" + dto.getGroupId());
-    dto.setTrainer_url("trainer/" + dto.getTrainerId());
-    dto.setPrevTrainer_url("trainer/" + dto.getPrevTrainerId());
+    dto.setTrainer_url("users/" + dto.getTrainerId());
+    dto.setPrevTrainer_url("users/" + dto.getPrevTrainerId());
     dto.setClub_url("clubs/" + dto.getClubId());
 
     return dto;

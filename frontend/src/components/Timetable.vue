@@ -120,7 +120,7 @@ export default {
     },
 
     async getAllTrainers() {
-      const response = await this.$ax.get('batch/users?role=TRAINER');
+      const response = await this.$ax.get('users?role=TRAINER');
       this.allTrainers = response.data;
     },
 
