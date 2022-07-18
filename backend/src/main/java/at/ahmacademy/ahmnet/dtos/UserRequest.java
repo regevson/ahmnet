@@ -1,6 +1,6 @@
 package at.ahmacademy.ahmnet.dtos;
 
-import java.util.Collection;
+import java.util.Set;
 
 import at.ahmacademy.ahmnet.model.UserRole;
 import lombok.Getter;
@@ -10,22 +10,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserResponse {
+public class UserRequest {
 
-  private String id;
   private String firstName;
   private String lastName;
-  private String fullName;
   private Integer birthYear;
   private String email;
   private String phone;
   private String clubId;
-  private Collection<Long> trainingGroupIds;
-  private Collection<UserRole> roles;
-
-  private String groups_url;
+  private Set<UserRole> roles;
 
 }
-
-/*
-*/

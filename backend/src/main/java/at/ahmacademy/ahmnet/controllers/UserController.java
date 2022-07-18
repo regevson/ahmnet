@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +33,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import at.ahmacademy.ahmnet.dtos.UserResponse;
+import at.ahmacademy.ahmnet.dtos.TrainingRequest;
 import at.ahmacademy.ahmnet.dtos.UserMapper;
+import at.ahmacademy.ahmnet.dtos.UserRequest;
+import at.ahmacademy.ahmnet.dtos.UserResponse;
+import at.ahmacademy.ahmnet.model.Training;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.model.UserRole;
 import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
@@ -88,6 +91,23 @@ public class UserController {
   public ResponseEntity<?> getAllUsersByClub(@PathVariable String clubId, Optional<UserRole> role) {
     Collection<UserResponse> dtos = mapper.mapToDto(userService.loadUsersByClubAndRole(clubId, role));
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
+  }
+
+/*
+  @PostMapping("/users")
+  public ResponseEntity<?> createNewUser(@RequestBody UserRequest userDto) {
+    User user = mapper.mapToEntity(null, userDto);
+    userService.saveNewTraining(user);
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
+*/
+
+  @PutMapping("/users/{userId}")
+  public ResponseEntity<?> updateExistingUser(@PathVariable String userId,
+                                                  @RequestBody UserRequest userDto) {
+    User user = mapper.mapToEntity(userId, userDto);
+    userService.saveUser(user);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
   
   

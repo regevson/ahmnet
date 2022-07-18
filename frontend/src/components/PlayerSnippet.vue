@@ -2,7 +2,7 @@
   <div>
     <div v-if="players">
       <div v-for="(player, pl_idx) in players" :key="pl_idx">
-        <router-link :to="{name: 'playerdetails', params: {clubId: clubId, groupId: player.id}}" class="link">
+        <router-link :to="{name: 'playerdetails', params: {playerId: player.id}}" class="link">
           <div id="groupSnippet">
             <div class="top">{{player.fullName}}<br /></div>
             <div class="bot">
