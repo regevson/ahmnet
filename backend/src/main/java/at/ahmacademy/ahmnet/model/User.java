@@ -13,8 +13,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
@@ -73,6 +71,7 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
   private Club club;
 
   @ManyToMany(mappedBy="players")
+  @Column(nullable=true)
   private Set<TrainingGroup> trainingGroups;
 
   @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)

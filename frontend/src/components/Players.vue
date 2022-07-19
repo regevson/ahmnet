@@ -3,7 +3,7 @@
     <div align="center">
       <h1>SPIELERÜBERSICHT</h1>
       <div align="center">
-        <button class="newBtn" v-on:click="createGroup">
+        <button class="newBtn" v-on:click="createPlayer">
           Neuer Spieler
         </button>
       </div>
@@ -53,8 +53,8 @@ export default {
   },
 
   methods: {
-    createGroup() {
-      this.$router.push({name: 'traininggroupdetails', params: {clubId: this.user.clubName, groupId: -1}});
+    createPlayer() {
+      this.$router.push({name: 'playerdetails', params: {playerId: -1}});
     },
 
   }

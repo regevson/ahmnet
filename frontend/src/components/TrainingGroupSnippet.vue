@@ -15,13 +15,11 @@
             ><br />
             <hr style="margin: 5px 0px 5px 0px" />
             <b>SpielerInnen:</b><br />
-            <span
-              class="player"
-              v-for="player in group.players"
-              :key="player.id"
-            >
-              {{player.fullName}}
-            </span>
+            <div v-for="player in group.players" :key="player.id">
+              <router-link :to="{name: 'playerdetails', params: {playerId: player.id}}" class="link">
+                <span class="player">{{player.fullName}}</span>
+              </router-link>
+            </div>
           </div>
         </div>
       </router-link>

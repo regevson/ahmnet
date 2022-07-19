@@ -3,7 +3,7 @@
     <form style="text-align: left" v-if="player" @submit.prevent="">
       <div align="center" v-if="!isNewPlayer()">
         <p class="entry" style="background: #1b2730; border-radius: 5px">
-          {{player.firstName}} {{player.lastName}} (@{{playerId}})
+          {{firstName}} {{lastName}} (@{{playerId}})
           <i
             v-if="!permChangePlayer()"
             class="fa-solid fa-lock fa-sm"
@@ -28,16 +28,31 @@
       />
       <br />
 
-      <p class="entry">Vorname:</p>
-      <b-form-input v-model="player.firstName" placeholder="z.B. Max"></b-form-input>
+      <p class="entry" :class="{'errorBg': $v.firstName.$invalid}"> Vorname:</p>
+      <b-form-input v-model="firstName" placeholder="z.B. Max"
+        :class="[$v.firstName.$invalid ? 'form-error' : 'detailsInput']">
+      </b-form-input>
+      <div class="errorText" v-if="$v.firstName.$invalid">
+        nicht leer & nur Buchstaben
+      </div>
       <br />
       
-      <p class="entry">Nachname:</p>
-      <b-form-input v-model="player.lastName" placeholder="z.B. Mustermann"></b-form-input>
+      <p class="entry" :class="{'errorBg': $v.lastName.$invalid}"> Nachname:</p>
+      <b-form-input v-model="lastName" placeholder="z.B. Mustermann"
+        :class="[$v.lastName.$invalid ? 'form-error' : 'detailsInput']">
+      </b-form-input>
+      <div class="errorText" v-if="$v.lastName.$invalid">
+        nicht leer & nur Buchstaben
+      </div>
       <br />
 
-      <p class="entry">Geburtsjahr:</p>
-      <b-form-input v-model="player.birthYear" type="number" placeholder="z.B. 2015"></b-form-input>
+      <p class="entry" :class="{'errorBg': $v.birthYear.$invalid}"> Geburtsjahr:</p>
+      <b-form-input v-model="birthYear" type="number" placeholder="z.B. 2015"
+        :class="[$v.birthYear.$invalid ? 'form-error' : 'detailsInput']">
+      </b-form-input>
+      <div class="errorText" v-if="$v.birthYear.$invalid">
+        Bitte korrekt ausfüllen!
+      </div>
       <br />
 
       <p class="entry">E-Mail:</p>
@@ -110,6 +125,10 @@
 <script>
 import Multiselect from 'vue-multiselect'
 
+import { required, minValue, maxLength } from 'vuelidate/lib/validators'
+const regex = new RegExp("^[a-zA-Z -]+$"); 
+const alphaAndSpaceValidator = (txt) => regex.test(txt);
+
 export default {
   name: 'PlayerDetails',
   components: {Multiselect},
@@ -122,7 +141,21 @@ export default {
       allClubs: [],
       allPlayers: [],
 
+      // fields to validate
+      firstName: '',
+      lastName: '',
+      birthYear: 2015,
+
       dialogTxt: '',
+    }
+  },
+
+  validations: {
+    firstName: { required, maxLengthValue: maxLength(30), alphaAndSpaceValidator },
+    lastName: { required, maxLengthValue: maxLength(30), alphaAndSpaceValidator },
+    birthYear: {
+      required,
+      minValue: minValue(1920),
     }
   },
 
@@ -147,6 +180,7 @@ export default {
         let resp = await this.getPlayer();
         this.setupRequest(resp.firstName, resp.lastName, resp.birthYear, resp.email, resp.phone, resp.clubId, resp.roles);
       }
+      this.setValidationFields();
     },
 
     async getAllClubs() {
@@ -159,7 +193,7 @@ export default {
       return player_res.data[0];
     },
 
-    setupRequest(firstName='', lastName='', birthYear=2015, email='beispiel@gmail.com', phone='1000', clubId='TC-Vomp', roles=['PLAYER']) {
+    setupRequest(firstName='', lastName='', birthYear=2015, email='', phone='', clubId='TC-Vomp', roles=['PLAYER']) {
       let player = {};
       player.firstName = firstName;
       player.lastName = lastName;
@@ -172,12 +206,39 @@ export default {
       this.player = player;
     },
 
+    setValidationFields() {
+      this.firstName = this.player.firstName;
+      this.lastName = this.player.lastName;
+      this.birthYear = this.player.birthYear;
+    },
+
+    validate() {
+      this.$v.$touch();
+      if(this.$v.$invalid) {
+        alert('Bitte füllen Sie das Formular korrekt aus!');
+        return false;
+      }
+      else
+        return true;
+    },
+
+    // copy validation-fields into dto to be sent
+    copyValidationFields() {
+      this.player.firstName = this.firstName;
+      this.player.lastName = this.lastName;
+      this.player.birthYear = this.birthYear;
+    },
+
     async createNewPlayer() {
+      if(!this.validate()) return;
+      this.copyValidationFields();
       await this.$ax.post('users', this.player);
       this.$router.push({name: 'players'});
     },
 
     async updatePlayerDetails() {
+      if(!this.validate()) return;
+      this.copyValidationFields();
       await this.$ax.put('users/' + this.playerId, this.player);
       this.$router.push({name: 'players'});
     },

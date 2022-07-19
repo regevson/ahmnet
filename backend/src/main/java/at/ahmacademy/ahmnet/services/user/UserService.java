@@ -67,6 +67,7 @@ public class UserService {
     if(user.isNew()) {
       user.setCreateDate(new Date());
       user.setCreateUser(getAuthUser());
+      user.setId(user.getFirstName() + user.getLastName());
     } 
     else {
       user.setUpdateDate(new Date());

@@ -45,6 +45,8 @@ export default {
     for(let player of players) {
       player.trainers = [];
       player.groups = [];
+      if(player.trainingGroupIds.length == 0)
+        continue;
       let res_group = await this.$ax.get(player.groups_url);
       for(let group of res_group.data) {
         player.groups.push(group);

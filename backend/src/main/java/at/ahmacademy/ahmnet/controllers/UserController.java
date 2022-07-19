@@ -93,14 +93,13 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-/*
   @PostMapping("/users")
   public ResponseEntity<?> createNewUser(@RequestBody UserRequest userDto) {
+  System.out.println(userDto.getFirstName());
     User user = mapper.mapToEntity(null, userDto);
-    userService.saveNewTraining(user);
+    userService.saveUser(user);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
-*/
 
   @PutMapping("/users/{userId}")
   public ResponseEntity<?> updateExistingUser(@PathVariable String userId,
