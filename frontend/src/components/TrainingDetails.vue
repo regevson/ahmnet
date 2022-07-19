@@ -365,8 +365,10 @@ export default {
       if(this.isAdmin)
         await this.getAllTrainer();
 
-      if(this.$route.params.trainingId == -1) // is new training
+      if(this.$route.params.trainingId == -1){ // is new training
         this.setupRequest();
+        console.log('did request');
+      }
       else {
         let resp = await this.getTraining();
         this.setupRequest(resp.date, resp.lastDate, resp.startTime, resp.durationMinutes, resp.court,
@@ -384,7 +386,7 @@ export default {
     async getAllGroups() {
       const res = await this.$ax.get('groups');
       this.allGroups = res.data;
-      this.allGroups.map(this.combineGroupInfo);
+      await Promise.all(this.allGroups.map(this.combineGroupInfo));
       this.selectedGroup = this.allGroups[0];
     },
 
