@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +35,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import at.ahmacademy.ahmnet.dtos.TrainingRequest;
 import at.ahmacademy.ahmnet.dtos.UserMapper;
 import at.ahmacademy.ahmnet.dtos.UserRequest;
 import at.ahmacademy.ahmnet.dtos.UserResponse;
@@ -67,25 +68,13 @@ public class UserController {
     Collection<UserResponse> dtos = mapper.mapToDto(users);
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
-  
-  /*
-  @GetMapping("/clubs/{clubIds}/players/{playerIds}")
-  public ResponseEntity<?> getPlayersById(@PathVariable String[] clubIds,
-                                         @PathVariable String[] playerIds) { 
-    Collection<User> players = Arrays.stream(playerIds).map(userService::loadUser).collect(Collectors.toSet());
-    Collection<UserDto> dtos = mapper.mapToDto(players);
-    return ResponseEntity.status(HttpStatus.OK).body(dtos);
-  }
 
-  @GetMapping("/trainer/{trainerIds}")
-  public ResponseEntity<?> getPlayersById(@PathVariable String[] trainerIds) {
-    Collection<User> trainers = Arrays.stream(trainerIds).map(userService::loadUser).collect(Collectors.toSet());
-    Collection<UserDto> dtos = mapper.mapToDto(trainers);
-    if(dtos.size() == 1) return ResponseEntity.status(HttpStatus.OK).body(dtos.iterator().next());
-    return ResponseEntity.status(HttpStatus.OK).body(dtos);
+  @DeleteMapping("/users/{userIds}")
+  public ResponseEntity<?> deleteUsersById(@PathVariable String[] userIds) {
+    Set<User> users = Arrays.stream(userIds).map(userService::loadUser).collect(Collectors.toSet());
+    users.stream().forEach(userService::deleteUser);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
-  */
-  
 
   @GetMapping("/clubs/{clubId}/users")
   public ResponseEntity<?> getAllUsersByClub(@PathVariable String clubId, Optional<UserRole> role) {

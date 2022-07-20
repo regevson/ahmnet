@@ -13,9 +13,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import at.ahmacademy.ahmnet.model.TrainingGroup;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.model.UserRole;
 import at.ahmacademy.ahmnet.repositories.UserRepository;
+import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
 
 @Service
 @Scope("application")
@@ -23,6 +25,8 @@ public class UserService {
 
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private TrainingGroupService ser;
 
   /**
    * Returns a collection of all users.
@@ -81,8 +85,12 @@ public class UserService {
    *
    * @param user the user to delete
    */
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
   public void deleteUser(User user) {
+    user.getTrainingGroups().stream().forEach(g -> g.getPlayers().remove(user));
+    user.getTrainingGroups().stream().forEach(g -> g.getTrainings()
+                                                   .forEach(t -> t.getAttendees().remove(user)));
+    user.getRoles().removeAll(user.getRoles());
     userRepository.delete(user);
   }
 
