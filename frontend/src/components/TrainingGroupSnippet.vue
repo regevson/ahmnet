@@ -7,14 +7,12 @@
           <div class="top">Gruppe {{group.id}}<br /></div>
           <div class="bot">
             <b>Trainer: </b>
-            <span class="player trainer"
-              >{{group.trainer.fullName}}</span
-            ><br />
+            <span class="player trainer">{{group.trainerId}}</span><br />
             <hr style="margin: 5px 0px 5px 0px" />
             <b>SpielerInnen:</b><br />
-            <div v-for="player in group.players" :key="player.id">
-              <router-link :to="{name: 'playerdetails', params: {playerId: player.id}}" class="link">
-                <span class="player">{{player.fullName}}</span>
+            <div v-for="playerId in group.playerIds" :key="playerId">
+              <router-link :to="{name: 'playerdetails', params: {playerId: playerId}}" class="link">
+                <span class="player">{{playerId}}</span>
               </router-link>
             </div>
             <hr style="margin: 5px 0px 5px 0px" />
@@ -45,18 +43,8 @@ export default {
   },
 
   async created() {
-    let response = await this.$ax.get('clubs/' + this.clubId + '/groups');
-    let groups = response.data;
-    
-    for(let group of groups) {
-      response = await this.$ax.get(group.trainer_url);
-      group.trainer = response.data[0];
-
-      response = await this.$ax.get(group.players_url);
-      group.players = response.data;
-    }
-
-    this.groups = groups;
+    let group_res = await this.$ax.get('clubs/' + this.clubId + '/groups');
+    this.groups = group_res.data;
   },
 
   methods: {
@@ -90,11 +78,11 @@ export default {
   text-align: center;
   font-weight: 800;
   color: white;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 #groupSnippet .bot {
-  padding: 10px;
+  padding: 7px;
   font-size: 13px;
 }
 
@@ -110,7 +98,6 @@ export default {
 
 #groupSnippet .trainer {
   background: #c28b8b;
-  font-weight: bold;
 }
 
 .link {
