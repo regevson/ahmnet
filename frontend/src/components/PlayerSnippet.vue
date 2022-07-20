@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="players" style="display: flex; flex-wrap:wrap;">
+    <div v-if="players" style="display: flex; flex-wrap:wrap; justify-content: center;">
       <div v-for="(player, pl_idx) in players" :key="pl_idx">
         <router-link :to="{name: 'playerdetails', params: {playerId: player.id}}" class="link">
           <div id="groupSnippet">

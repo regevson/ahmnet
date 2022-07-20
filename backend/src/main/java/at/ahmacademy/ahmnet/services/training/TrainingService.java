@@ -55,6 +55,7 @@ public class TrainingService {
   private UserAuthService usrAuth;
   @Autowired
   private TrainingAuthService trgAuth;
+
   private boolean enableNotify = false;
 
 

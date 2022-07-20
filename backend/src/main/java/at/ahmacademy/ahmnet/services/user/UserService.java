@@ -25,8 +25,6 @@ public class UserService {
 
   @Autowired
   private UserRepository userRepository;
-  @Autowired
-  private TrainingGroupService ser;
 
   /**
    * Returns a collection of all users.
@@ -52,7 +50,7 @@ public class UserService {
    * @param username the username to search for
    * @return the user with the given username
    */
-  @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER') or authentication.getName() eq #username")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER') || authentication.getName() eq #username")
   public User loadUser(String username) {
     return userRepository.findFirstByUsername(username);
   }
@@ -66,12 +64,13 @@ public class UserService {
    * @param user the user to save
    * @return the updated user
    */
-  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+  @PreAuthorize("hasAuthority('ADMIN') || @userAuthService.isUnderWing(#user.id) "
+                                    + "|| (hasAuthority('TRAINER') && #user.id == null)")
   public User saveUser(User user) {
     if(user.isNew()) {
       user.setCreateDate(new Date());
       user.setCreateUser(getAuthUser());
-      user.setId(user.getFirstName() + user.getLastName());
+      user.setId(createUsername(user));
     } 
     else {
       user.setUpdateDate(new Date());
@@ -79,13 +78,22 @@ public class UserService {
     }
     return userRepository.save(user);
   }
-
+  
+  private String createUsername(User user) {
+    String baseUsername = user.getFirstName() + user.getLastName();
+    String uniqueUsername = baseUsername;
+    int counter = 1;
+    while(loadUser(uniqueUsername) != null)
+      uniqueUsername = baseUsername + counter++;
+    return uniqueUsername;
+  }
+  
   /**
    * Deletes the user.
    *
    * @param user the user to delete
    */
-  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
+  @PreAuthorize("hasAnyAuthority('ADMIN') || @userAuthService.isUnderWing(#user.id)")
   public void deleteUser(User user) {
     user.getTrainingGroups().stream().forEach(g -> g.getPlayers().remove(user));
     user.getTrainingGroups().stream().forEach(g -> g.getTrainings()

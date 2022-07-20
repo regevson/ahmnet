@@ -1,6 +1,6 @@
 <template>
-  <div align="left">
-    <form v-if="training" @submit.prevent="">
+  <div>
+    <form class="detailsForm" v-if="training" @submit.prevent="">
 
       <div align="center" v-if="!isNewTraining()">
         <p class="entry" style="background: #1b2730; border-radius: 5px">

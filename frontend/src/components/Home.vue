@@ -263,5 +263,11 @@ h1 {
   border: 2px solid gray;
 }
 
+.detailsForm {
+  text-align: left; 
+  width: 100%; 
+  max-width: 700px;
+}
+
 </style>
 

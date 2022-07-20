@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form style="text-align: left" v-if="player" @submit.prevent="">
+    <form class="detailsForm" v-if="player" @submit.prevent="">
       <div align="center" v-if="!isNewPlayer()">
         <p class="entry" style="background: #1b2730; border-radius: 5px">
           {{firstName}} {{lastName}} (@{{playerId}})
@@ -288,6 +288,7 @@ export default {
   border-bottom-left-radius: 5px !important;
   border-bottom-right-radius: 5px !important;
   border-top: none !important;
+  color: #35495e !important;
 }
 
 .readonly {

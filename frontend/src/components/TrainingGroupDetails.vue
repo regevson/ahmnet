@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form style="text-align: left" v-if="group" @submit.prevent="">
+    <form class="detailsForm" v-if="group" @submit.prevent="">
       <div align="center" v-if="!isNewGroup()">
         <p class="entry" style="background: #1b2730; border-radius: 5px">
           Gruppe {{groupId}}

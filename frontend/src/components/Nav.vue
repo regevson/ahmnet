@@ -47,7 +47,7 @@
             :to="{name: 'vacationtable'}"
             class="nav-link"
           >
-            TAUSCHBÖRSE
+            URLAUBSTAFEL
           </b-nav-item>
         </b-navbar-nav>
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="groups" style="display: flex; flex-wrap:wrap;">
+    <div v-if="groups" style="display: flex; flex-wrap:wrap; justify-content: center; ">
     <div v-for="(group, idx) in groups" :key="idx">
       <router-link :to="{name: 'traininggroupdetails', params: {groupId: group.id}}" class="link">
         <div id="groupSnippet">

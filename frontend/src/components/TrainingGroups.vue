@@ -62,13 +62,15 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .card {
-  border: 2px solid #3e6d63;
+  border: 2px solid #4b9183 !important;
+  width: 100%;
+  max-width: 700px;
 }
 
 .card-header {
-  background: #3e6d63;
+  background: #4b9183 !important;
   border: none;
   border-radius: 0 !important;
 }
@@ -76,7 +78,7 @@ export default {
 .card-body {
   border: none;
   height: auto;
-  padding: 5px 0 5px 5px;
+  padding: 10px 0 5px 5px !important;
 }
 
 .cardBtn {
