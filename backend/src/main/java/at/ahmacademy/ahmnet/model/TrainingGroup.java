@@ -4,7 +4,11 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,7 +28,6 @@ import lombok.Setter;
 @Table(name="traininggroup")
 public class TrainingGroup {
 
-  //@Setter(AccessLevel.NONE)
   @Id
   // otherwise there is problem when saving with empty id
   @GeneratedValue(strategy = GenerationType.IDENTITY) 
@@ -38,6 +41,11 @@ public class TrainingGroup {
 
   @ManyToMany(fetch = FetchType.EAGER)
   private Set<User> players;
+  
+  @ElementCollection(targetClass = BallColor.class, fetch = FetchType.EAGER)
+  @CollectionTable(name = "ball_color")
+  @Enumerated(EnumType.STRING)
+  private Set<BallColor> ballColors;
 
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "trainingGroup", 
       cascade = CascadeType.ALL, orphanRemoval = true)

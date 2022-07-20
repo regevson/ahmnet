@@ -3,6 +3,7 @@ package at.ahmacademy.ahmnet.dtos;
 import java.util.Collection;
 import java.util.Map;
 
+import at.ahmacademy.ahmnet.model.BallColor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class GroupResponse {
   private String trainerId;
   private String clubId;
   private Collection<String> playerIds;
+  private Collection<BallColor> ballColors;
   private int numPlayedSessions;
   private Map<String, Integer> attendance;
   

@@ -351,6 +351,7 @@ export default {
     this.trainingId = this.$route.params.trainingId;
     this.getUserRole();
     this.getFormData();
+    this.selectedTrainer = this.user;
   },
 
   methods: {
@@ -367,7 +368,6 @@ export default {
 
       if(this.$route.params.trainingId == -1){ // is new training
         this.setupRequest();
-        console.log('did request');
       }
       else {
         let resp = await this.getTraining();

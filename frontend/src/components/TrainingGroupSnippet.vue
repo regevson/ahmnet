@@ -1,11 +1,8 @@
 <template>
   <div>
-    <div v-if="groups">
+    <div v-if="groups" style="display: flex; flex-wrap:wrap;">
     <div v-for="(group, idx) in groups" :key="idx">
-      <router-link
-        :to="{name: 'traininggroupdetails', params: {groupId: group.id}}"
-        class="link"
-      >
+      <router-link :to="{name: 'traininggroupdetails', params: {groupId: group.id}}" class="link">
         <div id="groupSnippet">
           <div class="top">Gruppe {{group.id}}<br /></div>
           <div class="bot">
@@ -19,6 +16,11 @@
               <router-link :to="{name: 'playerdetails', params: {playerId: player.id}}" class="link">
                 <span class="player">{{player.fullName}}</span>
               </router-link>
+            </div>
+            <hr style="margin: 5px 0px 5px 0px" />
+            <b>Ballfarben:</b><br />
+            <div v-for="col in group.ballColors" :key="col" style="display: inline-block; margin-right: 5px;">
+              <span>{{getBallEmoji(col)}}</span>
             </div>
           </div>
         </div>
@@ -49,6 +51,7 @@ export default {
     for(let group of groups) {
       response = await this.$ax.get(group.trainer_url);
       group.trainer = response.data[0];
+
       response = await this.$ax.get(group.players_url);
       group.players = response.data;
     }
@@ -56,12 +59,20 @@ export default {
     this.groups = groups;
   },
 
+  methods: {
+    getBallEmoji(col) {
+      if(col === 'RED') return '🔴';
+      else if(col === 'ORANGE') return '🟠';
+      else if(col === 'GREEN') return '🟢';
+      else return '🟡';
+    }
+  }
+
 }
 </script>
 
 <style>
 #groupSnippet {
-  float: left;
   background: #273a48;
   color: white;
   max-width: 181px;
@@ -79,10 +90,12 @@ export default {
   text-align: center;
   font-weight: 800;
   color: white;
+  font-size: 15px;
 }
 
 #groupSnippet .bot {
   padding: 10px;
+  font-size: 13px;
 }
 
 #groupSnippet .player {
@@ -91,7 +104,6 @@ export default {
   color: white;
   border-radius: 5px;
   margin-bottom: 2px;
-  margin-right: 2px;
   padding: 3px;
   font-size: 11px;
 }
@@ -99,6 +111,13 @@ export default {
 #groupSnippet .trainer {
   background: #c28b8b;
   font-weight: bold;
+}
+
+.link {
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: none;
 }
 </style>
 

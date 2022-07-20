@@ -50,6 +50,20 @@
       />
       <br />
 
+      <p class="entry">Ballfarbe(n):</p>
+        <div class="detailsInput" style="padding: 5px 5px 5px 10px">
+          <b-form-group :disabled="!permChangeGroup()" style="margin-top: 15px">
+            <b-form-checkbox-group
+              button-variant="outline-secondary"
+              v-model="group.ballColors"
+              :options="allColors"
+              name="buttons-1"
+              buttons
+            ></b-form-checkbox-group>
+          </b-form-group>
+        </div>
+      <br />
+
       <p class="entry">TrainerIn:</p>
       <multiselect
         :disabled="!isAdmin"
@@ -73,15 +87,10 @@
 
       <p class="entry">Anwesenheit:</p>
       <div class="detailsInput" style="padding: 5px 5px 5px 10px">
-        <div v-for="player in selectedPlayers" :key="player.id">
-          <span class="readonly">{{player.fullName}}:</span>
-          <span
-            class="readonly readonlyDigit"
-            >{{getAttendance(player.id)}}</span
-          >
-        </div>
+        <DoughnutChart v-if="values.length > 0" :labels="labels" :values="values"/>
+        <br/>
       </div>
-      <br />
+
 
       <div align="center" v-if="isNewGroup()">
         <input
@@ -138,16 +147,18 @@
       >{{dialogTxt}}</b-modal
     >
 
+
     <h5 v-if="!group" class="loading">LOADING...</h5>
   </div>
 </template>
 
 <script>
 import Multiselect from 'vue-multiselect'
+import DoughnutChart from './DoughnutChart'
 
 export default {
   name: 'TrainingGroupDetails',
-  components: {Multiselect},
+  components: {Multiselect, DoughnutChart},
   data() {
     return {
       user: null,
@@ -159,17 +170,29 @@ export default {
       selectedPlayers: [],
       allTrainers: [],
       selectedTrainer: null,
+      allColors: [
+        { text: '🔴', value: 'RED' },
+        { text: '🟠', value: 'ORANGE' },
+        { text: '🟢', value: 'GREEN' },
+        { text: '🟡', value: 'YELLOW' },
+      ],
       attendance: null,
       numPlayedSessions: 0,
 
       dialogTxt: '',
+
+      // chart-data
+      labels: [],
+      values: [],
     }
   },
 
   async created() {
     this.groupId = this.$route.params.groupId;
     this.getUserRole();
-    this.getFormData();
+    await this.getFormData();
+    if(this.groupId != -1)
+      this.fillDoughnutChart();
   },
 
   methods: {
@@ -190,9 +213,8 @@ export default {
         this.setupRequest();
       else {
         let resp = await this.getGroup();
-        this.setupRequest(resp.trainerId, resp.clubId, resp.playerIds);
+        this.setupRequest(resp.trainerId, resp.clubId, resp.playerIds, resp.ballColors);
       }
-
     },
 
     async getAllClubs() {
@@ -212,10 +234,10 @@ export default {
       this.selectedTrainer = this.user;
     },
 
-    // players should also display info about their age... in multiselect-row
+    // players should also display secondary about their age... in multiselect-row
     combinePlayerInfo(player) {
       let age = new Date().getFullYear() - player.birthYear;
-      player.combinedInfo = player.fullName + ' (' + age + 'J)';
+      player.combinedInfo = player.fullName + ' (' + age + 'J) \\' + player.clubId;
       return player;
     },
 
@@ -235,11 +257,12 @@ export default {
       return group_res;
     },
 
-    setupRequest(trainerId=this.user.id, clubId=this.allClubs[0], playerIds=[]) {
+    setupRequest(trainerId=this.user.id, clubId=this.allClubs[0], playerIds=[], ballColors=[]) {
       let group = {};
       group.trainerId = trainerId;
       group.clubId = clubId;
       group.playerIds = playerIds;
+      group.ballColors = ballColors;
 
       this.group = group;
     },
@@ -291,6 +314,12 @@ export default {
         this.dialogTxt = "Gruppe löschen?";
     },
 
+    fillDoughnutChart() {
+      this.labels = this.selectedPlayers.map(p => p.fullName);
+      //this.labels = ['player1', 'player2', 'player3', 'player4', 'player5'];
+      this.values = this.selectedPlayers.map(p => this.attendance[p.id]);
+    },
+
   },
 
 }
@@ -301,6 +330,27 @@ export default {
 -->
 
 <style>
+
+.btn-outline-secondary:not(:disabled):not(.disabled).active {
+  background-color: #5abba8c2;
+  border-color: #5abba8c2;
+  color: white !important;
+  outline: none !important;
+}
+
+.btn-outline-secondary {
+  border-color: #499082 !important;
+  color: #499082 !important;
+  outline: none !important;
+}
+
+.btn-outline-secondary:hover {
+  border-color: #499082 !important;
+  color: #499082 !important;
+  outline: none !important;
+}
+
+
 .detailsInput {
   border: 1px solid #b1acac !important;
   border-radius: 0px !important;
@@ -601,7 +651,7 @@ fieldset[disabled] .multiselect {
   background: #fff;
   width: 100%;
   max-height: 240px;
-  overflow: none;
+  overflow: scroll;
   border-top: 4px solid black !important;
   /*border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;

@@ -62,7 +62,7 @@ public class UserService {
    * @param user the user to save
    * @return the updated user
    */
-  @PreAuthorize("hasAuthority('ADMIN') or authentication.getName() eq #user.getUsername()")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
   public User saveUser(User user) {
     if(user.isNew()) {
       user.setCreateDate(new Date());

@@ -29,7 +29,7 @@
       <br />
 
       <p class="entry" :class="{'errorBg': $v.firstName.$invalid}"> Vorname:</p>
-      <b-form-input v-model="firstName" placeholder="z.B. Max"
+      <b-form-input v-model="firstName" placeholder="z.B. Max" :disabled="!permChangePlayer()"
         :class="[$v.firstName.$invalid ? 'form-error' : 'detailsInput']">
       </b-form-input>
       <div class="errorText" v-if="$v.firstName.$invalid">
@@ -38,7 +38,7 @@
       <br />
       
       <p class="entry" :class="{'errorBg': $v.lastName.$invalid}"> Nachname:</p>
-      <b-form-input v-model="lastName" placeholder="z.B. Mustermann"
+      <b-form-input v-model="lastName" placeholder="z.B. Mustermann" :disabled="!permChangePlayer()"
         :class="[$v.lastName.$invalid ? 'form-error' : 'detailsInput']">
       </b-form-input>
       <div class="errorText" v-if="$v.lastName.$invalid">
@@ -47,7 +47,7 @@
       <br />
 
       <p class="entry" :class="{'errorBg': $v.birthYear.$invalid}"> Geburtsjahr:</p>
-      <b-form-input v-model="birthYear" type="number" placeholder="z.B. 2015"
+      <b-form-input v-model="birthYear" type="number" placeholder="z.B. 2015" :disabled="!permChangePlayer()"
         :class="[$v.birthYear.$invalid ? 'form-error' : 'detailsInput']">
       </b-form-input>
       <div class="errorText" v-if="$v.birthYear.$invalid">
@@ -56,11 +56,11 @@
       <br />
 
       <p class="entry">E-Mail:</p>
-      <b-form-input v-model="player.email" type="email" placeholder="z.B. beispiel@gmail.com"></b-form-input>
+      <b-form-input v-model="player.email" type="email" placeholder="z.B. beispiel@gmail.com" :disabled="!permChangePlayer()"></b-form-input>
       <br />
 
       <p class="entry">Tel-Nummer:</p>
-      <b-form-input v-model="player.phone" type="text" placeholder="z.B. 069910983630"></b-form-input>
+      <b-form-input v-model="player.phone" type="text" placeholder="z.B. 069910983630" :disabled="!permChangePlayer()"></b-form-input>
       <br />
 
       <div align="center" v-if="isNewPlayer()">
@@ -138,8 +138,8 @@ export default {
       isAdmin: false,
       playerId: -1,
       player: null,
+      trainers: [],
       allClubs: [],
-      allPlayers: [],
 
       // fields to validate
       firstName: '',
@@ -177,8 +177,9 @@ export default {
       if(this.playerId == -1) // is new player
         this.setupRequest();
       else {
-        let resp = await this.getPlayer();
-        this.setupRequest(resp.firstName, resp.lastName, resp.birthYear, resp.email, resp.phone, resp.clubId, resp.roles);
+        let player = await this.getPlayer();
+        this.getTrainers(player);
+        this.setupRequest(player.firstName, player.lastName, player.birthYear, player.email, player.phone, player.clubId, player.roles);
       }
       this.setValidationFields();
     },
@@ -193,7 +194,7 @@ export default {
       return player_res.data[0];
     },
 
-    setupRequest(firstName='', lastName='', birthYear=2015, email='', phone='', clubId='TC-Vomp', roles=['PLAYER']) {
+    setupRequest(firstName='', lastName='', birthYear=2015, email='', phone='', clubId='TC-Breitenbach', roles=['PLAYER']) {
       let player = {};
       player.firstName = firstName;
       player.lastName = lastName;
@@ -249,7 +250,13 @@ export default {
     },
 
     permChangePlayer() {
-      return this.isAdmin;
+      return this.isAdmin || this.trainers.includes(this.user.id) || this.playerId == -1;
+    },
+
+    async getTrainers(player) {
+      const groups_res = await this.$ax.get(player.groups_url);
+      let groups = groups_res.data;
+      this.trainers = groups.map(g => g.trainerId);
     },
 
     isNewPlayer() {

@@ -163,6 +163,7 @@ td {
   background: #6bab9f;
   margin: 5px 0 5px 0;
   border-radius: 14px;
+  font-size: 15px;
 }
 
 .court {

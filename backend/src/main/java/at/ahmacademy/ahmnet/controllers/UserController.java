@@ -114,7 +114,6 @@ public class UserController {
   
   
   
-  
   @PostMapping("/users/{userId}/actions/change-password")
   public ResponseEntity<?> changePassword(@PathVariable String userId, 
                                            @RequestBody ObjectNode password) {

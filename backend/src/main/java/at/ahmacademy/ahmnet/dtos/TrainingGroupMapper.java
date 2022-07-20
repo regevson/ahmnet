@@ -35,6 +35,7 @@ public class TrainingGroupMapper {
     dto.setTrainerId(group.getTrainer().getId());
     dto.setClubId(group.getClub().getId());
     dto.setPlayerIds(group.getPlayers().stream().map(User::getId).collect(Collectors.toSet()));
+    dto.setBallColors(group.getBallColors());
     dto.setAttendance(group.getAttendance());
     dto.setNumPlayedSessions(group.getNumPlayedSessions());
 
@@ -57,8 +58,25 @@ public class TrainingGroupMapper {
     group.setTrainer(userService.loadUser(dto.getTrainerId()));
     group.setClub(clubService.loadClub(dto.getClubId()));
     Set<User> players = dto.getPlayerIds().stream().map(p -> userService.loadUser(p)).collect(Collectors.toSet());
+    group.setBallColors(dto.getBallColors());
     group.setPlayers(players);
     return group;
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
