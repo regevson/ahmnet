@@ -8,23 +8,22 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import at.ahmacademy.ahmnet.model.TrainingGroup;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.model.UserRole;
 import at.ahmacademy.ahmnet.repositories.UserRepository;
-import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
 
 @Service
 @Scope("application")
 public class UserService {
 
-  @Autowired
   private UserRepository userRepository;
+
 
   /**
    * Returns a collection of all users.
@@ -50,7 +49,7 @@ public class UserService {
    * @param username the username to search for
    * @return the user with the given username
    */
-  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER') || authentication.getName() eq #username")
+  @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER') || this.getAuthUser.id eq #username")
   public User loadUser(String username) {
     return userRepository.findFirstByUsername(username);
   }
@@ -64,7 +63,7 @@ public class UserService {
    * @param user the user to save
    * @return the updated user
    */
-  @PreAuthorize("hasAuthority('ADMIN') || @userAuthService.isUnderWing(#user.id) "
+  @PreAuthorize("hasAuthority('ADMIN') || this.isUnderWing(#user.id) "
                                     + "|| (hasAuthority('TRAINER') && #user.id == null)")
   public User saveUser(User user) {
     if(user.isNew()) {
@@ -93,8 +92,9 @@ public class UserService {
    *
    * @param user the user to delete
    */
-  @PreAuthorize("hasAnyAuthority('ADMIN') || @userAuthService.isUnderWing(#user.id)")
+  @PreAuthorize("hasAuthority('ADMIN') || this.isUnderWing(#user.id)")
   public void deleteUser(User user) {
+    System.out.println("in delate user");
     user.getTrainingGroups().stream().forEach(g -> g.getPlayers().remove(user));
     user.getTrainingGroups().stream().forEach(g -> g.getTrainings()
                                                    .forEach(t -> t.getAttendees().remove(user)));
@@ -103,6 +103,7 @@ public class UserService {
   }
 
   public User getAuthUser() {
+    System.out.println("in auth user");
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     User user = userRepository.findFirstByUsername(auth.getName());
     return user;
@@ -137,6 +138,31 @@ public class UserService {
     if(role.isPresent())
       members = members.stream().filter(m -> m.getRoles().contains(role.get())).collect(Collectors.toSet());
     return members;
+  }
+  
+  
+  /* AUTHENTICATION */
+
+
+
+  public boolean isAuthUsr(String userId) {
+    return getAuthUser().getId().equals(userId);
+  }
+
+  public boolean isUnderWing(String playerId) {
+    System.out.println("in wing");
+    if(playerId == null) return true;
+    User me = getAuthUser();
+    User player = loadUser(playerId);
+    Set<User> trainer = player.getTrainingGroups().stream().map(g -> g.getTrainer()).collect(Collectors.toSet());
+    if(trainer.isEmpty()) return true;
+    return trainer.stream().anyMatch(t -> t.getId() == me.getId());
+  }
+  
+  
+  @Autowired
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
   }
 
 }

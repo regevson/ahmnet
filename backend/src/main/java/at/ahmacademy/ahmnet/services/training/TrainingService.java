@@ -2,7 +2,6 @@ package at.ahmacademy.ahmnet.services.training;
 
 import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.exclId;
 import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasFreeStatus;
-import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasTrainer;
 import static at.ahmacademy.ahmnet.repositories.TrainingSpecification.hasWeekNum;
 import static at.ahmacademy.ahmnet.services.AuthService.authWhen;
 
@@ -33,29 +32,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import at.ahmacademy.ahmnet.model.SmsRequest;
 import at.ahmacademy.ahmnet.model.Training;
-import at.ahmacademy.ahmnet.model.TrainingGroup;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.repositories.TrainingRepository;
+import at.ahmacademy.ahmnet.repositories.TrainingSpecification;
 import at.ahmacademy.ahmnet.services.sms.SmsService;
-import at.ahmacademy.ahmnet.services.trainingGroup.TrainingGroupService;
-import at.ahmacademy.ahmnet.services.user.UserAuthService;
 import at.ahmacademy.ahmnet.services.user.UserService;
 
 @Service
 @Scope("application")
 public class TrainingService {
 
-  @Autowired
   private UserService userService;
-  @Autowired
   private TrainingRepository trainingRepo;
-  @Autowired
   private SmsService smsService;
-  @Autowired
-  private UserAuthService usrAuth;
-  @Autowired
-  private TrainingAuthService trgAuth;
-
   private boolean enableNotify = false;
 
 
@@ -141,11 +130,11 @@ public class TrainingService {
   }
 
   @PreAuthorize("hasAuthority('ADMIN') || "
-              + "(hasAuthority('TRAINER') && @userAuthService.isAuthUsr(#trainerId))")
+              + "(hasAuthority('TRAINER') && @userService.isAuthUsr(#trainerId))")
   public List<List<Training>> loadTrainingsByTrainer(String trainerId, Integer weekNum,
                                                                        Optional<Boolean> isFree) {
     Specification<Training> spec = Specification.where(hasWeekNum(weekNum))
-                                          .and(hasTrainer(trainerId))
+                                          .and(TrainingSpecification.hasTrainer(trainerId))
                                           .and(isFree.isPresent() ? hasFreeStatus(isFree.get()) : null);
     List<Training> trainings = trainingRepo.findAll(spec);
     return groupByDay(trainings);
@@ -153,8 +142,8 @@ public class TrainingService {
 
   @Transactional
   public void freeTrainings(List<Training> trainings, boolean notify) {
-     authWhen(usrAuth.authUsrIsAdmin() ||
-              trainings.stream().allMatch(t -> trgAuth.hasTrainer(t, userService.getAuthUser().getId())));
+     authWhen(userService.isAdmin() ||
+              trainings.stream().allMatch(t -> hasTrainer(t, userService.getAuthUser().getId())));
 
     for(Training t: trainings)
       freeTraining(t);
@@ -170,8 +159,8 @@ public class TrainingService {
 
   @Transactional
   public void grabTrainings(List<Training> trainings, boolean notify) {
-     authWhen(usrAuth.authUsrIsAdmin() ||
-              trainings.stream().allMatch(t -> usrAuth.authUsrIsTrainer() && trgAuth.isFree(t)));
+     authWhen(userService.isAdmin() ||
+              trainings.stream().allMatch(t -> userService.isTrainer() && isFree(t)));
 
     Map<User, List<Training>> prevTrainer_trainings = new HashMap<>();
     for(Training training: trainings) {
@@ -263,6 +252,35 @@ public class TrainingService {
     String phone = user.getPhone();
     SmsRequest sms = new SmsRequest(phone, msg);
     smsService.sendWAMessage(sms);
+  }
+
+
+  /* AUTHENTICATION */
+
+  public boolean hasTrainer(Training t, String userId) {
+    return userId.equals(t.getTrainer().getId());
+  }
+
+  public boolean isFree(Training training) {
+    return training.getIsFree();
+  }
+
+
+  
+  
+  @Autowired
+  public void setUserService(UserService userService) {
+    this.userService = userService;
+  }
+
+  @Autowired
+  public void setTrainingRepo(TrainingRepository trainingRepo) {
+    this.trainingRepo = trainingRepo;
+  }
+
+  @Autowired
+  public void setSmsService(SmsService smsService) {
+    this.smsService = smsService;
   }
 
 }

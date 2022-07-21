@@ -21,12 +21,10 @@ import at.ahmacademy.ahmnet.services.user.UserService;
 @Scope("application")
 public class ClubService {
 
-  @Autowired
   private ClubRepository clubRepository;
-  @Autowired
   private TrainingGroupService groupService;
-  @Autowired
   private UserService userService;
+
 
   public Club loadClub(String name) {
     return clubRepository.findFirstById(name);
@@ -52,6 +50,22 @@ public class ClubService {
     for(Club club: clubs)
       map.put(club.getId(), groupService.loadGroupsByClub(club.getId()).size());
     return map;
+  }
+
+
+  @Autowired
+  public void setClubRepository(ClubRepository clubRepository) {
+    this.clubRepository = clubRepository;
+  }
+
+  @Autowired
+  public void setGroupService(TrainingGroupService groupService) {
+    this.groupService = groupService;
+  }
+
+  @Autowired
+  public void setUserService(UserService userService) {
+    this.userService = userService;
   }
 
 }

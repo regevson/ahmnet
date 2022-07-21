@@ -11,12 +11,5 @@ import at.ahmacademy.ahmnet.services.AuthService;
 @Scope("application")
 public class TrainingAuthService extends AuthService<Training> {
 
-  public boolean hasTrainer(Training t, String userId) {
-    return userId.equals(t.getTrainer().getId());
-  }
-
-  public boolean isFree(Training training) {
-    return training.getIsFree();
-  }
 
 }

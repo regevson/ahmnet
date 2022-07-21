@@ -70,7 +70,6 @@ INSERT INTO traininggroup_players (TRAINING_GROUPS_ID, PLAYERS_USERNAME) VALUES(
     on duplicate key update training_groups_id = training_groups_id;
 
 
-
 INSERT INTO training (ID, TRAINER_USERNAME, PREV_TRAINER_USERNAME, BULLET_POINTS, COMMENTS, COURT, CLUB_ID, DURATION_MINUTES, DATE_TIME, WEEK_NUM, TRAINING_GROUP_ID) VALUES(100, 'johndoe', 'johndoe', 'some bullet points', 'some comments', 1, 'TC-Wiesing', 60, '2022-07-04 18:30', 27, 1)
     on duplicate key update id = id;
 INSERT INTO training (ID, TRAINER_USERNAME, PREV_TRAINER_USERNAME, BULLET_POINTS, COMMENTS, COURT, CLUB_ID, DURATION_MINUTES, DATE_TIME, WEEK_NUM, TRAINING_GROUP_ID) VALUES(1, 'johndoe', 'johndoe', 'some bullet points', 'some comments', 2, 'TC-Wiesing', 120, '2022-07-04 14:30', 27, 1)
@@ -94,6 +93,7 @@ INSERT INTO training (ID, TRAINER_USERNAME, PREV_TRAINER_USERNAME, BULLET_POINTS
     on duplicate key update id = id;
 INSERT INTO training (ID, TRAINER_USERNAME, PREV_TRAINER_USERNAME, BULLET_POINTS, COMMENTS, COURT, CLUB_ID, DURATION_MINUTES, DATE_TIME, WEEK_NUM, IS_FREE, TRAINING_GROUP_ID) VALUES(10, 'admin', 'admin', 'some bullet points', 'some comments', 3, 'TC-Schwaz', 60, '2022-07-07 13:30', 15, true, 3)
     on duplicate key update id = id;
+
 
 INSERT INTO training_attendees (TRAINING_ID, ATTENDEES_USERNAME) VALUES(100, 'max')
     on duplicate key update training_id = training_id;

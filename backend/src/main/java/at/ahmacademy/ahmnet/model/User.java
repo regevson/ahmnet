@@ -71,7 +71,7 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
   @ManyToOne
   private Club club;
 
-  @ManyToMany(mappedBy="players")
+  @ManyToMany(mappedBy="players", fetch = FetchType.EAGER)
   @Column(nullable=true)
   private Set<TrainingGroup> trainingGroups;
 
