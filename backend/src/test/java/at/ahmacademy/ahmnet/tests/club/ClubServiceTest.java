@@ -1,33 +1,7 @@
 package at.ahmacademy.ahmnet.tests.club;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.transaction.annotation.Transactional;
-
-import at.ahmacademy.ahmnet.model.Training;
-import at.ahmacademy.ahmnet.model.User;
-import at.ahmacademy.ahmnet.repositories.TrainingRepository;
-import at.ahmacademy.ahmnet.services.training.TrainingAuthService;
-import at.ahmacademy.ahmnet.services.training.TrainingService;
-import at.ahmacademy.ahmnet.services.user.UserAuthService;
-import at.ahmacademy.ahmnet.services.user.UserService;
 
 @SpringBootTest
 @WebAppConfiguration

@@ -11,7 +11,7 @@
     <br>
 
     <div v-for="(club, idx) in clubs" :key="idx">
-      <b-card no-body class="mb-1">
+      <b-card no-body class="mb-1" @click="clicked(club[0])">
         <b-card-header header-tag="header" class="p-1" role="tab">
           <button block class="cardBtn" v-b-toggle="'accordion-'+idx">
             {{club[0]}} ({{club[1]}})
@@ -23,7 +23,7 @@
           role="tabpanel"
         >
           <b-card-body>
-            <TrainingGroupSnippet :clubId="club[0]" />
+            <TrainingGroupSnippet v-if="isActive(club[0])" :clubId="club[0]" />
           </b-card-body>
         </b-collapse>
       </b-card>
@@ -44,6 +44,7 @@ export default {
   data() {
     return {
       clubs: null,
+      activeClubId: '',
     }
   },
 
@@ -56,6 +57,14 @@ export default {
     createGroup() {
       this.$router.push({name: 'traininggroupdetails', params: {clubId: this.user.clubName, groupId: -1}});
     },
+
+    isActive(clubId) {
+      return this.activeClubId == clubId;
+    },
+
+    clicked(club) {
+      this.activeClubId = club;
+    }
 
   }
 

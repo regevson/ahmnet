@@ -49,8 +49,8 @@ public class TrainingService {
 
 
   @PostAuthorize("hasAuthority('ADMIN') || "
-               + "@trainingAuthService.hasTrainer(returnObject, authentication.name) || "
-               + "(@trainingAuthService.isFree(returnObject) && hasAuthority('TRAINER'))")
+               + "this.hasTrainer(returnObject, authentication.name) || "
+               + "(this.isFree(returnObject) && hasAuthority('TRAINER'))")
   public Training loadTrainingById(Long trainingId) {
     return trainingRepo.findById(trainingId).orElse(null);
   }
@@ -60,13 +60,13 @@ public class TrainingService {
   }
 
   @PreAuthorize("hasAuthority('ADMIN') || "
-              + "@trainingAuthService.hasTrainer(#training, authentication.name)")
+              + "this.hasTrainer(#training, authentication.name)")
   public void updateTraining(Training training) {
     saveTraining(training);
   }
 
   @PreAuthorize("hasAuthority('ADMIN') || "
-              + "@trainingAuthService.hasTrainer(#training, authentication.name)")
+              + "this.hasTrainer(#training, authentication.name)")
   public void deleteTraining(Training training) {
     training.getTrainingGroup().getTrainings().removeIf(t -> t.getId() == training.getId());
     trainingRepo.delete(training);
@@ -94,7 +94,7 @@ public class TrainingService {
   }
 
   @PreAuthorize("hasAuthority('ADMIN') || "
-              + "(hasAuthority('TRAINER') && @userAuthService.isAuthUsr(#training.trainer.id))")
+              + "(hasAuthority('TRAINER') && @userService.isAuthUsr(#training.trainer.id))")
   public List<Training> saveNewTraining(Training training) {
     if(training.getLastDate() == null)
       return List.of(saveTraining(training));
