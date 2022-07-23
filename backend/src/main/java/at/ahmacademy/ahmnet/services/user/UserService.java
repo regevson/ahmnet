@@ -94,7 +94,6 @@ public class UserService {
    */
   @PreAuthorize("hasAuthority('ADMIN') || this.isUnderWing(#user.id)")
   public void deleteUser(User user) {
-    System.out.println("in delate user");
     user.getTrainingGroups().stream().forEach(g -> g.getPlayers().remove(user));
     user.getTrainingGroups().stream().forEach(g -> g.getTrainings()
                                                    .forEach(t -> t.getAttendees().remove(user)));
@@ -103,8 +102,9 @@ public class UserService {
   }
 
   public User getAuthUser() {
-    System.out.println("in auth user");
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if(auth == null)
+      return null;
     User user = userRepository.findFirstByUsername(auth.getName());
     return user;
   }

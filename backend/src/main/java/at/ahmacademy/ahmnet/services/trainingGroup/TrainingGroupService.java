@@ -24,7 +24,6 @@ import at.ahmacademy.ahmnet.services.user.UserService;
 public class TrainingGroupService {
 
   private TrainingGroupRepository groupRepository;
-  private UserService userService;
 
 
   @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
@@ -75,11 +74,6 @@ public class TrainingGroupService {
   @Autowired
   public void setGroupRepository(TrainingGroupRepository groupRepository) {
     this.groupRepository = groupRepository;
-  }
-
-  @Autowired
-  public void setUserService(UserService userService) {
-    this.userService = userService;
   }
 
 }

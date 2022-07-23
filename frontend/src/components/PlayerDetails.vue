@@ -126,7 +126,7 @@
 import Multiselect from 'vue-multiselect'
 
 import { required, minValue, maxLength } from 'vuelidate/lib/validators'
-const regex = new RegExp("^[a-zA-Z -]+$"); 
+const regex = new RegExp("^[a-zA-Z,Ö,Ä,Ü,ö,ä,ü,ß -]+$"); 
 const alphaAndSpaceValidator = (txt) => regex.test(txt);
 
 export default {
@@ -250,6 +250,9 @@ export default {
     },
 
     permChangePlayer() {
+      console.log(this.trainers.includes(this.user.id));
+      if(this.playerId != -1 && this.user.trainingGroupIds.length < 1)
+        return false;
       return this.isAdmin || this.trainers.includes(this.user.id) || this.playerId == -1;
     },
 

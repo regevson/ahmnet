@@ -2,6 +2,8 @@ package at.ahmacademy.ahmnet.tests.user;
 
 import static org.mockito.Mockito.doReturn;
 
+import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
@@ -18,6 +20,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import at.ahmacademy.ahmnet.model.Club;
 import at.ahmacademy.ahmnet.model.User;
 import at.ahmacademy.ahmnet.model.UserRole;
 import at.ahmacademy.ahmnet.repositories.UserRepository;
@@ -251,5 +254,41 @@ public class UserServiceTest {
       userService.deleteUser(user);
     });
   }
+  
+  @Test
+  public void testLoadUsersByClubAndRole() {
+    UserRepository fakeUsrRepo = Mockito.mock(UserRepository.class);
+    userService.setUserRepository(fakeUsrRepo);
+    
+    Club club1 = Club.builder().id("TC-Wiesing").build();
+    Club club2 = Club.builder().id("TC-Terfens").build();
+
+    User p1 = User.builder().username("p1").club(club1).roles(Set.of(UserRole.PLAYER)).build();
+    User p2 = User.builder().username("p2").club(club1).roles(Set.of(UserRole.ADMIN)).build();
+    User p3 = User.builder().username("p3").club(club2).roles(Set.of(UserRole.PLAYER)).build();
+
+    doReturn(Set.of(p1,p2)).when(fakeUsrRepo).findByClub_IdContaining(Mockito.anyString());
+
+    Set<User> users = userService.loadUsersByClubAndRole(club1.getId(), Optional.of(UserRole.PLAYER));
+    Assertions.assertEquals(1, users.size(), "wrong numbear of users retrieved");
+    Assertions.assertEquals("p1", users.iterator().next().getId(), "wrong users retrieved");
+  }
+
+  @Test
+  public void testCreateUserName() {
+    UserRepository fakeUsrRepo = Mockito.mock(UserRepository.class);
+    userService.setUserRepository(fakeUsrRepo);
+    
+    User u = User.builder().firstName("firstName").lastName("lastName").createDate(null).build();
+
+    doReturn(u).when(fakeUsrRepo).save(Mockito.any());
+    doReturn(u).when(fakeUsrRepo).findFirstByUsername(u.getFirstName() + u.getLastName());
+
+    u = userService.saveUser(u);
+    Assertions.assertEquals("firstNamelastName1", u.getId(), "wrong id created");
+  }
+  
+  
+  
 
 }
