@@ -71,11 +71,12 @@
         v-model="selectedTrainer"
         :options="allTrainers"
         placeholder="Select one"
-        label="fullName"
-        track-by="fullName"
+        label="combinedInfo"
+        track-by="combinedInfo"
         deselectLabel=""
         selectLabel=""
         @input="extractTrainerId"
+        id="test"
       />
       <br />
 
@@ -207,7 +208,7 @@ export default {
       if(this.isAdmin)
         await this.getAllTrainers();
       else
-        this.selectedTrainer = this.user;
+        this.selectedTrainer = this.combineTrainerInfo(this.user);
 
       if(this.groupId == -1) // is new group
         this.setupRequest();
@@ -230,8 +231,8 @@ export default {
 
     async getAllTrainers() {
       const res = await this.$ax.get('users?role=TRAINER');
-      this.allTrainers = res.data;
-      this.selectedTrainer = this.user;
+      this.allTrainers = res.data.map(this.combineTrainerInfo);
+      this.selectedTrainer = this.combineTrainerInfo(this.user);
     },
 
     // players should also display secondary about their age... in multiselect-row
@@ -239,6 +240,11 @@ export default {
       let age = new Date().getFullYear() - player.birthYear;
       player.combinedInfo = player.fullName + ' (' + age + 'J) \\' + player.clubId;
       return player;
+    },
+
+    combineTrainerInfo(trainer) {
+      trainer.combinedInfo = trainer.fullName + ' (' + trainer.phone + ')';
+      return trainer;
     },
 
     async getGroup() {
@@ -249,7 +255,7 @@ export default {
       this.selectedPlayers = players_res.data.map(this.combinePlayerInfo);
 
       const trainer_res = await this.$ax.get(group_res.trainer_url);
-      this.selectedTrainer = trainer_res.data;
+      this.selectedTrainer = this.combineTrainerInfo(trainer_res.data[0]);
 
       this.attendance = group_res.attendance;
       this.numPlayedSessions = group_res.numPlayedSessions;
@@ -357,6 +363,7 @@ export default {
   border-bottom-left-radius: 5px !important;
   border-bottom-right-radius: 5px !important;
   border-top: none !important;
+  color: black;
 }
 
 .readonly {

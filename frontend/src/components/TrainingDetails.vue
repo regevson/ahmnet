@@ -117,8 +117,8 @@
         v-model="selectedTrainer"
         :options="allTrainers"
         placeholder="TrainerIn suchen"
-        label="fullName"
-        track-by="fullName"
+        label="combinedInfo"
+        track-by="combinedInfo"
         deselectLabel=""
         selectLabel=""
         @input="extractTrainerId"
@@ -137,7 +137,7 @@
               :id="player.id"
               v-model="training.attendeeIds"
             />
-            <label class="form-check-label" :for="player.id">
+            <label class="form-check-label attendancePlayer" :for="player.id">
               <span> {{player.firstName}} {{player.lastName}} </span>
             </label>
           </div>
@@ -351,7 +351,7 @@ export default {
     this.trainingId = this.$route.params.trainingId;
     this.getUserRole();
     this.getFormData();
-    this.selectedTrainer = this.user;
+    this.selectedTrainer = this.combineTrainerInfo(this.user);
   },
 
   methods: {
@@ -373,7 +373,7 @@ export default {
         let resp = await this.getTraining();
         this.setupRequest(resp.date, resp.lastDate, resp.startTime, resp.durationMinutes, resp.court,
                           resp.bulletPoints, resp.comments, resp.playerIds, resp.attendeeIds, resp.groupId, resp.trainerId,
-                          resp.clubId, resp.isFree);
+                          resp.clubId, resp.free);
       }
       this.setValidationFields();
     },
@@ -392,13 +392,13 @@ export default {
 
     async getAllTrainer() {
       const res = await this.$ax.get('users?role=TRAINER');
-      this.allTrainers = res.data;
-      this.selectedTrainer = this.user;
+      this.allTrainers = res.data.map(this.combineTrainerInfo);
+      this.selectedTrainer = this.combineTrainerInfo(this.user);
     },
 
     setupRequest(date=this.getCurrentDate(), lastDate=null, startTime="10:30", durationMinutes=60,
                  court=1, bulletPoints = '', comments='', playerIds=[], attendeeIds=[], groupId=this.allGroups[0].id,
-                 trainerId=this.user.id, clubId=this.allClubs[0], isFree=false) {
+                 trainerId=this.user.id, clubId=this.allClubs[0], free=false) {
 
       let training = {};
       training.date = date;
@@ -413,7 +413,7 @@ export default {
       training.groupId = groupId;
       training.trainerId = trainerId;
       training.clubId = clubId;
-      training.isFree = isFree;
+      training.free = free;
 
       this.training = training;
     },
@@ -433,7 +433,7 @@ export default {
       this.combineGroupInfo(this.selectedGroup);
 
       const trainer_res = await this.$ax.get(training_res.trainer_url);
-      this.selectedTrainer = trainer_res.data[0];
+      this.selectedTrainer = this.combineTrainerInfo(trainer_res.data[0]);
 
       const players_res = await this.$ax.get(training_res.players_url);
       this.players = players_res.data;
@@ -443,12 +443,14 @@ export default {
 
     // group should also display info about participants in multiselect-row
     async combineGroupInfo(group) {
-      const players_res = await this.$ax.get(group.players_url);
-      let players = players_res.data;
+      let usernames = group.playerIds;
+      usernames = usernames.map(this.$funcs.splitCamelCase);
+      group.combinedInfo = group.clubId + '\\GR' + group.id + ' - {' + usernames + '}';
+    },
 
-      let fullNames = [];
-      players.forEach((player) => { fullNames.push(player.fullName); });
-      group.combinedInfo = group.clubId + '\\GR' + group.id + ' - {' + fullNames + '}';
+    combineTrainerInfo(trainer) {
+      trainer.combinedInfo = trainer.fullName + ' (' + trainer.phone + ')';
+      return trainer;
     },
 
     setValidationFields() {
@@ -511,7 +513,7 @@ export default {
     },
 
     isFree() {
-      return this.training.isFree;
+      return this.training.free;
     },
 
     isNewTraining() {
@@ -566,5 +568,21 @@ export default {
 .errorBg {
   background: #bf0000;
 }
+
+.attendancePlayer {
+  background: #396f64;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  padding: 3px;
+  color: white;
+  font-weight: 450;
+  font-size: 14px;
+}
+
+.form-check-input[disabled] ~ .form-check-label {
+  color: white !important;
+}
+
+
 </style>
 

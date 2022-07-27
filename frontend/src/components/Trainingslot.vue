@@ -33,8 +33,12 @@
           <span>{{training.timeslot}}</span>
           <br />
         </div>
-        <span v-if="!training.free" class="court">Court {{training.court}}</span>
-        <span v-if="training.free" class="court">{{training.trainerId}}</span>
+        <span v-if="!training.free" class="trainingPreviewInner court">
+          Court {{training.court}}
+        </span>
+        <span v-if="training.free" class="trainingPreviewInner court">
+          {{$funcs.splitCamelCase(training.trainerId)}}
+        </span>
       </router-link>
 
     </div>
@@ -114,14 +118,15 @@ td {
 .trainingPreview {
   font-weight: 700;
   padding: 5px 0 5px 0;
-  width: auto;
+  width: fit-content;
   margin-top: 20px;
-  min-width: 125px;
+  min-width: 131px;
   transition: all 0.5s ease-in-out;
   background: #4b9183;
   border: 2px solid #4b9183;
   border-radius: 14px;
   text-align: center;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .trainingPreview:hover {
@@ -147,29 +152,36 @@ td {
 .groupLink {
   background: #6bab9f;
   font-size: 13px;
-  display: block;
-  font-weight: 600;
   font-weight: bold;
   border-radius: 10px;
   color: white;
   text-decoration: none !important;
   padding: 2px 5px 2px 5px;
   display: inline-block;
-  width: auto;
 }
 
 .trainingPreviewInner {
   padding: 5px 5px 5px 5px;
   background: #6bab9f;
-  margin: 5px 0 5px 0;
+  margin: 4px 0 2px 0;
   border-radius: 14px;
   font-size: 15px;
 }
 
 .court {
-  font-size: 13px;
-  display: block;
-  font-weight: 600;
+  font-size: 12px !important;
+  font-weight: 800;
+  color: white;
+  box-shadow: none;
+}
+
+.court:hover {
+  cursor: default;
+}
+
+.tooltip-inner {
+  color: #774e00 !important;
+  background-color: red !important;
 }
 
 .currentslot {
